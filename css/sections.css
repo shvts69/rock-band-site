@@ -1,0 +1,959 @@
+/* ========================================
+   SECTION-SPECIFIC STYLES
+   ======================================== */
+
+/* ====== СЕКЦІЯ 1: ГОЛОВНА ====== */
+.section-home {
+    background: linear-gradient(180deg, #1a0a2e 0%, #ff6b35 40%, #ffcc00 70%, #87ceeb 100%);
+}
+
+.home-bg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+/* Гори */
+.mountains {
+    position: absolute;
+    bottom: 150px;
+    left: 0;
+    width: 100%;
+    height: 200px;
+}
+
+.mountains::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-bottom: 200px solid #4a2d6e;
+}
+
+.mountains::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 35%;
+    width: 0;
+    height: 0;
+    border-left: 200px solid transparent;
+    border-right: 200px solid transparent;
+    border-bottom: 260px solid #3a1d5e;
+}
+
+/* Кактуси */
+.cactus {
+    position: absolute;
+    bottom: 100px;
+    z-index: 5;
+}
+
+.cactus::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 60px;
+    background: #2d5a1e;
+    border: 2px solid #1a3a10;
+}
+
+.cactus::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: -12px;
+    width: 12px;
+    height: 30px;
+    background: #2d5a1e;
+    border: 2px solid #1a3a10;
+    border-radius: 4px 4px 0 0;
+}
+
+.cactus-1 { left: 8%; bottom: 110px; }
+.cactus-2 { left: 75%; bottom: 120px; transform: scale(1.3); }
+.cactus-3 { left: 90%; bottom: 105px; transform: scale(0.8); }
+
+/* Route 66 знак */
+.route-sign {
+    position: absolute;
+    top: 30%;
+    right: 12%;
+    z-index: 6;
+}
+
+.route-sign::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 80px;
+    background: #888;
+    margin: 0 auto;
+}
+
+.route-sign-text {
+    width: 64px;
+    height: 64px;
+    background: #fff;
+    color: #000;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 4px solid #000;
+    border-radius: 50%;
+    position: relative;
+    top: -80px;
+    line-height: 1.2;
+    box-shadow: 0 0 0 4px #cc0000, 0 0 0 8px #000;
+}
+
+/* Американський прапор */
+.us-flag {
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 80px;
+    height: 48px;
+    z-index: 6;
+    transform: rotate(-5deg);
+}
+
+.flag-stripes {
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        180deg,
+        #cc0000 0px,
+        #cc0000 4px,
+        #fff 4px,
+        #fff 8px
+    );
+    border: 2px solid #333;
+}
+
+.flag-stars {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 32px;
+    height: 24px;
+    background: #003388;
+    color: #fff;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 2px;
+}
+
+/* Лого групи */
+.band-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+}
+
+.logo-text {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 64px;
+    color: #ff0000;
+    text-shadow:
+        4px 4px 0 #000,
+        8px 8px 0 rgba(0,0,0,0.3),
+        0 0 20px #ff0000,
+        0 0 40px #ff4444,
+        0 0 80px #ff0000;
+    line-height: 1.3;
+    letter-spacing: 8px;
+    animation: logoPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes logoPulse {
+    from {
+        text-shadow:
+            4px 4px 0 #000,
+            0 0 20px #ff0000,
+            0 0 40px #ff4444;
+    }
+    to {
+        text-shadow:
+            4px 4px 0 #000,
+            0 0 40px #ff0000,
+            0 0 80px #ff4444,
+            0 0 120px #ff6666;
+    }
+}
+
+.logo-subtitle {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    color: #ffcc00;
+    margin-top: 20px;
+    letter-spacing: 6px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+
+/* ====== СЕКЦІЯ 2: ПРО ГРУПУ ====== */
+.section-about {
+    background: #2a1a0a;
+    width: 250vw;
+}
+
+.about-bg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background:
+        /* Бруклін нічний фон */
+        linear-gradient(180deg, #0d0d2b 0%, #1a1a3a 30%, #2a1a0a 60%, #3a2a1a 100%);
+}
+
+/* Бруклінські будинки */
+.brooklyn-buildings {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    width: 100%;
+    height: 70%;
+    z-index: 1;
+}
+
+/* Будинки через box-shadow */
+.brooklyn-buildings::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        /* Будинок 1 */
+        linear-gradient(#3a2820, #3a2820) 0% 20% / 120px 80% no-repeat,
+        /* Будинок 2 */
+        linear-gradient(#4a3830, #4a3830) 8% 10% / 100px 90% no-repeat,
+        /* Будинок 3 */
+        linear-gradient(#3a2820, #3a2820) 16% 25% / 130px 75% no-repeat,
+        /* Будинок 4 */
+        linear-gradient(#4a3830, #4a3830) 25% 15% / 110px 85% no-repeat,
+        /* Будинок 5 */
+        linear-gradient(#3a2820, #3a2820) 34% 30% / 120px 70% no-repeat,
+        /* Будинок 6 */
+        linear-gradient(#4a3830, #4a3830) 43% 20% / 140px 80% no-repeat,
+        /* Будинок 7 */
+        linear-gradient(#3a2820, #3a2820) 53% 10% / 100px 90% no-repeat,
+        /* Будинок 8 */
+        linear-gradient(#4a3830, #4a3830) 62% 25% / 130px 75% no-repeat,
+        /* Будинок 9 */
+        linear-gradient(#3a2820, #3a2820) 72% 15% / 110px 85% no-repeat,
+        /* Будинок 10 */
+        linear-gradient(#4a3830, #4a3830) 82% 20% / 120px 80% no-repeat,
+        /* Будинок 11 */
+        linear-gradient(#3a2820, #3a2820) 92% 30% / 130px 70% no-repeat;
+}
+
+/* Вікна будинків */
+.brooklyn-windows {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    width: 100%;
+    height: 70%;
+    z-index: 2;
+    background-image:
+        radial-gradient(circle, #ffcc44 2px, transparent 2px);
+    background-size: 40px 30px;
+    background-position: 10px 10px;
+    opacity: 0.6;
+}
+
+/* Пожежні драбини */
+.fire-escapes {
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    z-index: 3;
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 28px,
+            #666 28px,
+            #666 30px
+        );
+    background-size: 200px 30px;
+    background-position: 50px 0;
+    opacity: 0.15;
+}
+
+/* Галерея учасників */
+.members-gallery {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: calc(100% - 100px);
+    padding: 0 80px;
+    position: relative;
+    z-index: 10;
+}
+
+.member-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 280px;
+}
+
+/* Вишукані рамки */
+.ornate-frame {
+    position: relative;
+    padding: 12px;
+    background: linear-gradient(135deg, #8B7355, #C4A76C, #8B7355);
+    border: 4px solid #5a4a30;
+    box-shadow:
+        inset 0 0 10px rgba(0,0,0,0.5),
+        0 0 20px rgba(0,0,0,0.5),
+        4px 4px 0 #000;
+}
+
+.ornate-frame::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 2px solid #d4b87a;
+    pointer-events: none;
+}
+
+.ornate-frame::after {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid #a08050;
+    pointer-events: none;
+}
+
+/* Кутики рамки */
+.frame-corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #d4b87a;
+    z-index: 2;
+}
+.frame-tl { top: -2px; left: -2px; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.frame-tr { top: -2px; right: -2px; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.frame-bl { bottom: -2px; left: -2px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+.frame-br { bottom: -2px; right: -2px; clip-path: polygon(100% 0, 0 100%, 100% 100%); }
+
+.member-photo {
+    width: 200px;
+    height: 240px;
+    overflow: hidden;
+}
+
+.photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #1a1a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #333;
+}
+
+/* Піксельні аватарки */
+.pixel-avatar {
+    width: 80px;
+    height: 120px;
+    image-rendering: pixelated;
+}
+
+.avatar-guitar {
+    background:
+        /* шапка */
+        linear-gradient(#cc0000, #cc0000) 16px 0 / 48px 16px no-repeat,
+        /* волосся */
+        linear-gradient(#332200, #332200) 12px 16px / 56px 16px no-repeat,
+        /* обличчя */
+        linear-gradient(#ffcc88, #ffcc88) 16px 32px / 48px 32px no-repeat,
+        /* очі */
+        linear-gradient(#000, #000) 24px 40px / 8px 8px no-repeat,
+        linear-gradient(#000, #000) 48px 40px / 8px 8px no-repeat,
+        /* тіло */
+        linear-gradient(#222, #222) 8px 64px / 64px 32px no-repeat,
+        /* гітара */
+        linear-gradient(#884400, #884400) 64px 48px / 12px 48px no-repeat,
+        /* ноги */
+        linear-gradient(#333366, #333366) 16px 96px / 20px 24px no-repeat,
+        linear-gradient(#333366, #333366) 44px 96px / 20px 24px no-repeat;
+}
+
+.avatar-vocals {
+    background:
+        linear-gradient(#ffcc88, #ffcc88) 16px 16px / 48px 32px no-repeat,
+        linear-gradient(#000, #000) 24px 28px / 8px 8px no-repeat,
+        linear-gradient(#000, #000) 48px 28px / 8px 8px no-repeat,
+        /* довге волосся */
+        linear-gradient(#1a1a1a, #1a1a1a) 8px 0 / 64px 52px no-repeat,
+        linear-gradient(#ffcc88, #ffcc88) 20px 16px / 40px 32px no-repeat,
+        /* тіло */
+        linear-gradient(#cc0000, #cc0000) 8px 52px / 64px 36px no-repeat,
+        /* мікрофон */
+        linear-gradient(#888, #888) 72px 52px / 8px 32px no-repeat,
+        linear-gradient(#aaa, #aaa) 68px 48px / 16px 8px no-repeat,
+        /* ноги */
+        linear-gradient(#222, #222) 16px 88px / 20px 32px no-repeat,
+        linear-gradient(#222, #222) 44px 88px / 20px 32px no-repeat;
+}
+
+.avatar-bass {
+    background:
+        /* бандана */
+        linear-gradient(#228822, #228822) 12px 0 / 56px 12px no-repeat,
+        /* обличчя */
+        linear-gradient(#ffcc88, #ffcc88) 16px 12px / 48px 36px no-repeat,
+        /* окуляри */
+        linear-gradient(#000, #000) 20px 24px / 40px 10px no-repeat,
+        /* борода */
+        linear-gradient(#553300, #553300) 20px 40px / 40px 12px no-repeat,
+        /* тіло */
+        linear-gradient(#111, #111) 8px 52px / 64px 36px no-repeat,
+        /* бас */
+        linear-gradient(#662200, #662200) 0px 40px / 12px 56px no-repeat,
+        /* ноги */
+        linear-gradient(#333, #333) 16px 88px / 20px 32px no-repeat,
+        linear-gradient(#333, #333) 44px 88px / 20px 32px no-repeat;
+}
+
+.avatar-drums {
+    background:
+        /* мохавк */
+        linear-gradient(#ff4444, #ff4444) 28px 0 / 24px 20px no-repeat,
+        /* обличчя */
+        linear-gradient(#ffcc88, #ffcc88) 16px 20px / 48px 32px no-repeat,
+        /* очі */
+        linear-gradient(#000, #000) 24px 32px / 8px 8px no-repeat,
+        linear-gradient(#000, #000) 48px 32px / 8px 8px no-repeat,
+        /* тіло */
+        linear-gradient(#cc0000, #cc0000) 8px 52px / 64px 36px no-repeat,
+        /* палички */
+        linear-gradient(#aa8844, #aa8844) 0px 56px / 8px 40px no-repeat,
+        linear-gradient(#aa8844, #aa8844) 72px 56px / 8px 40px no-repeat,
+        /* ноги */
+        linear-gradient(#222, #222) 16px 88px / 20px 32px no-repeat,
+        linear-gradient(#222, #222) 44px 88px / 20px 32px no-repeat;
+}
+
+.member-info {
+    text-align: center;
+}
+
+.member-name {
+    font-size: 14px;
+    color: #ffcc00;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 6px;
+}
+
+.member-role {
+    font-size: 10px;
+    color: #ff6644;
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.member-desc {
+    font-size: 8px;
+    color: #ccc;
+    line-height: 1.8;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.model-placeholder {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    font-size: 8px;
+}
+
+
+/* ====== СЕКЦІЯ 3: ЖИВІ ВИСТУПИ ====== */
+.section-live {
+    width: 200vw;
+    background: #0a0a1a;
+}
+
+.live-bg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Нічне небо */
+.night-sky {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #0a0a2a 0%, #1a1a4a 50%, #0a0a1a 100%);
+}
+
+/* Зірки що палахкотять */
+.pixel-star {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    box-shadow: 0 0 4px #fff, 0 0 8px #fff;
+    animation: twinkle 2s ease-in-out infinite alternate;
+}
+
+.star-1  { top: 5%;  left: 10%; animation-delay: 0s; }
+.star-2  { top: 12%; left: 25%; animation-delay: 0.3s; width: 6px; height: 6px; }
+.star-3  { top: 8%;  left: 40%; animation-delay: 0.7s; }
+.star-4  { top: 15%; left: 55%; animation-delay: 1s; width: 6px; height: 6px; }
+.star-5  { top: 3%;  left: 65%; animation-delay: 0.5s; }
+.star-6  { top: 18%; left: 78%; animation-delay: 1.2s; }
+.star-7  { top: 7%;  left: 88%; animation-delay: 0.8s; width: 6px; height: 6px; }
+.star-8  { top: 20%; left: 15%; animation-delay: 1.5s; }
+.star-9  { top: 10%; left: 48%; animation-delay: 0.2s; width: 6px; height: 6px; }
+.star-10 { top: 4%;  left: 72%; animation-delay: 1.8s; }
+.star-11 { top: 16%; left: 35%; animation-delay: 0.9s; }
+.star-12 { top: 6%;  left: 92%; animation-delay: 1.1s; width: 6px; height: 6px; }
+
+@keyframes twinkle {
+    0%   { opacity: 0.3; transform: scale(0.8); }
+    50%  { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0.5; transform: scale(1); }
+}
+
+/* Міст Верразано */
+.bridge {
+    position: absolute;
+    bottom: 120px;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    z-index: 5;
+}
+
+.bridge-tower {
+    position: absolute;
+    bottom: 0;
+    width: 24px;
+    height: 180px;
+    background: #444;
+    border: 2px solid #555;
+}
+
+.bridge-tower::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -4px;
+    width: 32px;
+    height: 12px;
+    background: #555;
+}
+
+.bridge-tower-l { left: 20%; }
+.bridge-tower-r { right: 20%; }
+
+.bridge-cables {
+    position: absolute;
+    bottom: 80px;
+    left: 20%;
+    width: 60%;
+    height: 100px;
+    border-top: 3px solid #666;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+.bridge-cables::before {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 28px,
+        #555 28px,
+        #555 30px
+    );
+}
+
+.bridge-deck {
+    position: absolute;
+    bottom: 40px;
+    left: 10%;
+    width: 80%;
+    height: 16px;
+    background: #555;
+    border-top: 3px solid #666;
+    border-bottom: 3px solid #444;
+}
+
+/* Річка */
+.river {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(180deg, #0a2a4a, #0a1a3a);
+    z-index: 4;
+    overflow: hidden;
+}
+
+.river::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 40px,
+        rgba(100, 150, 255, 0.1) 40px,
+        rgba(100, 150, 255, 0.1) 60px
+    );
+    animation: riverFlow 4s linear infinite;
+}
+
+@keyframes riverFlow {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* Фотогалерея */
+.photo-gallery {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    height: calc(100% - 120px);
+    padding: 40px 80px;
+    position: relative;
+    z-index: 10;
+    flex-wrap: wrap;
+}
+
+.gallery-item {
+    text-align: center;
+}
+
+.gallery-frame {
+    width: 240px;
+    height: 180px;
+    border: 4px solid #666;
+    box-shadow:
+        0 0 0 2px #333,
+        0 0 0 6px #888,
+        4px 4px 0 6px rgba(0,0,0,0.5);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.gallery-frame:hover {
+    transform: scale(1.05);
+    box-shadow:
+        0 0 0 2px #333,
+        0 0 0 6px #ff4444,
+        0 0 20px rgba(255, 68, 68, 0.3),
+        4px 4px 0 6px rgba(0,0,0,0.5);
+}
+
+.gallery-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a0a2e, #2a1a3e, #1a0a2e);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #ff6644;
+    font-size: 14px;
+    text-shadow: 0 0 10px #ff4444;
+}
+
+.pixel-concert-icon {
+    width: 40px;
+    height: 40px;
+    background:
+        /* мікрофон стенд */
+        linear-gradient(#888, #888) 18px 0 / 4px 30px no-repeat,
+        linear-gradient(#aaa, #aaa) 14px 0 / 12px 8px no-repeat,
+        linear-gradient(#666, #666) 8px 30px / 24px 4px no-repeat,
+        linear-gradient(#666, #666) 16px 34px / 8px 6px no-repeat;
+}
+
+.gallery-caption {
+    font-size: 8px;
+    color: #aaa;
+    margin-top: 12px;
+    text-shadow: 1px 1px 0 #000;
+}
+
+
+/* ====== СЕКЦІЯ 4: СЦЕНА / ФІНАЛ ====== */
+.section-stage {
+    background: #0a0a0a;
+}
+
+.stage-bg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: radial-gradient(ellipse at 50% 30%, #1a0a2e 0%, #0a0a0a 70%);
+    overflow: hidden;
+}
+
+/* Прожектори */
+.spotlight {
+    position: absolute;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    z-index: 8;
+}
+
+.spotlight::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #fff, 0 0 40px #fff;
+}
+
+.spotlight-1 {
+    left: 25%;
+    background: linear-gradient(180deg, rgba(255,0,0,0.3) 0%, transparent 70%);
+    animation: spotlightSway1 4s ease-in-out infinite alternate;
+}
+
+.spotlight-2 {
+    left: 50%;
+    background: linear-gradient(180deg, rgba(255,255,0,0.2) 0%, transparent 60%);
+    animation: spotlightSway2 3s ease-in-out infinite alternate;
+}
+
+.spotlight-3 {
+    left: 75%;
+    background: linear-gradient(180deg, rgba(0,100,255,0.3) 0%, transparent 70%);
+    animation: spotlightSway3 5s ease-in-out infinite alternate;
+}
+
+@keyframes spotlightSway1 {
+    from { transform: rotate(-10deg); transform-origin: top center; }
+    to { transform: rotate(10deg); transform-origin: top center; }
+}
+
+@keyframes spotlightSway2 {
+    from { transform: rotate(5deg); transform-origin: top center; }
+    to { transform: rotate(-5deg); transform-origin: top center; }
+}
+
+@keyframes spotlightSway3 {
+    from { transform: rotate(8deg); transform-origin: top center; }
+    to { transform: rotate(-12deg); transform-origin: top center; }
+}
+
+/* Сцена */
+.stage-platform {
+    position: absolute;
+    bottom: 120px;
+    left: 10%;
+    width: 80%;
+    height: 200px;
+    z-index: 10;
+}
+
+.stage-floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+    border-top: 4px solid #444;
+    clip-path: polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%);
+}
+
+.stage-front {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    width: 100%;
+    height: 24px;
+    background: #333;
+    border-bottom: 4px solid #555;
+    clip-path: polygon(0% 0%, 100% 0%, 98% 100%, 2% 100%);
+}
+
+/* Лого на сцені */
+.stage-logo {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 12;
+}
+
+.stage-logo-text {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 32px;
+    color: #ff0000;
+    text-shadow:
+        0 0 20px #ff0000,
+        0 0 40px #ff4444,
+        0 0 80px #ff0000,
+        4px 4px 0 #000;
+    animation: stageLogoPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes stageLogoPulse {
+    from {
+        text-shadow: 0 0 20px #ff0000, 0 0 40px #ff4444, 4px 4px 0 #000;
+        color: #ff0000;
+    }
+    to {
+        text-shadow: 0 0 40px #ff0000, 0 0 80px #ff4444, 0 0 120px #ff6666, 4px 4px 0 #000;
+        color: #ff4444;
+    }
+}
+
+/* Колонки */
+.speaker {
+    position: absolute;
+    bottom: 30px;
+    width: 48px;
+    height: 64px;
+    background: #222;
+    border: 3px solid #444;
+    z-index: 12;
+}
+
+.speaker-l { left: 10%; }
+.speaker-r { right: 10%; }
+
+.speaker-cone {
+    width: 32px;
+    height: 32px;
+    margin: 12px auto;
+    border-radius: 50%;
+    background: radial-gradient(circle, #333 30%, #222 50%, #444 70%, #222 100%);
+    border: 2px solid #555;
+}
+
+/* Натовп */
+.crowd {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    z-index: 15;
+}
+
+.crowd-row {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+.crowd-row-1 {
+    height: 60px;
+    background: repeating-linear-gradient(
+        90deg,
+        #111 0px,
+        #111 12px,
+        #0a0a0a 12px,
+        #0a0a0a 14px
+    );
+    border-radius: 8px 8px 0 0;
+    clip-path: polygon(
+        0% 40%, 3% 20%, 6% 35%, 9% 15%, 12% 30%, 15% 10%, 18% 25%,
+        21% 5%, 24% 30%, 27% 15%, 30% 35%, 33% 10%, 36% 25%, 39% 5%,
+        42% 30%, 45% 20%, 48% 35%, 51% 10%, 54% 25%, 57% 15%,
+        60% 30%, 63% 5%, 66% 25%, 69% 15%, 72% 35%, 75% 10%,
+        78% 30%, 81% 20%, 84% 35%, 87% 5%, 90% 25%, 93% 15%,
+        96% 30%, 100% 20%, 100% 100%, 0% 100%
+    );
+    animation: crowdBounce 0.5s ease-in-out infinite alternate;
+}
+
+.crowd-row-2 {
+    height: 80px;
+    background: repeating-linear-gradient(
+        90deg,
+        #1a1a1a 0px,
+        #1a1a1a 14px,
+        #111 14px,
+        #111 16px
+    );
+    clip-path: polygon(
+        0% 50%, 4% 30%, 8% 45%, 12% 25%, 16% 40%, 20% 20%, 24% 35%,
+        28% 15%, 32% 40%, 36% 25%, 40% 45%, 44% 20%, 48% 35%, 52% 15%,
+        56% 40%, 60% 30%, 64% 45%, 68% 20%, 72% 35%, 76% 25%,
+        80% 40%, 84% 15%, 88% 35%, 92% 25%, 96% 40%, 100% 30%,
+        100% 100%, 0% 100%
+    );
+    animation: crowdBounce 0.6s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes crowdBounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-4px); }
+}
+
+/* Спалахи камер */
+.flash {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    z-index: 20;
+    opacity: 0;
+    animation: cameraFlash 3s ease-in-out infinite;
+}
+
+.flash-1 { bottom: 50px; left: 15%; animation-delay: 0s; }
+.flash-2 { bottom: 40px; left: 35%; animation-delay: 0.8s; }
+.flash-3 { bottom: 55px; left: 55%; animation-delay: 1.6s; }
+.flash-4 { bottom: 35px; left: 72%; animation-delay: 2.2s; }
+.flash-5 { bottom: 45px; left: 88%; animation-delay: 0.4s; }
+
+@keyframes cameraFlash {
+    0%   { opacity: 0; box-shadow: none; }
+    5%   { opacity: 1; box-shadow: 0 0 30px #fff, 0 0 60px #fff; }
+    10%  { opacity: 0; box-shadow: none; }
+    100% { opacity: 0; box-shadow: none; }
+}

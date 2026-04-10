@@ -1,0 +1,276 @@
+/* ========================================
+   ROAD REBELS — Global Styles
+   8-bit Pixel Rock Band Website
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+body {
+    font-family: 'Press Start 2P', monospace;
+    background: #0a0a0a;
+    color: #fff;
+    overflow-x: hidden;
+    cursor: crosshair;
+    image-rendering: pixelated;
+}
+
+/* Горизонтальний wrapper */
+.horizontal-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Базова секція */
+.section {
+    width: 100vw;
+    height: 100vh;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Заголовки секцій */
+.section-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 36px;
+    text-align: center;
+    color: #fff;
+    text-shadow:
+        4px 4px 0 #000,
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000;
+    position: relative;
+    z-index: 10;
+    padding-top: 30px;
+    letter-spacing: 4px;
+}
+
+.title-glow {
+    animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from { text-shadow: 4px 4px 0 #000, 0 0 10px #ff4444; }
+    to { text-shadow: 4px 4px 0 #000, 0 0 30px #ff4444, 0 0 60px #ff6666; }
+}
+
+/* ====== ДОРОГА ====== */
+.road {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: #333;
+    z-index: 50;
+    border-top: 4px solid #555;
+}
+
+.road::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #666;
+}
+
+.road-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 200%;
+    height: 4px;
+    background: repeating-linear-gradient(
+        90deg,
+        #ffcc00 0px,
+        #ffcc00 30px,
+        transparent 30px,
+        transparent 60px
+    );
+    transform: translateY(-50%);
+}
+
+/* Sidewalk/curb */
+.road::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: #888;
+    border-top: 4px solid #999;
+}
+
+/* ====== МУЗИКАНТИ (placeholder) ====== */
+.band-walkers {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    display: flex;
+    gap: 12px;
+}
+
+.walker {
+    width: 32px;
+    height: 48px;
+}
+
+.pixel-musician {
+    width: 32px;
+    height: 48px;
+    image-rendering: pixelated;
+}
+
+/* Піксельні музиканти з CSS */
+.musician-guitar {
+    background:
+        /* голова */
+        linear-gradient(#ffcc88, #ffcc88) 8px 0 / 16px 16px no-repeat,
+        /* тіло */
+        linear-gradient(#cc0000, #cc0000) 4px 16px / 24px 20px no-repeat,
+        /* ноги */
+        linear-gradient(#333, #333) 4px 36px / 8px 12px no-repeat,
+        linear-gradient(#333, #333) 20px 36px / 8px 12px no-repeat;
+}
+
+.musician-vocal {
+    background:
+        linear-gradient(#ffcc88, #ffcc88) 8px 0 / 16px 16px no-repeat,
+        linear-gradient(#2222cc, #2222cc) 4px 16px / 24px 20px no-repeat,
+        linear-gradient(#333, #333) 4px 36px / 8px 12px no-repeat,
+        linear-gradient(#333, #333) 20px 36px / 8px 12px no-repeat;
+}
+
+.musician-bass {
+    background:
+        linear-gradient(#ffcc88, #ffcc88) 8px 0 / 16px 16px no-repeat,
+        linear-gradient(#228822, #228822) 4px 16px / 24px 20px no-repeat,
+        linear-gradient(#333, #333) 4px 36px / 8px 12px no-repeat,
+        linear-gradient(#333, #333) 20px 36px / 8px 12px no-repeat;
+}
+
+.musician-drums {
+    background:
+        linear-gradient(#ffcc88, #ffcc88) 8px 0 / 16px 16px no-repeat,
+        linear-gradient(#aa22aa, #aa22aa) 4px 16px / 24px 20px no-repeat,
+        linear-gradient(#333, #333) 4px 36px / 8px 12px no-repeat,
+        linear-gradient(#333, #333) 20px 36px / 8px 12px no-repeat;
+}
+
+/* ====== СТІНА З ЦЕГЛИ ====== */
+.brick-wall {
+    width: 60px;
+    height: 100vh;
+    flex-shrink: 0;
+    background: #8b2500;
+    position: relative;
+    z-index: 20;
+    border-left: 4px solid #5a1a00;
+    border-right: 4px solid #5a1a00;
+}
+
+.brick-pattern {
+    width: 100%;
+    height: 100%;
+    background:
+        /* Ряд цегли 1 */
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 18px,
+            #5a1a00 18px,
+            #5a1a00 20px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 26px,
+            #5a1a00 26px,
+            #5a1a00 28px
+        );
+    background-size: 28px 20px;
+}
+
+/* Зсув через ряд для реалістичності */
+.brick-pattern::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 18px,
+            #5a1a00 18px,
+            #5a1a00 20px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 26px,
+            #5a1a00 26px,
+            #5a1a00 28px
+        );
+    background-size: 28px 20px;
+    background-position: 14px 10px;
+}
+
+/* Highlights на цеглі */
+.brick-wall::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(0,0,0,0.3) 0%,
+        rgba(0,0,0,0) 30%,
+        rgba(0,0,0,0) 70%,
+        rgba(0,0,0,0.3) 100%
+    );
+    z-index: 1;
+}
+
+/* ====== SCROLLBAR ====== */
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cc0000;
+    border: 2px solid #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ff2222;
+}
