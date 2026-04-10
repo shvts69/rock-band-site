@@ -24,7 +24,7 @@
 .horizontal-wrapper::after {
     content: '';
     position: fixed;
-    bottom: 80px;
+    bottom: 100px;
     left: 0;
     right: 0;
     height: 4px;
@@ -75,7 +75,7 @@ body {
 /* Піксельний scrollbar на дорозі */
 .road-progress {
     position: fixed;
-    bottom: 84px;
+    bottom: 164px;
     left: 0;
     height: 4px;
     background: #ff0000;

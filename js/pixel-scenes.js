@@ -87,20 +87,6 @@ function drawHomeScene(canvas) {
         }
     }
 
-    // HIGHWAY
-    const roadY = Math.floor(H * 0.7);
-    const roadH = Math.floor(H * 0.12);
-    drawRect(ctx, 0, roadY, W, roadH, '#3a3a3a');
-    drawRect(ctx, 0, roadY, W, 1, '#555');
-    drawRect(ctx, 0, roadY + roadH - 1, W, 1, '#222');
-    // Road lines
-    for (let x = 0; x < W; x += 8) {
-        drawRect(ctx, x, roadY + Math.floor(roadH / 2), 4, 1, '#ccaa00');
-    }
-    // Road edges
-    drawRect(ctx, 0, roadY + 1, W, 1, '#666');
-    drawRect(ctx, 0, roadY + roadH - 2, W, 1, '#555');
-
     // CACTUS
     drawCactus(ctx, Math.floor(W * 0.12), Math.floor(H * 0.5), 1.2);
     drawCactus(ctx, Math.floor(W * 0.78), Math.floor(H * 0.48), 1.5);
@@ -363,20 +349,6 @@ function drawBrooklynScene(canvas) {
         }
     });
 
-    // SIDEWALK
-    drawRect(ctx, 0, groundY, W, 4, '#666');
-    drawRect(ctx, 0, groundY, W, 1, '#777');
-    for (let x = 0; x < W; x += 10) {
-        drawRect(ctx, x, groundY, 1, 4, '#555');
-    }
-
-    // STREET
-    drawRect(ctx, 0, groundY + 4, W, H - groundY - 4, '#333');
-    // Road markings
-    for (let x = 0; x < W; x += 8) {
-        drawRect(ctx, x, groundY + 8, 4, 1, '#ccaa00');
-    }
-
     // Street lamps
     for (let lx = 15; lx < W; lx += 40) {
         drawRect(ctx, lx, groundY - 20, 1, 20, '#888');
@@ -608,8 +580,8 @@ function drawStageScene(canvas) {
         }
     });
 
-    // STAGE PLATFORM
-    const stageY = Math.floor(H * 0.55);
+    // STAGE PLATFORM — aligned with the fixed road (bottom ~160px from bottom)
+    const stageY = Math.floor(H * 0.58);
     const stageLeft = Math.floor(W * 0.08);
     const stageRight = Math.floor(W * 0.92);
     const stageW = stageRight - stageLeft;

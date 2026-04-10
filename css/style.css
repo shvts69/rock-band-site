@@ -72,10 +72,10 @@ body {
 /* ====== ДОРОГА ====== */
 .road {
     position: fixed;
-    bottom: 0;
+    bottom: 100px;
     left: 0;
     width: 100%;
-    height: 80px;
+    height: 60px;
     background: #333;
     z-index: 50;
     border-top: 4px solid #555;
@@ -111,18 +111,18 @@ body {
 .road::after {
     content: '';
     position: absolute;
-    top: -8px;
+    top: -6px;
     left: 0;
     right: 0;
-    height: 8px;
+    height: 6px;
     background: #888;
-    border-top: 4px solid #999;
+    border-top: 3px solid #999;
 }
 
 /* ====== МУЗИКАНТИ (placeholder) ====== */
 .band-walkers {
     position: fixed;
-    bottom: 16px;
+    bottom: 110px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 60;
