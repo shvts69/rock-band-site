@@ -2,42 +2,7 @@
    PIXEL ART DECORATIONS & EXTRAS
    ======================================== */
 
-/* Піксельний бордер для всього сайту */
-.horizontal-wrapper::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: repeating-linear-gradient(
-        90deg,
-        #ff0000 0px,
-        #ff0000 8px,
-        #ffcc00 8px,
-        #ffcc00 16px,
-        #ff0000 16px
-    );
-    z-index: 100;
-}
-
-.horizontal-wrapper::after {
-    content: '';
-    position: fixed;
-    bottom: 60px;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: repeating-linear-gradient(
-        90deg,
-        #ff0000 0px,
-        #ff0000 8px,
-        #ffcc00 8px,
-        #ffcc00 16px,
-        #ff0000 16px
-    );
-    z-index: 100;
-}
+/* Borders removed */
 
 /* Піксельний CRT ефект */
 body::after {
@@ -72,17 +37,7 @@ body {
     z-index: 100;
 }
 
-/* Піксельний scrollbar на дорозі */
-.road-progress {
-    position: fixed;
-    bottom: calc(60px + 54px);
-    left: 0;
-    height: 4px;
-    background: #ff0000;
-    z-index: 100;
-    transition: width 0.1s;
-    box-shadow: 0 0 8px #ff0000;
-}
+/* Progress bar removed */
 
 /* Глітч ефект для заголовків */
 @keyframes glitch {

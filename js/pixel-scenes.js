@@ -587,21 +587,11 @@ function drawStageScene(canvas) {
     const stageRight = Math.floor(W * 0.92);
     const stageW = stageRight - stageLeft;
 
-    // Stage floor
-    for (let y = stageY; y < stageY + 15; y++) {
-        const t = (y - stageY) / 15;
-        drawRect(ctx, stageLeft, y, stageW, 1, `rgb(${Math.floor(40 + t * 20)},${Math.floor(30 + t * 15)},${Math.floor(25 + t * 10)})`);
-    }
-    // Stage edge
-    drawRect(ctx, stageLeft, stageY + 15, stageW, 3, '#555');
-    drawRect(ctx, stageLeft, stageY + 18, stageW, 2, '#333');
+    // Stage edge highlight (no dark floor — road connects directly)
+    drawRect(ctx, stageLeft, stageY, stageW, 2, '#555');
     // Stage front lights
     for (let x = stageLeft + 5; x < stageRight - 5; x += 8) {
-        drawRect(ctx, x, stageY + 15, 2, 1, '#ffcc00');
-        // Light glow downward
-        for (let dy = 1; dy < 6; dy++) {
-            drawPixel(ctx, x, stageY + 15 + dy, `rgba(255,200,0,${0.2 - dy * 0.03})`);
-        }
+        drawRect(ctx, x, stageY, 2, 1, '#ffcc00');
     }
 
     // SPEAKERS (left & right)

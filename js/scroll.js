@@ -5,7 +5,6 @@
 (function() {
     const wrapper = document.getElementById('horizontalWrapper');
     const road = document.getElementById('road');
-    const bandWalkers = document.getElementById('bandWalkers');
 
     function initHorizontalScroll() {
         const totalWidth = wrapper.scrollWidth;
@@ -14,7 +13,6 @@
 
         document.body.style.height = totalWidth + 'px';
 
-        // Find stage section position for road clipping
         const stageSection = document.getElementById('stage');
 
         function onScroll() {
@@ -28,10 +26,7 @@
             wrapper.style.left = '0';
             wrapper.style.transform = `translateX(${translateX}px)`;
 
-            // Update road progress bar
-            updateRoadProgress(progress);
-
-            // Move road line markings
+            // Road line animation
             if (road) {
                 const roadLine = road.querySelector('.road-line');
                 if (roadLine) {
@@ -39,22 +34,14 @@
                 }
             }
 
-            // Hide road & walkers when entering stage section
+            // Clip road so it ends exactly where the stage begins
             if (stageSection && road) {
                 const stageRect = stageSection.getBoundingClientRect();
-                // Road disappears as stage section enters viewport
-                if (stageRect.left < viewportWidth * 0.3) {
-                    road.style.opacity = '0';
-                    road.style.pointerEvents = 'none';
-                    if (bandWalkers) {
-                        bandWalkers.style.opacity = '0';
-                    }
+                if (stageRect.left < viewportWidth) {
+                    // Stage is visible — clip the road at the stage's left edge
+                    road.style.clipPath = `inset(0 ${viewportWidth - stageRect.left}px 0 0)`;
                 } else {
-                    road.style.opacity = '1';
-                    road.style.pointerEvents = 'auto';
-                    if (bandWalkers) {
-                        bandWalkers.style.opacity = '1';
-                    }
+                    road.style.clipPath = 'none';
                 }
             }
         }
@@ -66,16 +53,6 @@
         });
 
         onScroll();
-    }
-
-    function updateRoadProgress(progress) {
-        let progressBar = document.querySelector('.road-progress');
-        if (!progressBar) {
-            progressBar = document.createElement('div');
-            progressBar.className = 'road-progress';
-            document.body.appendChild(progressBar);
-        }
-        progressBar.style.width = (progress * 100) + '%';
     }
 
     if (document.readyState === 'loading') {

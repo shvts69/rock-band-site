@@ -79,7 +79,6 @@ body {
     background: #333;
     z-index: 50;
     border-top: 4px solid #555;
-    transition: opacity 0.3s;
 }
 
 .road::before {
@@ -128,7 +127,6 @@ body {
     z-index: 60;
     display: flex;
     gap: 12px;
-    transition: opacity 0.3s;
 }
 
 .walker {
