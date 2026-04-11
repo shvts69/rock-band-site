@@ -408,10 +408,6 @@ function drawBrooklynScene(canvas) {
         }
     }
 
-    // GRAFFITI
-    drawGraffiti(ctx, Math.floor(W * 0.15), groundY - 15);
-    drawGraffiti(ctx, Math.floor(W * 0.55), groundY - 20);
-
     // Trash cans — on road level
     drawTrashCan(ctx, Math.floor(W * 0.25), roadY);
     drawTrashCan(ctx, Math.floor(W * 0.7), roadY);
