@@ -390,8 +390,11 @@ function drawBrooklynScene(canvas) {
     const lampPositions = [];
     for (let lx = 15; lx < W; lx += 40) {
         lampPositions.push(lx);
-        // Pole with outline
-        drawOutlinedRect(ctx, lx, roadY - 22, 1, 22, '#777');
+        // Pole — gray with thin black outline
+        drawRect(ctx, lx, roadY - 22, 2, 22, '#888');
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(lx * PIXEL + 1, (roadY - 22) * PIXEL + 1, 2 * PIXEL - 2, 22 * PIXEL - 2);
         // Lamp head
         drawOutlinedRect(ctx, lx - 2, roadY - 24, 5, 3, '#aa9944');
         // Light glow
@@ -438,11 +441,14 @@ function drawTree(ctx, x, y, type) {
         // Small right branch
         drawOutlinedRect(ctx, x + 5, y - 16, 2, 3, '#3d8a2e');
     } else {
-        // Spreading shape
-        drawOutlinedRect(ctx, x - 3, y - 17, 8, 4, '#2d7a1e');
-        drawOutlinedRect(ctx, x - 6, y - 19, 5, 3, '#258a18');
-        drawOutlinedRect(ctx, x + 3, y - 20, 5, 4, '#1d6a0e');
-        drawOutlinedRect(ctx, x - 1, y - 22, 4, 3, '#3d8a2e');
+        // Wide full canopy with side bumps
+        drawOutlinedRect(ctx, x - 5, y - 20, 12, 7, '#2d7a1e');
+        // Left bump
+        drawOutlinedRect(ctx, x - 7, y - 18, 3, 4, '#258a18');
+        // Right bump
+        drawOutlinedRect(ctx, x + 6, y - 19, 3, 5, '#1d6a0e');
+        // Top bump
+        drawOutlinedRect(ctx, x - 3, y - 23, 8, 4, '#3d8a2e');
     }
 
     // Leaf texture highlights
