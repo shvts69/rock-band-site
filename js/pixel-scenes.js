@@ -370,37 +370,28 @@ function drawBrooklynScene(canvas) {
         }
     });
 
-    // RATS under buildings
-    drawRat(ctx, Math.floor(W * 0.1), groundY + 2);
-    drawRat(ctx, Math.floor(W * 0.33), groundY + 1);
-    drawRat(ctx, Math.floor(W * 0.6), groundY + 2);
-    drawRat(ctx, Math.floor(W * 0.85), groundY + 1);
-
     // TREES — on road level
-    drawTree(ctx, Math.floor(W * 0.08), roadY);
-    drawTree(ctx, Math.floor(W * 0.22), roadY);
-    drawTree(ctx, Math.floor(W * 0.38), roadY);
-    drawTree(ctx, Math.floor(W * 0.52), roadY);
-    drawTree(ctx, Math.floor(W * 0.68), roadY);
-    drawTree(ctx, Math.floor(W * 0.82), roadY);
-    drawTree(ctx, Math.floor(W * 0.95), roadY);
+    drawTree(ctx, Math.floor(W * 0.08), roadY, 0);
+    drawTree(ctx, Math.floor(W * 0.22), roadY, 1);
+    drawTree(ctx, Math.floor(W * 0.38), roadY, 2);
+    drawTree(ctx, Math.floor(W * 0.52), roadY, 0);
+    drawTree(ctx, Math.floor(W * 0.68), roadY, 1);
+    drawTree(ctx, Math.floor(W * 0.82), roadY, 2);
+    drawTree(ctx, Math.floor(W * 0.95), roadY, 0);
 
     // HYDRANTS — on road level
     drawHydrant(ctx, Math.floor(W * 0.18), roadY);
     drawHydrant(ctx, Math.floor(W * 0.42), roadY);
     drawHydrant(ctx, Math.floor(W * 0.62), roadY);
     drawHydrant(ctx, Math.floor(W * 0.88), roadY);
-    // Hydrant with dog peeing on it
-    drawHydrantWithDog(ctx, Math.floor(W * 0.48), roadY);
+    drawHydrant(ctx, Math.floor(W * 0.48), roadY);
 
     // Street lamps — on road level, with pigeons
     const lampPositions = [];
     for (let lx = 15; lx < W; lx += 40) {
         lampPositions.push(lx);
-        // Pole
-        drawRect(ctx, lx, roadY - 22, 1, 22, '#777');
-        drawPixel(ctx, lx, roadY - 22, '#000');
-        drawPixel(ctx, lx, roadY, '#000');
+        // Pole with outline
+        drawOutlinedRect(ctx, lx, roadY - 22, 1, 22, '#777');
         // Lamp head
         drawOutlinedRect(ctx, lx - 2, roadY - 24, 5, 3, '#aa9944');
         // Light glow
@@ -414,19 +405,6 @@ function drawBrooklynScene(canvas) {
         }
     }
 
-    // PIGEONS on rooftops
-    buildings.forEach((b, i) => {
-        if (i % 4 === 1) {
-            const bTop = groundY - b.h;
-            drawPigeon(ctx, b.x + 3, bTop - 3);
-            drawPigeon(ctx, b.x + 8, bTop - 3);
-        }
-        if (i % 5 === 3) {
-            const bTop = groundY - b.h;
-            drawPigeon(ctx, b.x + 5, bTop - 3);
-        }
-    });
-
     // GRAFFITI
     drawGraffiti(ctx, Math.floor(W * 0.15), groundY - 15);
     drawGraffiti(ctx, Math.floor(W * 0.55), groundY - 20);
@@ -436,11 +414,9 @@ function drawBrooklynScene(canvas) {
     drawTrashCan(ctx, Math.floor(W * 0.7), roadY);
 }
 
-function drawTree(ctx, x, y) {
+function drawTree(ctx, x, y, type) {
     // Trunk
     drawOutlinedRect(ctx, x, y - 14, 2, 14, '#5a3a20');
-    // Varied tree shapes — pick one per tree based on position
-    const type = (x * 7) % 3;
     const greens = ['#1d6a0e', '#2d7a1e', '#3d8a2e', '#258a18'];
 
     if (type === 0) {
