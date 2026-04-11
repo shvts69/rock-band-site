@@ -16,15 +16,12 @@ function drawPixel(ctx, x, y, color) {
     ctx.fillRect(x * PIXEL, y * PIXEL, PIXEL, PIXEL);
 }
 
-// Draw outlined rectangle (fill + 1px black border)
+// Draw outlined rectangle (fill + thin 1-real-pixel black border)
 function drawOutlinedRect(ctx, x, y, w, h, fillColor) {
     drawRect(ctx, x, y, w, h, fillColor);
-    // Top & bottom
-    drawRect(ctx, x, y, w, 1, '#000');
-    drawRect(ctx, x, y + h - 1, w, 1, '#000');
-    // Left & right
-    drawRect(ctx, x, y, 1, h, '#000');
-    drawRect(ctx, x + w - 1, y, 1, h, '#000');
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x * PIXEL + 0.5, y * PIXEL + 0.5, w * PIXEL - 1, h * PIXEL - 1);
 }
 
 // Draw a row of pixels from color array
@@ -417,10 +414,18 @@ function drawBrooklynScene(canvas) {
         }
     }
 
-    // PIGEONS on some lamp posts
-    if (lampPositions.length > 1) drawPigeon(ctx, lampPositions[1], roadY - 26);
-    if (lampPositions.length > 3) drawPigeon(ctx, lampPositions[3], roadY - 26);
-    if (lampPositions.length > 5) drawPigeon(ctx, lampPositions[5] + 1, roadY - 26);
+    // PIGEONS on rooftops
+    buildings.forEach((b, i) => {
+        if (i % 4 === 1) {
+            const bTop = groundY - b.h;
+            drawPigeon(ctx, b.x + 3, bTop - 3);
+            drawPigeon(ctx, b.x + 8, bTop - 3);
+        }
+        if (i % 5 === 3) {
+            const bTop = groundY - b.h;
+            drawPigeon(ctx, b.x + 5, bTop - 3);
+        }
+    });
 
     // GRAFFITI
     drawGraffiti(ctx, Math.floor(W * 0.15), groundY - 15);
@@ -432,26 +437,34 @@ function drawBrooklynScene(canvas) {
 }
 
 function drawTree(ctx, x, y) {
-    // Trunk with outline
-    drawOutlinedRect(ctx, x, y - 16, 3, 16, '#5a3a20');
-    // Canopy layers with outline
-    const greens = ['#1d6a0e', '#2d7a1e', '#3d8a2e', '#2d6a1e'];
-    for (let ly = 0; ly < 4; ly++) {
-        const cw = 9 - ly * 2;
-        const cx = x - Math.floor(cw / 2) + 1;
-        const cy = y - 19 - ly * 3;
-        drawRect(ctx, cx, cy, cw, 4, greens[ly % greens.length]);
-        // Black outline on canopy
-        drawRect(ctx, cx, cy, cw, 1, '#000');
-        drawRect(ctx, cx, cy + 3, cw, 1, '#000');
-        drawRect(ctx, cx, cy, 1, 4, '#000');
-        drawRect(ctx, cx + cw - 1, cy, 1, 4, '#000');
-        // Leaf highlights
-        for (let dx = 1; dx < cw - 1; dx++) {
-            if (Math.random() > 0.5) {
-                drawPixel(ctx, cx + dx, cy + 1 + Math.floor(Math.random() * 2), greens[(ly + 1) % greens.length]);
+    // Trunk
+    drawOutlinedRect(ctx, x, y - 14, 2, 14, '#5a3a20');
+    // Natural round canopy — drawn as filled circle with leaf texture
+    const cx = x + 1;
+    const cy = y - 22;
+    const radius = 7;
+    const greens = ['#1d6a0e', '#2d7a1e', '#3d8a2e', '#258a18', '#1a5a0a'];
+    // Fill canopy
+    for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist <= radius) {
+                const shade = greens[Math.floor(Math.random() * greens.length)];
+                drawPixel(ctx, cx + dx, cy + dy, shade);
             }
         }
+    }
+    // Outer outline only — thin stroke
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc((cx) * PIXEL, (cy) * PIXEL, radius * PIXEL, 0, Math.PI * 2);
+    ctx.stroke();
+    // Highlights (lighter spots)
+    for (let i = 0; i < 6; i++) {
+        const hx = cx - 3 + Math.floor(Math.random() * 6);
+        const hy = cy - 3 + Math.floor(Math.random() * 4);
+        drawPixel(ctx, hx, hy, '#4daa3e');
     }
 }
 
@@ -498,50 +511,46 @@ function drawPigeon(ctx, x, y) {
 }
 
 function drawHydrantWithDog(ctx, x, y) {
-    // Hydrant
-    drawOutlinedRect(ctx, x, y - 6, 3, 6, '#cc2200');
-    drawRect(ctx, x - 1, y - 4, 5, 1, '#dd3300');
-    drawRect(ctx, x - 1, y - 4, 1, 1, '#000');
-    drawRect(ctx, x + 3, y - 4, 1, 1, '#000');
-    drawOutlinedRect(ctx, x, y - 7, 3, 1, '#cc2200');
-    drawPixel(ctx, x + 1, y - 8, '#dd3300');
-    drawPixel(ctx, x + 1, y - 9, '#000');
+    // Hydrant (bigger)
+    drawOutlinedRect(ctx, x, y - 8, 4, 8, '#cc2200');
+    drawOutlinedRect(ctx, x - 1, y - 6, 6, 2, '#dd3300');
+    drawOutlinedRect(ctx, x, y - 10, 4, 2, '#cc2200');
+    drawOutlinedRect(ctx, x + 1, y - 11, 2, 1, '#dd3300');
+    drawRect(ctx, x + 1, y - 7, 1, 5, '#ee4422');
 
     // Dog next to hydrant
-    const dx = x + 5;
+    const dx = x + 6;
     const dy = y;
     // Body
-    drawOutlinedRect(ctx, dx, dy - 5, 5, 3, '#aa7744');
+    drawOutlinedRect(ctx, dx, dy - 5, 6, 3, '#aa7744');
     // Head
-    drawOutlinedRect(ctx, dx - 2, dy - 6, 3, 3, '#aa7744');
+    drawOutlinedRect(ctx, dx - 2, dy - 7, 3, 4, '#aa7744');
     // Ear
-    drawPixel(ctx, dx - 2, dy - 7, '#886633');
-    drawPixel(ctx, dx - 2, dy - 7, '#000');
+    drawPixel(ctx, dx - 2, dy - 8, '#886633');
     // Eye
-    drawPixel(ctx, dx - 1, dy - 5, '#000');
+    drawPixel(ctx, dx - 1, dy - 6, '#000');
     // Nose
-    drawPixel(ctx, dx - 2, dy - 4, '#222');
-    // Legs
-    drawRect(ctx, dx, dy - 2, 1, 2, '#aa7744');
-    drawRect(ctx, dx + 4, dy - 2, 1, 2, '#aa7744');
-    drawPixel(ctx, dx, dy, '#000');
-    drawPixel(ctx, dx + 4, dy, '#000');
+    drawPixel(ctx, dx - 2, dy - 5, '#222');
+    // Back legs
+    drawOutlinedRect(ctx, dx + 4, dy - 2, 1, 2, '#aa7744');
+    // Front leg on ground
+    drawOutlinedRect(ctx, dx, dy - 2, 1, 2, '#aa7744');
     // Raised leg (peeing pose)
-    drawRect(ctx, dx + 1, dy - 4, 1, 2, '#aa7744');
-    drawPixel(ctx, dx + 1, dy - 5, '#000');
-    // Tail
-    drawRect(ctx, dx + 5, dy - 6, 1, 2, '#aa7744');
-    drawPixel(ctx, dx + 5, dy - 7, '#aa7744');
-    drawPixel(ctx, dx + 5, dy - 7, '#000');
+    drawRect(ctx, dx + 1, dy - 4, 2, 1, '#aa7744');
+    drawRect(ctx, dx + 2, dy - 5, 1, 1, '#aa7744');
+    // Tail up
+    drawRect(ctx, dx + 6, dy - 6, 1, 2, '#aa7744');
+    drawPixel(ctx, dx + 6, dy - 7, '#886633');
 
     // PEE stream — yellow arc from dog to hydrant
-    drawPixel(ctx, dx, dy - 3, '#ddcc00');
-    drawPixel(ctx, x + 3, dy - 3, '#ddcc00');
+    drawPixel(ctx, dx + 1, dy - 3, '#ddcc00');
     drawPixel(ctx, x + 4, dy - 3, '#ddcc00');
-    drawPixel(ctx, x + 3, dy - 2, '#ccbb00');
-    // Puddle under hydrant
-    drawRect(ctx, x - 1, dy, 6, 1, '#ccbb00');
-    drawRect(ctx, x, dy + 1, 4, 1, '#bbaa00');
+    drawPixel(ctx, x + 5, dy - 3, '#ddcc00');
+    drawPixel(ctx, x + 4, dy - 2, '#ccbb00');
+    drawPixel(ctx, x + 5, dy - 2, '#ccbb00');
+    // Puddle
+    drawRect(ctx, x - 1, dy, 7, 1, '#ccbb00');
+    drawRect(ctx, x, dy + 1, 5, 1, '#bbaa00');
 }
 
 function drawGraffiti(ctx, x, y) {
@@ -561,13 +570,16 @@ function drawTrashCan(ctx, x, y) {
 }
 
 function drawHydrant(ctx, x, y) {
-    drawOutlinedRect(ctx, x, y - 6, 3, 6, '#cc2200');
-    drawRect(ctx, x - 1, y - 4, 5, 1, '#dd3300');
-    drawRect(ctx, x - 1, y - 4, 1, 1, '#000');
-    drawRect(ctx, x + 3, y - 4, 1, 1, '#000');
-    drawOutlinedRect(ctx, x, y - 7, 3, 1, '#cc2200');
-    drawPixel(ctx, x + 1, y - 8, '#dd3300');
-    drawPixel(ctx, x + 1, y - 9, '#000');
+    // Main body — bigger
+    drawOutlinedRect(ctx, x, y - 8, 4, 8, '#cc2200');
+    // Side nozzles
+    drawOutlinedRect(ctx, x - 1, y - 6, 6, 2, '#dd3300');
+    // Cap
+    drawOutlinedRect(ctx, x, y - 10, 4, 2, '#cc2200');
+    // Top knob
+    drawOutlinedRect(ctx, x + 1, y - 11, 2, 1, '#dd3300');
+    // Highlight
+    drawRect(ctx, x + 1, y - 7, 1, 5, '#ee4422');
 }
 
 
@@ -608,12 +620,12 @@ function drawLiveScene(canvas) {
         drawPixel(ctx, bx, by + 1, 'rgba(255,255,255,0.5)');
     });
 
-    // CITY SKYLINE in background
-    const skylineY = Math.floor(H * 0.4);
+    // CITY SKYLINE — sitting at water level
+    const skylineY = waterY;
     for (let x = 0; x < W; x++) {
-        const bh = 5 + Math.floor(Math.random() * 20);
+        const bh = 5 + Math.floor(Math.random() * 25);
         if (x % 3 === 0) {
-            drawRect(ctx, x, skylineY - bh, 2, bh, '#0a0a15');
+            drawRect(ctx, x, skylineY - bh, 2, bh, '#0a0a18');
             // Tiny windows
             for (let wy = skylineY - bh + 2; wy < skylineY; wy += 3) {
                 if (Math.random() > 0.5) {
@@ -646,7 +658,7 @@ function drawLiveScene(canvas) {
 
     // STATUE OF LIBERTY (far background, left side)
     const statueX = Math.floor(W * 0.12);
-    const statueBase = waterY - 2;
+    const statueBase = waterY + 4;
     // Pedestal
     drawOutlinedRect(ctx, statueX - 3, statueBase - 8, 8, 8, '#4a5a4a');
     drawOutlinedRect(ctx, statueX - 4, statueBase - 9, 10, 1, '#5a6a5a');
@@ -681,9 +693,9 @@ function drawLiveScene(canvas) {
         drawPixel(ctx, statueX, waterY + 2 + ry, `rgba(90,140,106,${0.12 - ry * 0.01})`);
     }
 
-    // NY FERRY (under bridge area)
-    const ferryX = Math.floor(W * 0.55);
-    const ferryY = waterY + 3;
+    // NY FERRY — right side, visible in the water area
+    const ferryX = Math.floor(W * 0.82);
+    const ferryY = waterY + 8;
     // Hull with outline
     drawOutlinedRect(ctx, ferryX, ferryY, 18, 4, '#dd6600');
     drawOutlinedRect(ctx, ferryX + 1, ferryY + 4, 16, 2, '#cc5500');
