@@ -16,6 +16,17 @@ function drawPixel(ctx, x, y, color) {
     ctx.fillRect(x * PIXEL, y * PIXEL, PIXEL, PIXEL);
 }
 
+// Draw outlined rectangle (fill + 1px black border)
+function drawOutlinedRect(ctx, x, y, w, h, fillColor) {
+    drawRect(ctx, x, y, w, h, fillColor);
+    // Top & bottom
+    drawRect(ctx, x, y, w, 1, '#000');
+    drawRect(ctx, x, y + h - 1, w, 1, '#000');
+    // Left & right
+    drawRect(ctx, x, y, 1, h, '#000');
+    drawRect(ctx, x + w - 1, y, 1, h, '#000');
+}
+
 // Draw a row of pixels from color array
 function drawRow(ctx, startX, y, colors) {
     colors.forEach((color, i) => {
@@ -144,25 +155,20 @@ function drawCactus(ctx, x, y, scale) {
     const s = Math.floor;
     const h = s(18 * scale);
     const w = s(3 * scale);
-    // Main trunk
+    // Main trunk with outline
+    drawOutlinedRect(ctx, x, y - h, w, h, '#2d6b1e');
+    // Highlight
     for (let i = 0; i < h; i++) {
-        const shade = i < h / 2 ? '#2d6b1e' : '#1d5b0e';
-        drawRect(ctx, x, y - i, w, 1, shade);
-        // Highlight
-        drawPixel(ctx, x + w - 1, y - i, '#3d8b2e');
+        drawPixel(ctx, x + w - 2, y - i, '#3d8b2e');
     }
     // Left arm
     const armY = y - s(h * 0.6);
-    drawRect(ctx, x - s(4 * scale), armY, s(4 * scale), w, '#2d6b1e');
-    for (let i = 0; i < s(6 * scale); i++) {
-        drawRect(ctx, x - s(4 * scale), armY - i, w, 1, '#2d6b1e');
-    }
+    drawOutlinedRect(ctx, x - s(4 * scale), armY, s(4 * scale), w, '#2d6b1e');
+    drawOutlinedRect(ctx, x - s(4 * scale), armY - s(6 * scale), w, s(6 * scale), '#2d6b1e');
     // Right arm
     const armY2 = y - s(h * 0.4);
-    drawRect(ctx, x + w, armY2, s(3 * scale), w, '#2d6b1e');
-    for (let i = 0; i < s(5 * scale); i++) {
-        drawRect(ctx, x + w + s(2 * scale), armY2 - i, w, 1, '#1d5b0e');
-    }
+    drawOutlinedRect(ctx, x + w, armY2, s(3 * scale), w, '#2d6b1e');
+    drawOutlinedRect(ctx, x + w + s(2 * scale), armY2 - s(5 * scale), w, s(5 * scale), '#1d5b0e');
 }
 
 function drawRouteSign(ctx, x, y) {
@@ -285,16 +291,18 @@ function drawBrooklynScene(canvas) {
             x: i * 20,
             w: 18 + Math.floor(Math.random() * 4),
             h: 60 + Math.floor(Math.random() * 40),
-            color: ['#4a2a1a', '#3a2a2a', '#5a3a2a', '#4a3020', '#3a2018'][Math.floor(Math.random() * 5)],
-            trim: ['#6a4a3a', '#5a3a3a', '#7a5a4a'][Math.floor(Math.random() * 3)]
+            color: ['#7a3325', '#6a2a20', '#8a3a28', '#7a2e22', '#6a3328'][Math.floor(Math.random() * 5)],
+            trim: ['#9a5a3a', '#8a4a35', '#aa6a4a'][Math.floor(Math.random() * 3)]
         });
     }
 
+    // groundY = where buildings end, roadY = top of the CSS road overlay
     const groundY = Math.floor(H * 0.82);
+    const roadY = Math.floor(H * 0.855); // matches CSS road top edge
 
-    // GRASS AREA — fill between buildings and bottom
-    for (let y = groundY; y < H; y++) {
-        const t = (y - groundY) / (H - groundY);
+    // GRASS AREA — from building base to road level
+    for (let y = groundY; y <= roadY; y++) {
+        const t = (y - groundY) / (roadY - groundY);
         for (let x = 0; x < W; x++) {
             const shade = Math.random() * 0.15;
             const r = Math.floor(30 + t * 10 - shade * 40);
@@ -303,42 +311,51 @@ function drawBrooklynScene(canvas) {
             drawPixel(ctx, x, y, `rgb(${Math.max(0,r)},${Math.max(0,g)},${Math.max(0,b)})`);
         }
     }
-    // Grass blades
-    for (let i = 0; i < 200; i++) {
+    // Grass blades on the strip
+    for (let i = 0; i < 150; i++) {
         const gx = Math.floor(Math.random() * W);
-        const gy = groundY + Math.floor(Math.random() * (H - groundY));
-        const gh = 1 + Math.floor(Math.random() * 3);
+        const gy = groundY + Math.floor(Math.random() * (roadY - groundY));
+        const gh = 1 + Math.floor(Math.random() * 2);
         const gc = ['#2d7a1e', '#3d8a2e', '#1d6a0e', '#4d9a3e'][Math.floor(Math.random() * 4)];
         drawRect(ctx, gx, gy - gh, 1, gh, gc);
     }
 
-    // BUILDINGS
+    // BUILDINGS — reddish-brown Brooklyn brownstones with outlines
     buildings.forEach(b => {
         const bTop = groundY - b.h;
+        // Main building fill
         drawRect(ctx, b.x, bTop, b.w, b.h, b.color);
-        drawRect(ctx, b.x, bTop, b.w, 2, b.trim);
+        // Black outline
+        drawRect(ctx, b.x, bTop, b.w, 1, '#000');
+        drawRect(ctx, b.x, bTop + b.h - 1, b.w, 1, '#000');
+        drawRect(ctx, b.x, bTop, 1, b.h, '#000');
+        drawRect(ctx, b.x + b.w - 1, bTop, 1, b.h, '#000');
+        // Roof trim
+        drawRect(ctx, b.x, bTop + 1, b.w, 2, b.trim);
         drawRect(ctx, b.x - 1, bTop - 1, b.w + 2, 1, b.trim);
-        drawRect(ctx, b.x, bTop + 3, b.w, 1, b.trim);
+        drawRect(ctx, b.x, bTop + 4, b.w, 1, b.trim);
 
-        for (let wy = bTop + 6; wy < groundY - 10; wy += 8) {
+        // Windows
+        for (let wy = bTop + 7; wy < groundY - 10; wy += 8) {
             for (let wx = b.x + 3; wx < b.x + b.w - 3; wx += 5) {
                 const lit = Math.random() > 0.3;
                 if (lit) {
                     const warmth = Math.random();
                     drawRect(ctx, wx, wy, 3, 4, `rgb(${Math.floor(200 + warmth * 55)},${Math.floor(150 + warmth * 80)},${Math.floor(50 + warmth * 40)})`);
-                    drawRect(ctx, wx - 1, wy - 1, 5, 1, '#2a1a0a');
-                    drawRect(ctx, wx - 1, wy + 4, 5, 1, '#2a1a0a');
-                    if (Math.random() > 0.6) drawRect(ctx, wx, wy, 1, 4, 'rgba(100,50,30,0.5)');
                 } else {
                     drawRect(ctx, wx, wy, 3, 4, '#1a1020');
-                    drawRect(ctx, wx - 1, wy - 1, 5, 1, '#2a1a0a');
-                    drawRect(ctx, wx - 1, wy + 4, 5, 1, '#2a1a0a');
                 }
+                // Window frame (black outline)
+                drawRect(ctx, wx - 1, wy - 1, 5, 1, '#111');
+                drawRect(ctx, wx - 1, wy + 4, 5, 1, '#111');
+                drawRect(ctx, wx - 1, wy - 1, 1, 6, '#111');
+                drawRect(ctx, wx + 3, wy - 1, 1, 6, '#111');
             }
         }
 
+        // Fire escapes
         if (Math.random() > 0.5) {
-            for (let fy = bTop + 10; fy < groundY - 15; fy += 12) {
+            for (let fy = bTop + 12; fy < groundY - 15; fy += 12) {
                 drawRect(ctx, b.x + b.w - 1, fy, 5, 1, '#555');
                 drawRect(ctx, b.x + b.w + 3, fy, 1, 12, '#555');
                 drawRect(ctx, b.x + b.w - 1, fy - 3, 1, 3, '#444');
@@ -346,71 +363,185 @@ function drawBrooklynScene(canvas) {
             }
         }
 
+        // Door
         if (Math.random() > 0.4) {
             const doorX = b.x + Math.floor(b.w / 2) - 2;
-            drawRect(ctx, doorX, groundY - 8, 4, 8, '#2a1a0a');
+            drawOutlinedRect(ctx, doorX, groundY - 8, 4, 8, '#2a1a0a');
             drawRect(ctx, doorX, groundY - 9, 4, 1, b.trim);
             drawRect(ctx, doorX - 1, groundY - 2, 6, 2, '#666');
             drawPixel(ctx, doorX + 3, groundY - 4, '#aa8844');
         }
     });
 
-    // TREES
-    drawTree(ctx, Math.floor(W * 0.08), groundY);
-    drawTree(ctx, Math.floor(W * 0.22), groundY);
-    drawTree(ctx, Math.floor(W * 0.38), groundY);
-    drawTree(ctx, Math.floor(W * 0.52), groundY);
-    drawTree(ctx, Math.floor(W * 0.68), groundY);
-    drawTree(ctx, Math.floor(W * 0.82), groundY);
-    drawTree(ctx, Math.floor(W * 0.95), groundY);
+    // RATS under buildings
+    drawRat(ctx, Math.floor(W * 0.1), groundY + 2);
+    drawRat(ctx, Math.floor(W * 0.33), groundY + 1);
+    drawRat(ctx, Math.floor(W * 0.6), groundY + 2);
+    drawRat(ctx, Math.floor(W * 0.85), groundY + 1);
 
-    // HYDRANTS
-    drawHydrant(ctx, Math.floor(W * 0.12), groundY);
-    drawHydrant(ctx, Math.floor(W * 0.35), groundY);
-    drawHydrant(ctx, Math.floor(W * 0.58), groundY);
-    drawHydrant(ctx, Math.floor(W * 0.78), groundY);
-    drawHydrant(ctx, Math.floor(W * 0.92), groundY);
+    // TREES — on road level
+    drawTree(ctx, Math.floor(W * 0.08), roadY);
+    drawTree(ctx, Math.floor(W * 0.22), roadY);
+    drawTree(ctx, Math.floor(W * 0.38), roadY);
+    drawTree(ctx, Math.floor(W * 0.52), roadY);
+    drawTree(ctx, Math.floor(W * 0.68), roadY);
+    drawTree(ctx, Math.floor(W * 0.82), roadY);
+    drawTree(ctx, Math.floor(W * 0.95), roadY);
 
-    // Street lamps
+    // HYDRANTS — on road level
+    drawHydrant(ctx, Math.floor(W * 0.18), roadY);
+    drawHydrant(ctx, Math.floor(W * 0.42), roadY);
+    drawHydrant(ctx, Math.floor(W * 0.62), roadY);
+    drawHydrant(ctx, Math.floor(W * 0.88), roadY);
+    // Hydrant with dog peeing on it
+    drawHydrantWithDog(ctx, Math.floor(W * 0.48), roadY);
+
+    // Street lamps — on road level, with pigeons
+    const lampPositions = [];
     for (let lx = 15; lx < W; lx += 40) {
-        drawRect(ctx, lx, groundY - 20, 1, 20, '#888');
-        drawRect(ctx, lx - 2, groundY - 22, 5, 3, '#aa9944');
+        lampPositions.push(lx);
+        // Pole
+        drawRect(ctx, lx, roadY - 22, 1, 22, '#777');
+        drawPixel(ctx, lx, roadY - 22, '#000');
+        drawPixel(ctx, lx, roadY, '#000');
+        // Lamp head
+        drawOutlinedRect(ctx, lx - 2, roadY - 24, 5, 3, '#aa9944');
+        // Light glow
         for (let dy = -3; dy <= 5; dy++) {
             for (let dx = -4; dx <= 4; dx++) {
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < 5) {
-                    drawPixel(ctx, lx + dx, groundY - 22 + dy, `rgba(255,220,100,${0.15 - dist * 0.025})`);
+                    drawPixel(ctx, lx + dx, roadY - 24 + dy, `rgba(255,220,100,${0.12 - dist * 0.02})`);
                 }
             }
         }
     }
 
+    // PIGEONS on some lamp posts
+    if (lampPositions.length > 1) drawPigeon(ctx, lampPositions[1], roadY - 26);
+    if (lampPositions.length > 3) drawPigeon(ctx, lampPositions[3], roadY - 26);
+    if (lampPositions.length > 5) drawPigeon(ctx, lampPositions[5] + 1, roadY - 26);
+
     // GRAFFITI
     drawGraffiti(ctx, Math.floor(W * 0.15), groundY - 15);
     drawGraffiti(ctx, Math.floor(W * 0.55), groundY - 20);
 
-    // Trash cans
-    drawTrashCan(ctx, Math.floor(W * 0.25), groundY);
-    drawTrashCan(ctx, Math.floor(W * 0.7), groundY);
+    // Trash cans — on road level
+    drawTrashCan(ctx, Math.floor(W * 0.25), roadY);
+    drawTrashCan(ctx, Math.floor(W * 0.7), roadY);
 }
 
-function drawTree(ctx, x, groundY) {
-    // Trunk
-    drawRect(ctx, x, groundY - 15, 2, 15, '#4a3020');
-    drawRect(ctx, x + 1, groundY - 15, 1, 15, '#5a4030');
-    // Canopy layers
-    const greens = ['#1d5a0e', '#2d6a1e', '#3d7a2e', '#2d5a1e'];
+function drawTree(ctx, x, y) {
+    // Trunk with outline
+    drawOutlinedRect(ctx, x, y - 16, 3, 16, '#5a3a20');
+    // Canopy layers with outline
+    const greens = ['#1d6a0e', '#2d7a1e', '#3d8a2e', '#2d6a1e'];
     for (let ly = 0; ly < 4; ly++) {
-        const cw = 8 - ly;
+        const cw = 9 - ly * 2;
         const cx = x - Math.floor(cw / 2) + 1;
-        drawRect(ctx, cx, groundY - 18 - ly * 3, cw, 4, greens[ly % greens.length]);
-        // Leaf texture
-        for (let dx = 0; dx < cw; dx++) {
+        const cy = y - 19 - ly * 3;
+        drawRect(ctx, cx, cy, cw, 4, greens[ly % greens.length]);
+        // Black outline on canopy
+        drawRect(ctx, cx, cy, cw, 1, '#000');
+        drawRect(ctx, cx, cy + 3, cw, 1, '#000');
+        drawRect(ctx, cx, cy, 1, 4, '#000');
+        drawRect(ctx, cx + cw - 1, cy, 1, 4, '#000');
+        // Leaf highlights
+        for (let dx = 1; dx < cw - 1; dx++) {
             if (Math.random() > 0.5) {
-                drawPixel(ctx, cx + dx, groundY - 18 - ly * 3 + Math.floor(Math.random() * 3), greens[(ly + 1) % greens.length]);
+                drawPixel(ctx, cx + dx, cy + 1 + Math.floor(Math.random() * 2), greens[(ly + 1) % greens.length]);
             }
         }
     }
+}
+
+function drawRat(ctx, x, y) {
+    // Body
+    drawRect(ctx, x, y, 4, 2, '#555');
+    drawPixel(ctx, x - 1, y + 1, '#555'); // nose
+    // Outline
+    drawPixel(ctx, x - 1, y, '#000');
+    drawPixel(ctx, x + 4, y, '#000');
+    drawPixel(ctx, x - 1, y + 2, '#000');
+    drawPixel(ctx, x + 4, y + 1, '#000');
+    drawRect(ctx, x, y - 1, 4, 1, '#000');
+    drawRect(ctx, x, y + 2, 4, 1, '#000');
+    // Eye
+    drawPixel(ctx, x, y, '#ff0000');
+    // Tail
+    drawRect(ctx, x + 4, y + 1, 3, 1, '#444');
+    drawPixel(ctx, x + 4, y + 1, '#000');
+    // Ears
+    drawPixel(ctx, x + 1, y - 1, '#666');
+}
+
+function drawPigeon(ctx, x, y) {
+    // Body
+    drawRect(ctx, x, y, 3, 2, '#888');
+    // Head
+    drawPixel(ctx, x - 1, y, '#999');
+    // Beak
+    drawPixel(ctx, x - 2, y, '#dd8800');
+    // Outline
+    drawPixel(ctx, x - 2, y - 1, '#000');
+    drawPixel(ctx, x - 1, y - 1, '#000');
+    drawRect(ctx, x, y - 1, 3, 1, '#000');
+    drawPixel(ctx, x + 3, y, '#000');
+    drawPixel(ctx, x + 3, y + 1, '#000');
+    drawRect(ctx, x - 1, y + 2, 4, 1, '#000');
+    drawPixel(ctx, x - 2, y + 1, '#000');
+    // Eye
+    drawPixel(ctx, x - 1, y, '#ff4400');
+    // Feet
+    drawPixel(ctx, x, y + 2, '#dd6600');
+    drawPixel(ctx, x + 2, y + 2, '#dd6600');
+}
+
+function drawHydrantWithDog(ctx, x, y) {
+    // Hydrant
+    drawOutlinedRect(ctx, x, y - 6, 3, 6, '#cc2200');
+    drawRect(ctx, x - 1, y - 4, 5, 1, '#dd3300');
+    drawRect(ctx, x - 1, y - 4, 1, 1, '#000');
+    drawRect(ctx, x + 3, y - 4, 1, 1, '#000');
+    drawOutlinedRect(ctx, x, y - 7, 3, 1, '#cc2200');
+    drawPixel(ctx, x + 1, y - 8, '#dd3300');
+    drawPixel(ctx, x + 1, y - 9, '#000');
+
+    // Dog next to hydrant
+    const dx = x + 5;
+    const dy = y;
+    // Body
+    drawOutlinedRect(ctx, dx, dy - 5, 5, 3, '#aa7744');
+    // Head
+    drawOutlinedRect(ctx, dx - 2, dy - 6, 3, 3, '#aa7744');
+    // Ear
+    drawPixel(ctx, dx - 2, dy - 7, '#886633');
+    drawPixel(ctx, dx - 2, dy - 7, '#000');
+    // Eye
+    drawPixel(ctx, dx - 1, dy - 5, '#000');
+    // Nose
+    drawPixel(ctx, dx - 2, dy - 4, '#222');
+    // Legs
+    drawRect(ctx, dx, dy - 2, 1, 2, '#aa7744');
+    drawRect(ctx, dx + 4, dy - 2, 1, 2, '#aa7744');
+    drawPixel(ctx, dx, dy, '#000');
+    drawPixel(ctx, dx + 4, dy, '#000');
+    // Raised leg (peeing pose)
+    drawRect(ctx, dx + 1, dy - 4, 1, 2, '#aa7744');
+    drawPixel(ctx, dx + 1, dy - 5, '#000');
+    // Tail
+    drawRect(ctx, dx + 5, dy - 6, 1, 2, '#aa7744');
+    drawPixel(ctx, dx + 5, dy - 7, '#aa7744');
+    drawPixel(ctx, dx + 5, dy - 7, '#000');
+
+    // PEE stream — yellow arc from dog to hydrant
+    drawPixel(ctx, dx, dy - 3, '#ddcc00');
+    drawPixel(ctx, x + 3, dy - 3, '#ddcc00');
+    drawPixel(ctx, x + 4, dy - 3, '#ddcc00');
+    drawPixel(ctx, x + 3, dy - 2, '#ccbb00');
+    // Puddle under hydrant
+    drawRect(ctx, x - 1, dy, 6, 1, '#ccbb00');
+    drawRect(ctx, x, dy + 1, 4, 1, '#bbaa00');
 }
 
 function drawGraffiti(ctx, x, y) {
@@ -424,17 +555,19 @@ function drawGraffiti(ctx, x, y) {
 }
 
 function drawTrashCan(ctx, x, y) {
-    drawRect(ctx, x, y - 5, 3, 5, '#555');
-    drawRect(ctx, x - 1, y - 6, 5, 1, '#666');
-    drawRect(ctx, x, y - 5, 3, 1, '#666');
-    drawPixel(ctx, x + 1, y - 3, '#444');
+    drawOutlinedRect(ctx, x, y - 6, 4, 6, '#555');
+    drawOutlinedRect(ctx, x - 1, y - 7, 6, 1, '#666');
+    drawPixel(ctx, x + 1, y - 4, '#444');
 }
 
 function drawHydrant(ctx, x, y) {
-    drawRect(ctx, x, y - 5, 3, 5, '#cc2200');
-    drawRect(ctx, x - 1, y - 3, 5, 1, '#dd3300');
-    drawRect(ctx, x, y - 6, 3, 1, '#cc2200');
-    drawPixel(ctx, x + 1, y - 7, '#dd3300');
+    drawOutlinedRect(ctx, x, y - 6, 3, 6, '#cc2200');
+    drawRect(ctx, x - 1, y - 4, 5, 1, '#dd3300');
+    drawRect(ctx, x - 1, y - 4, 1, 1, '#000');
+    drawRect(ctx, x + 3, y - 4, 1, 1, '#000');
+    drawOutlinedRect(ctx, x, y - 7, 3, 1, '#cc2200');
+    drawPixel(ctx, x + 1, y - 8, '#dd3300');
+    drawPixel(ctx, x + 1, y - 9, '#000');
 }
 
 
@@ -515,14 +648,14 @@ function drawLiveScene(canvas) {
     const statueX = Math.floor(W * 0.12);
     const statueBase = waterY - 2;
     // Pedestal
-    drawRect(ctx, statueX - 3, statueBase - 8, 8, 8, '#4a5a4a');
-    drawRect(ctx, statueX - 4, statueBase - 9, 10, 1, '#5a6a5a');
-    drawRect(ctx, statueX - 2, statueBase, 6, 2, '#3a4a3a');
+    drawOutlinedRect(ctx, statueX - 3, statueBase - 8, 8, 8, '#4a5a4a');
+    drawOutlinedRect(ctx, statueX - 4, statueBase - 9, 10, 1, '#5a6a5a');
+    drawOutlinedRect(ctx, statueX - 2, statueBase, 6, 2, '#3a4a3a');
     // Body
-    drawRect(ctx, statueX - 1, statueBase - 22, 4, 14, '#5a8a6a');
-    drawRect(ctx, statueX, statueBase - 22, 2, 14, '#6a9a7a');
+    drawOutlinedRect(ctx, statueX - 1, statueBase - 22, 4, 14, '#5a8a6a');
+    drawRect(ctx, statueX, statueBase - 21, 2, 12, '#6a9a7a');
     // Head
-    drawRect(ctx, statueX - 1, statueBase - 26, 4, 4, '#5a8a6a');
+    drawOutlinedRect(ctx, statueX - 1, statueBase - 26, 4, 4, '#5a8a6a');
     // Crown
     drawPixel(ctx, statueX - 2, statueBase - 27, '#6a9a7a');
     drawPixel(ctx, statueX - 1, statueBase - 28, '#6a9a7a');
@@ -551,20 +684,19 @@ function drawLiveScene(canvas) {
     // NY FERRY (under bridge area)
     const ferryX = Math.floor(W * 0.55);
     const ferryY = waterY + 3;
-    // Hull
-    drawRect(ctx, ferryX, ferryY, 18, 4, '#dd6600');
-    drawRect(ctx, ferryX + 1, ferryY + 4, 16, 2, '#cc5500');
+    // Hull with outline
+    drawOutlinedRect(ctx, ferryX, ferryY, 18, 4, '#dd6600');
+    drawOutlinedRect(ctx, ferryX + 1, ferryY + 4, 16, 2, '#cc5500');
     // White top deck
-    drawRect(ctx, ferryX + 2, ferryY - 4, 14, 4, '#eeeedd');
-    drawRect(ctx, ferryX + 3, ferryY - 3, 12, 3, '#ffffff');
+    drawOutlinedRect(ctx, ferryX + 2, ferryY - 4, 14, 4, '#eeeedd');
+    drawRect(ctx, ferryX + 3, ferryY - 3, 12, 2, '#ffffff');
     // Windows
     for (let wx = ferryX + 4; wx < ferryX + 14; wx += 3) {
         drawPixel(ctx, wx, ferryY - 2, '#88ccff');
     }
     // Smokestack
-    drawRect(ctx, ferryX + 8, ferryY - 7, 2, 3, '#dd6600');
+    drawOutlinedRect(ctx, ferryX + 8, ferryY - 7, 2, 3, '#dd6600');
     drawPixel(ctx, ferryX + 8, ferryY - 8, '#888');
-    drawPixel(ctx, ferryX + 9, ferryY - 8, '#777');
     // Wake
     for (let wi = 0; wi < 8; wi++) {
         drawPixel(ctx, ferryX - 2 - wi * 2, ferryY + 3 + Math.floor(Math.sin(wi) * 1), `rgba(150,180,220,${0.2 - wi * 0.02})`);
@@ -574,46 +706,57 @@ function drawLiveScene(canvas) {
         drawRect(ctx, ferryX + 2, ferryY + 6 + ry, 14, 1, `rgba(200,100,0,${0.08 - ry * 0.015})`);
     }
 
-    // VERRAZANO BRIDGE — spans full width (edge to edge, wall to wall)
-    const bridgeY = Math.floor(H * 0.45);
+    // VERRAZANO BRIDGE — spans full width, deck at road level
+    const bridgeDeckY = Math.floor(H * 0.855); // matches CSS road top
     const towerL = Math.floor(W * 0.3);
     const towerR = Math.floor(W * 0.7);
-    const towerH = 40;
+    const towerH = 50;
 
-    // Bridge deck — full width
-    drawRect(ctx, 0, bridgeY + 10, W, 4, '#4a4a5a');
-    drawRect(ctx, 0, bridgeY + 10, W, 1, '#5a5a6a');
+    // Bridge deck — full width at road level
+    drawRect(ctx, 0, bridgeDeckY, W, 4, '#4a4a5a');
+    drawRect(ctx, 0, bridgeDeckY, W, 1, '#5a5a6a');
+    drawRect(ctx, 0, bridgeDeckY + 3, W, 1, '#000'); // bottom outline
     // Deck lights
     for (let x = 0; x < W; x += 6) {
-        drawPixel(ctx, x, bridgeY + 9, '#ffcc44');
-        drawPixel(ctx, x, bridgeY + 14, '#ffcc44');
+        drawPixel(ctx, x, bridgeDeckY - 1, '#ffcc44');
         // Light reflections in water
-        for (let ry = 0; ry < 8; ry++) {
-            drawPixel(ctx, x + Math.floor(Math.random() * 3) - 1, bridgeY + 20 + ry * 3, `rgba(255,200,60,${0.1 - ry * 0.01})`);
+        for (let ry = 0; ry < 5; ry++) {
+            const reflY = bridgeDeckY + 8 + ry * 3;
+            if (reflY < H) {
+                drawPixel(ctx, x + Math.floor(Math.random() * 3) - 1, reflY, `rgba(255,200,60,${0.08 - ry * 0.01})`);
+            }
         }
     }
+    // Railing
+    drawRect(ctx, 0, bridgeDeckY - 3, W, 1, '#555');
+    drawRect(ctx, 0, bridgeDeckY - 3, W, 1, '#000');
+    for (let x = 0; x < W; x += 3) {
+        drawRect(ctx, x, bridgeDeckY - 3, 1, 3, '#555');
+    }
 
-    // Towers
+    // Towers with outlines
     [towerL, towerR].forEach(tx => {
-        drawRect(ctx, tx - 3, bridgeY - towerH, 6, towerH + 14, '#5a5a6a');
-        drawRect(ctx, tx - 4, bridgeY - towerH, 8, 2, '#6a6a7a');
-        drawRect(ctx, tx - 2, bridgeY - towerH - 3, 4, 3, '#6a6a7a');
-        drawRect(ctx, tx - 2, bridgeY - towerH + 5, 1, towerH - 10, '#4a4a5a');
-        drawRect(ctx, tx + 1, bridgeY - towerH + 5, 1, towerH - 10, '#6a6a7a');
-        drawPixel(ctx, tx, bridgeY - towerH - 3, '#ff0000');
+        drawOutlinedRect(ctx, tx - 3, bridgeDeckY - towerH, 6, towerH + 4, '#5a5a6a');
+        drawOutlinedRect(ctx, tx - 4, bridgeDeckY - towerH, 8, 2, '#6a6a7a');
+        drawOutlinedRect(ctx, tx - 2, bridgeDeckY - towerH - 3, 4, 3, '#6a6a7a');
+        // Tower details
+        drawRect(ctx, tx - 2, bridgeDeckY - towerH + 5, 1, towerH - 10, '#4a4a5a');
+        drawRect(ctx, tx + 1, bridgeDeckY - towerH + 5, 1, towerH - 10, '#6a6a7a');
+        // Tower light
+        drawPixel(ctx, tx, bridgeDeckY - towerH - 4, '#ff0000');
         for (let d = 1; d <= 3; d++) {
-            drawPixel(ctx, tx - d, bridgeY - towerH - 3, `rgba(255,0,0,${0.3 / d})`);
-            drawPixel(ctx, tx + d, bridgeY - towerH - 3, `rgba(255,0,0,${0.3 / d})`);
+            drawPixel(ctx, tx - d, bridgeDeckY - towerH - 4, `rgba(255,0,0,${0.3 / d})`);
+            drawPixel(ctx, tx + d, bridgeDeckY - towerH - 4, `rgba(255,0,0,${0.3 / d})`);
         }
     });
 
     // Cables between towers
     for (let x = towerL; x <= towerR; x++) {
         const t = (x - towerL) / (towerR - towerL);
-        const cableY = bridgeY - towerH + Math.floor(towerH * 0.8 * Math.pow(2 * t - 1, 2));
+        const cableY = bridgeDeckY - towerH + Math.floor(towerH * 0.8 * Math.pow(2 * t - 1, 2));
         drawPixel(ctx, x, cableY, '#888');
         if (x % 4 === 0) {
-            for (let sy = cableY; sy < bridgeY + 10; sy++) {
+            for (let sy = cableY; sy < bridgeDeckY; sy++) {
                 drawPixel(ctx, x, sy, 'rgba(100,100,120,0.4)');
             }
         }
@@ -621,13 +764,13 @@ function drawLiveScene(canvas) {
     // Outer cables — left edge to tower
     for (let x = 0; x < towerL; x++) {
         const t = x / towerL;
-        const cableY = bridgeY + 10 - Math.floor(t * towerH * 0.6);
+        const cableY = bridgeDeckY - Math.floor(t * towerH * 0.6);
         drawPixel(ctx, x, cableY, '#777');
     }
     // Outer cables — tower to right edge
     for (let x = towerR; x < W; x++) {
         const t = (x - towerR) / (W - towerR);
-        const cableY = bridgeY - towerH * 0.6 + Math.floor(t * (towerH * 0.6 + 10));
+        const cableY = bridgeDeckY - towerH * 0.6 + Math.floor(t * towerH * 0.6);
         drawPixel(ctx, x, cableY, '#777');
     }
 }
