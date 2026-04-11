@@ -757,17 +757,44 @@ function drawLiveScene(canvas) {
         drawRect(ctx, x, bridgeDeckY - 3, 1, 3, '#555');
     }
 
-    // SUPPORT PILLARS under bridge — going down into water
+    // SUPPORT PILLARS — paired with X-braces
     const pillarBottom = H;
+    const pillarGap = 6; // distance between paired pillars
     for (let px = Math.floor(W * 0.08); px < W; px += Math.floor(W * 0.1)) {
-        const pillarH = pillarBottom - bridgeDeckY - 4;
-        // Main pillar
-        drawOutlinedRect(ctx, px - 1, bridgeDeckY + 4, 3, pillarH, '#4a4a55');
-        // Wider base where it meets water
-        const waterHitY = Math.max(bridgeDeckY + 4, waterY - 2);
-        drawOutlinedRect(ctx, px - 2, waterHitY, 5, 4, '#3a3a45');
-        // Wider footing at deck
-        drawOutlinedRect(ctx, px - 2, bridgeDeckY + 3, 5, 3, '#5a5a65');
+        const topY = bridgeDeckY + 4;
+        const pillarH = pillarBottom - topY;
+        const px2 = px + pillarGap; // second pillar
+
+        // Left pillar
+        drawOutlinedRect(ctx, px - 1, topY, 2, pillarH, '#4a4a55');
+        // Right pillar
+        drawOutlinedRect(ctx, px2 - 1, topY, 2, pillarH, '#4a4a55');
+
+        // X-braces between the pair
+        const braceSpacing = Math.floor(pillarH / 3);
+        for (let bi = 0; bi < 2; bi++) {
+            const by1 = topY + 4 + bi * braceSpacing;
+            const by2 = by1 + braceSpacing - 2;
+            // Diagonal "\"
+            for (let t = 0; t <= 1; t += 0.05) {
+                const bx = Math.floor(px + t * pillarGap);
+                const by = Math.floor(by1 + t * (by2 - by1));
+                drawPixel(ctx, bx, by, '#555');
+            }
+            // Diagonal "/"
+            for (let t = 0; t <= 1; t += 0.05) {
+                const bx = Math.floor(px + pillarGap - t * pillarGap);
+                const by = Math.floor(by1 + t * (by2 - by1));
+                drawPixel(ctx, bx, by, '#555');
+            }
+        }
+
+        // Wider footings at deck
+        drawOutlinedRect(ctx, px - 2, topY, 5 + pillarGap, 2, '#5a5a65');
+        // Wider base at water
+        const waterHitY = Math.max(topY, waterY - 2);
+        drawOutlinedRect(ctx, px - 2, waterHitY, 3, 3, '#3a3a45');
+        drawOutlinedRect(ctx, px2 - 2, waterHitY, 3, 3, '#3a3a45');
     }
 
     // Towers with outlines
