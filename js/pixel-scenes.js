@@ -16,12 +16,12 @@ function drawPixel(ctx, x, y, color) {
     ctx.fillRect(x * PIXEL, y * PIXEL, PIXEL, PIXEL);
 }
 
-// Draw outlined rectangle (fill + thin 1-real-pixel black border)
+// Draw outlined rectangle (fill + thin 2-real-pixel black border)
 function drawOutlinedRect(ctx, x, y, w, h, fillColor) {
     drawRect(ctx, x, y, w, h, fillColor);
     ctx.strokeStyle = '#000';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x * PIXEL + 0.5, y * PIXEL + 0.5, w * PIXEL - 1, h * PIXEL - 1);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x * PIXEL + 1, y * PIXEL + 1, w * PIXEL - 2, h * PIXEL - 2);
 }
 
 // Draw a row of pixels from color array
@@ -439,32 +439,41 @@ function drawBrooklynScene(canvas) {
 function drawTree(ctx, x, y) {
     // Trunk
     drawOutlinedRect(ctx, x, y - 14, 2, 14, '#5a3a20');
-    // Natural round canopy — drawn as filled circle with leaf texture
-    const cx = x + 1;
-    const cy = y - 22;
-    const radius = 7;
-    const greens = ['#1d6a0e', '#2d7a1e', '#3d8a2e', '#258a18', '#1a5a0a'];
-    // Fill canopy
-    for (let dy = -radius; dy <= radius; dy++) {
-        for (let dx = -radius; dx <= radius; dx++) {
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist <= radius) {
-                const shade = greens[Math.floor(Math.random() * greens.length)];
-                drawPixel(ctx, cx + dx, cy + dy, shade);
-            }
-        }
+    // Varied tree shapes — pick one per tree based on position
+    const type = (x * 7) % 3;
+    const greens = ['#1d6a0e', '#2d7a1e', '#3d8a2e', '#258a18'];
+
+    if (type === 0) {
+        // Wide horizontal canopy
+        drawOutlinedRect(ctx, x - 5, y - 18, 12, 5, '#2d7a1e');
+        // Small branch left
+        drawOutlinedRect(ctx, x - 7, y - 16, 3, 3, '#258a18');
+        // Small branch right
+        drawOutlinedRect(ctx, x + 6, y - 17, 3, 3, '#1d6a0e');
+        // Top bump
+        drawOutlinedRect(ctx, x - 2, y - 21, 6, 3, '#3d8a2e');
+    } else if (type === 1) {
+        // Tall bushy
+        drawOutlinedRect(ctx, x - 4, y - 20, 10, 7, '#2d7a1e');
+        // Branch sticking out left
+        drawOutlinedRect(ctx, x - 6, y - 18, 3, 2, '#1d6a0e');
+        // Top part
+        drawOutlinedRect(ctx, x - 2, y - 23, 6, 4, '#258a18');
+        // Small right branch
+        drawOutlinedRect(ctx, x + 5, y - 16, 2, 3, '#3d8a2e');
+    } else {
+        // Spreading shape
+        drawOutlinedRect(ctx, x - 3, y - 17, 8, 4, '#2d7a1e');
+        drawOutlinedRect(ctx, x - 6, y - 19, 5, 3, '#258a18');
+        drawOutlinedRect(ctx, x + 3, y - 20, 5, 4, '#1d6a0e');
+        drawOutlinedRect(ctx, x - 1, y - 22, 4, 3, '#3d8a2e');
     }
-    // Outer outline only — thin stroke
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc((cx) * PIXEL, (cy) * PIXEL, radius * PIXEL, 0, Math.PI * 2);
-    ctx.stroke();
-    // Highlights (lighter spots)
-    for (let i = 0; i < 6; i++) {
-        const hx = cx - 3 + Math.floor(Math.random() * 6);
-        const hy = cy - 3 + Math.floor(Math.random() * 4);
-        drawPixel(ctx, hx, hy, '#4daa3e');
+
+    // Leaf texture highlights
+    for (let i = 0; i < 5; i++) {
+        const hx = x - 4 + Math.floor(Math.random() * 10);
+        const hy = y - 22 + Math.floor(Math.random() * 7);
+        drawPixel(ctx, hx, hy, greens[Math.floor(Math.random() * greens.length)]);
     }
 }
 
@@ -620,40 +629,42 @@ function drawLiveScene(canvas) {
         drawPixel(ctx, bx, by + 1, 'rgba(255,255,255,0.5)');
     });
 
-    // CITY SKYLINE — sitting at water level
-    const skylineY = waterY;
-    for (let x = 0; x < W; x++) {
-        const bh = 5 + Math.floor(Math.random() * 25);
-        if (x % 3 === 0) {
-            drawRect(ctx, x, skylineY - bh, 2, bh, '#0a0a18');
-            // Tiny windows
-            for (let wy = skylineY - bh + 2; wy < skylineY; wy += 3) {
-                if (Math.random() > 0.5) {
-                    drawPixel(ctx, x, wy, `rgba(255,200,100,${0.2 + Math.random() * 0.3})`);
-                }
-            }
-        }
-    }
-
-    // WATER
+    // WATER — optimized: row-based fills instead of per-pixel
     const waterY = Math.floor(H * 0.6);
     for (let y = waterY; y < H; y++) {
         const t = (y - waterY) / (H - waterY);
-        for (let x = 0; x < W; x++) {
+        const r = Math.floor(5 + t * 10);
+        const g = Math.floor(15 + t * 15);
+        const b = Math.floor(40 + t * 20);
+        drawRect(ctx, 0, y, W, 1, `rgb(${r},${g},${b})`);
+    }
+    // Wave highlights
+    for (let y = waterY; y < H; y += 2) {
+        for (let x = 0; x < W; x += 4) {
             const wave = Math.sin(x * 0.3 + y * 0.5) * 0.15;
-            const r = Math.floor(5 + t * 10);
-            const g = Math.floor(15 + t * 15 + wave * 20);
-            const b = Math.floor(40 + t * 20 + wave * 30);
-            drawPixel(ctx, x, y, `rgb(${r},${g},${b})`);
+            if (wave > 0.05) {
+                drawPixel(ctx, x, y, `rgba(100,150,200,${wave})`);
+            }
         }
     }
-
-    // Water reflections
+    // Reflections
     for (let i = 0; i < 40; i++) {
         const rx = Math.floor(Math.random() * W);
         const ry = waterY + Math.floor(Math.random() * (H - waterY));
         const rw = 2 + Math.floor(Math.random() * 4);
         drawRect(ctx, rx, ry, rw, 1, `rgba(100,150,200,${0.1 + Math.random() * 0.15})`);
+    }
+
+    // CITY SKYLINE — sitting at water level (drawn AFTER water)
+    const skylineY = waterY;
+    for (let x = 0; x < W; x += 3) {
+        const bh = 5 + Math.floor(Math.random() * 25);
+        drawRect(ctx, x, skylineY - bh, 2, bh, '#0a0a18');
+        for (let wy = skylineY - bh + 2; wy < skylineY; wy += 3) {
+            if (Math.random() > 0.5) {
+                drawPixel(ctx, x, wy, `rgba(255,200,100,${0.2 + Math.random() * 0.3})`);
+            }
+        }
     }
 
     // STATUE OF LIBERTY (far background, left side)
