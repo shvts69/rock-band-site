@@ -7,14 +7,15 @@
     const road = document.getElementById('road');
     const bandWalkers = document.getElementById('bandWalkers');
 
-    // Конвертуємо вертикальний скрол в горизонтальний
     function initHorizontalScroll() {
         const totalWidth = wrapper.scrollWidth;
         const viewportWidth = window.innerWidth;
         const maxScroll = totalWidth - viewportWidth;
 
-        // Встановлюємо висоту body для скролу
         document.body.style.height = totalWidth + 'px';
+
+        // Find stage section position for road clipping
+        const stageSection = document.getElementById('stage');
 
         function onScroll() {
             const scrollY = window.scrollY;
@@ -27,14 +28,33 @@
             wrapper.style.left = '0';
             wrapper.style.transform = `translateX(${translateX}px)`;
 
-            // Оновлюємо прогрес-бар на дорозі
+            // Update road progress bar
             updateRoadProgress(progress);
 
-            // Рухаємо розмітку дороги
+            // Move road line markings
             if (road) {
                 const roadLine = road.querySelector('.road-line');
                 if (roadLine) {
                     roadLine.style.transform = `translateX(${translateX * 0.5}px) translateY(-50%)`;
+                }
+            }
+
+            // Hide road & walkers when entering stage section
+            if (stageSection && road) {
+                const stageRect = stageSection.getBoundingClientRect();
+                // Road disappears as stage section enters viewport
+                if (stageRect.left < viewportWidth * 0.3) {
+                    road.style.opacity = '0';
+                    road.style.pointerEvents = 'none';
+                    if (bandWalkers) {
+                        bandWalkers.style.opacity = '0';
+                    }
+                } else {
+                    road.style.opacity = '1';
+                    road.style.pointerEvents = 'auto';
+                    if (bandWalkers) {
+                        bandWalkers.style.opacity = '1';
+                    }
                 }
             }
         }
@@ -45,11 +65,9 @@
             onScroll();
         });
 
-        // Перший виклик
         onScroll();
     }
 
-    // Прогрес-бар
     function updateRoadProgress(progress) {
         let progressBar = document.querySelector('.road-progress');
         if (!progressBar) {
@@ -60,7 +78,6 @@
         progressBar.style.width = (progress * 100) + '%';
     }
 
-    // Ініціалізація після завантаження
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initHorizontalScroll);
     } else {

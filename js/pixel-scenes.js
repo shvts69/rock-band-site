@@ -580,9 +580,9 @@ function drawStageScene(canvas) {
         }
     });
 
-    // STAGE PLATFORM — aligned with the fixed road (bottom: 33% + 50px height)
-    // Road surface (top of road) ≈ 40% from bottom = 60% from top
-    const stageY = Math.floor(H * 0.60);
+    // STAGE PLATFORM — aligned with the fixed road (bottom: 60px + 50px height)
+    // Road surface (top of road) = 110px from bottom ≈ 85% from top
+    const stageY = Math.floor(H * 0.84);
     const stageLeft = Math.floor(W * 0.08);
     const stageRight = Math.floor(W * 0.92);
     const stageW = stageRight - stageLeft;
