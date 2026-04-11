@@ -704,8 +704,8 @@ function drawLiveScene(canvas) {
         drawPixel(ctx, statueX, waterY + 2 + ry, `rgba(90,140,106,${0.12 - ry * 0.01})`);
     }
 
-    // NY FERRY — right side, visible in the water area
-    const ferryX = Math.floor(W * 0.82);
+    // NY FERRY — far right, visible in the water area
+    const ferryX = Math.floor(W * 0.9);
     const ferryY = waterY + 8;
     // Hull with outline
     drawOutlinedRect(ctx, ferryX, ferryY, 18, 4, '#dd6600');
@@ -755,6 +755,19 @@ function drawLiveScene(canvas) {
     drawRect(ctx, 0, bridgeDeckY - 3, W, 1, '#000');
     for (let x = 0; x < W; x += 3) {
         drawRect(ctx, x, bridgeDeckY - 3, 1, 3, '#555');
+    }
+
+    // SUPPORT PILLARS under bridge — going down into water
+    const pillarBottom = H;
+    for (let px = Math.floor(W * 0.08); px < W; px += Math.floor(W * 0.1)) {
+        const pillarH = pillarBottom - bridgeDeckY - 4;
+        // Main pillar
+        drawOutlinedRect(ctx, px - 1, bridgeDeckY + 4, 3, pillarH, '#4a4a55');
+        // Wider base where it meets water
+        const waterHitY = Math.max(bridgeDeckY + 4, waterY - 2);
+        drawOutlinedRect(ctx, px - 2, waterHitY, 5, 4, '#3a3a45');
+        // Wider footing at deck
+        drawOutlinedRect(ctx, px - 2, bridgeDeckY + 3, 5, 3, '#5a5a65');
     }
 
     // Towers with outlines
