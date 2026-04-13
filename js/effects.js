@@ -4,29 +4,186 @@
 
 (function() {
 
-    // ====== CAMERA FLASHES (рандомні спалахи в натовпі) ======
+    // ====== STAGE EFFECTS: flashes + moving spotlights ======
     function initRandomFlashes() {
-        const stage = document.querySelector('.section-stage');
-        if (!stage) return;
+        const PIXEL = 4;
+        const parent = document.querySelector('.section-stage .stage-bg');
+        if (!parent) return;
 
-        setInterval(() => {
-            const flash = document.createElement('div');
-            flash.style.cssText = `
-                position: absolute;
-                width: 6px;
-                height: 6px;
-                background: #fff;
-                border-radius: 50%;
-                bottom: ${20 + Math.random() * 60}px;
-                left: ${10 + Math.random() * 80}%;
-                z-index: 25;
-                pointer-events: none;
-                box-shadow: 0 0 20px #fff, 0 0 40px #fff;
-            `;
-            stage.querySelector('.crowd').appendChild(flash);
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8;';
+        const section = parent.closest('.section') || parent;
+        canvas.width = section.offsetWidth || parent.offsetWidth;
+        canvas.height = section.offsetHeight || parent.offsetHeight;
+        parent.appendChild(canvas);
 
-            setTimeout(() => flash.remove(), 150);
-        }, 800 + Math.random() * 1200);
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        // Flashes state
+        const flashes = [];
+        let nextFlash = 0;
+
+        // Spotlight positions (moving)
+        const spots = [
+            { x: W * 0.2, speed: 0.3, phase: 0, r: 255, g: 50, b: 50 },
+            { x: W * 0.4, speed: 0.25, phase: 1.5, r: 255, g: 200, b: 50 },
+            { x: W * 0.6, speed: 0.35, phase: 3, r: 50, g: 100, b: 255 },
+            { x: W * 0.8, speed: 0.2, phase: 4.5, r: 255, g: 50, b: 200 },
+        ];
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            const t = Date.now() * 0.001;
+
+            // Moving spotlights
+            spots.forEach(sp => {
+                const spotX = Math.floor(sp.x + Math.sin(t * sp.speed + sp.phase) * W * 0.12);
+                // Bright beam cone
+                for (let y = 7; y < H * 0.7; y++) {
+                    const bt = (y - 7) / (H * 0.7 - 7);
+                    const beamW = Math.floor(2 + bt * 18);
+                    for (let dx = -beamW; dx <= beamW; dx++) {
+                        const dist = Math.abs(dx) / beamW;
+                        const alpha = (1 - dist) * (1 - bt) * 0.12;
+                        if (alpha > 0.01) {
+                            ctx.fillStyle = `rgba(${sp.r},${sp.g},${sp.b},${alpha})`;
+                            ctx.fillRect(spotX + dx, y, 1, 1);
+                        }
+                    }
+                }
+                // Light fixture — detailed
+                // Mount bracket
+                ctx.fillStyle = '#333';
+                ctx.fillRect(spotX - 1, 3, 3, 2);
+                // Housing (dark metal)
+                ctx.fillStyle = '#222';
+                ctx.fillRect(spotX - 2, 5, 5, 3);
+                ctx.fillStyle = '#2a2a2a';
+                ctx.fillRect(spotX - 2, 5, 5, 1);
+                // Lens (bright, colored)
+                ctx.fillStyle = `rgb(${sp.r},${sp.g},${sp.b})`;
+                ctx.fillRect(spotX - 1, 7, 3, 1);
+                // Lens glow
+                ctx.fillStyle = `rgba(${sp.r},${sp.g},${sp.b},0.5)`;
+                ctx.fillRect(spotX - 2, 8, 5, 1);
+                // Bright center of lens
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(spotX, 7, 1, 1);
+            });
+
+            // Camera flashes — random bursts
+            if (t > nextFlash) {
+                flashes.push({
+                    x: Math.floor(10 + Math.random() * (W - 20)),
+                    y: Math.floor(H * 0.88 + Math.random() * H * 0.08),
+                    life: 0.15,
+                    born: t
+                });
+                nextFlash = t + 0.2 + Math.random() * 0.5;
+            }
+
+            // Draw flashes
+            for (let i = flashes.length - 1; i >= 0; i--) {
+                const f = flashes[i];
+                const age = t - f.born;
+                if (age > f.life) {
+                    flashes.splice(i, 1);
+                    continue;
+                }
+                const alpha = 1 - age / f.life;
+                // Bright center
+                ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+                ctx.fillRect(f.x, f.y, 2, 2);
+                // Glow
+                ctx.fillStyle = `rgba(255,255,255,${alpha * 0.5})`;
+                ctx.fillRect(f.x - 1, f.y, 1, 2);
+                ctx.fillRect(f.x + 2, f.y, 1, 2);
+                ctx.fillRect(f.x, f.y - 1, 2, 1);
+                ctx.fillRect(f.x, f.y + 2, 2, 1);
+                // Wide glow
+                ctx.fillStyle = `rgba(255,255,200,${alpha * 0.2})`;
+                ctx.fillRect(f.x - 2, f.y - 1, 6, 4);
+            }
+
+            // === SOUND WAVES from ALL speakers (vibrating arcs both sides) ===
+            const stY = Math.floor(H * 0.855);
+            const stLeft = Math.floor(W * 0.08);
+            const stRight = Math.floor(W * 0.92);
+
+            // Floor speakers — center Y of stack
+            const floorSpeakers = [
+                { x: stLeft + 7, y: stY - 10 },
+                { x: stRight - 6, y: stY - 10 }
+            ];
+            // Hanging speakers — from ceiling
+            const hangingSpeakers = [
+                { x: 7, y: 19 },
+                { x: W - 6, y: 19 }
+            ];
+
+            const allSpeakers = [...floorSpeakers, ...hangingSpeakers];
+
+            allSpeakers.forEach((sp, si) => {
+                // Arcs going BOTH left and right from each speaker
+                [-1, 1].forEach(dir => {
+                    for (let wave = 0; wave < 3; wave++) {
+                        const dist = 3 + wave * 4;
+                        const vibrate = Math.sin(t * 8 + wave * 2 + si * 3 + dir) * 1.5;
+                        const alpha = 0.18 - wave * 0.05;
+                        for (let a = -0.8; a <= 0.8; a += 0.12) {
+                            const ax = sp.x + Math.floor((dist + vibrate) * dir * Math.cos(a));
+                            const ay = sp.y + Math.floor((dist + vibrate) * Math.sin(a));
+                            ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+                            ctx.fillRect(ax, ay, 1, 1);
+                        }
+                    }
+                });
+            });
+
+            // === LOGO 5051 flickering + lightning ===
+            const gs = 3;
+            const logoTotalW = 23 * gs;
+            const logoStageY = Math.floor(H * 0.855);
+            const logoLX = Math.floor(W * 0.5) - Math.floor(logoTotalW / 2);
+            const logoLY = logoStageY - 25 - 6 * gs;
+
+            // Intense neon flicker
+            const flick = Math.sin(t * 12) > -0.2 ? 1 : 0;
+            const flick2 = Math.sin(t * 7 + 2) > 0 ? 1 : 0;
+
+            if (flick * flick2) {
+                // Red glow pulse
+                for (let dy = -3; dy <= 6 * gs + 3; dy++) {
+                    for (let dx = -3; dx <= logoTotalW + 3; dx++) {
+                        const a = 0.06;
+                        ctx.fillStyle = `rgba(255,20,20,${a})`;
+                        ctx.fillRect(logoLX + dx, logoLY + dy, 1, 1);
+                    }
+                }
+            }
+
+            // Lightning bolts from logo
+            if (Math.random() > 0.6) {
+                const boltX = logoLX + Math.floor(Math.random() * logoTotalW);
+                const boltY = logoLY + Math.floor(Math.random() * 6 * gs);
+                const dirX = (Math.random() - 0.5) * 3;
+                const dirY = (Math.random() - 0.5) * 3;
+                const len = 3 + Math.floor(Math.random() * 5);
+                for (let bi = 0; bi < len; bi++) {
+                    const bx = Math.floor(boltX + bi * dirX + (Math.random() - 0.5) * 2);
+                    const by = Math.floor(boltY + bi * dirY + (Math.random() - 0.5) * 2);
+                    ctx.fillStyle = bi === 0 ? '#fff' : '#ffdd44';
+                    ctx.fillRect(bx, by, 1, 1);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
     }
 
     // ====== ЗІРКИ що мигають (додаткові в секції live) ======
@@ -73,11 +230,1197 @@
         }
     }
 
+    // ====== TWINKLING STARS on canvas (sections 2, 3) ======
+    function initTwinklingStars() {
+        const PIXEL = 4;
+        const sections = [
+            { sel: '.section-home .home-bg', starCount: 0, maxY: 0, sun: true },
+            { sel: '.section-about .about-bg', starCount: 80, maxY: 0.35, moon: true },
+            { sel: '.section-live .live-bg', starCount: 120, maxY: 0.5, torch: true }
+        ];
+
+        sections.forEach(sec => {
+            const parent = document.querySelector(sec.sel);
+            if (!parent) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;';
+            parent.style.position = 'relative';
+            parent.appendChild(canvas);
+
+            let ctx, W, H, stars, sunX, sunY, moonX, moonY;
+
+            function resize() {
+                // Use the section parent (not .bg) for reliable dimensions
+                const section = parent.closest('.section') || parent;
+                const w = section.offsetWidth || parent.offsetWidth || window.innerWidth;
+                const h = section.offsetHeight || parent.offsetHeight || window.innerHeight;
+                canvas.width = w;
+                canvas.height = h;
+                ctx = canvas.getContext('2d');
+                W = canvas.width / PIXEL;
+                H = canvas.height / PIXEL;
+                ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+                ctx.imageSmoothingEnabled = false;
+
+                sunX = Math.floor(W * 0.3);
+                sunY = Math.floor(H * 0.28);
+                moonX = Math.floor(W * 0.85);
+                moonY = Math.floor(H * 0.1);
+
+                // Regenerate stars for new size
+                stars = [];
+                for (let i = 0; i < sec.starCount; i++) {
+                    stars.push({
+                        x: Math.floor(Math.random() * W),
+                        y: Math.floor(Math.random() * H * sec.maxY),
+                        speed: 0.5 + Math.random() * 2,
+                        phase: Math.random() * Math.PI * 2,
+                        maxAlpha: 0.3 + Math.random() * 0.5,
+                        size: Math.random() > 0.85 ? 2 : 1,
+                        r: 200 + Math.floor(Math.random() * 55),
+                        g: 200 + Math.floor(Math.random() * 55),
+                        b: 220 + Math.floor(Math.random() * 35)
+                    });
+                }
+            }
+            resize();
+
+            function animate() {
+                ctx.clearRect(0, 0, W, H);
+                const t = Date.now() * 0.001;
+
+                // Twinkling stars
+                stars.forEach(s => {
+                    const alpha = s.maxAlpha * (0.2 + 0.8 * Math.abs(Math.sin(t * s.speed + s.phase)));
+                    ctx.fillStyle = `rgba(${s.r},${s.g},${s.b},${alpha})`;
+                    ctx.fillRect(s.x, s.y, s.size, s.size);
+                    const glowAlpha = alpha * 0.35;
+                    ctx.fillStyle = `rgba(${s.r},${s.g},${s.b},${glowAlpha})`;
+                    ctx.fillRect(s.x - 1, s.y, 1, 1);
+                    ctx.fillRect(s.x + s.size, s.y, 1, 1);
+                    ctx.fillRect(s.x, s.y - 1, 1, 1);
+                    ctx.fillRect(s.x, s.y + s.size, 1, 1);
+                });
+
+                // Sun pulsing glow (section 1) — on the sun itself + corona
+                if (sec.sun) {
+                    const pulse = 0.6 + 0.4 * Math.sin(t * 0.6);
+                    const pulse2 = 0.5 + 0.5 * Math.sin(t * 1.1 + 1);
+                    const pulse3 = 0.7 + 0.3 * Math.sin(t * 0.4 + 2);
+                    // Bright shimmer on sun body
+                    for (let dy = -6; dy <= 6; dy++) {
+                        for (let dx = -6; dx <= 6; dx++) {
+                            const d = Math.sqrt(dx * dx + dy * dy);
+                            if (d <= 6) {
+                                const a = 0.25 * pulse2;
+                                ctx.fillStyle = `rgba(255,255,180,${a})`;
+                                ctx.fillRect(sunX + dx, sunY + dy, 1, 1);
+                            }
+                        }
+                    }
+                    // Inner corona
+                    for (let dy = -14; dy <= 14; dy++) {
+                        for (let dx = -14; dx <= 14; dx++) {
+                            const d = Math.sqrt(dx * dx + dy * dy);
+                            if (d > 5 && d <= 14) {
+                                const a = (0.25 - (d - 5) * 0.025) * pulse;
+                                if (a > 0) {
+                                    ctx.fillStyle = `rgba(255,150,40,${a})`;
+                                    ctx.fillRect(sunX + dx, sunY + dy, 1, 1);
+                                }
+                            }
+                        }
+                    }
+                    // Outer glow
+                    for (let dy = -22; dy <= 22; dy++) {
+                        for (let dx = -22; dx <= 22; dx++) {
+                            const d = Math.sqrt(dx * dx + dy * dy);
+                            if (d > 14 && d <= 22) {
+                                const a = (0.12 - (d - 14) * 0.013) * pulse3;
+                                if (a > 0) {
+                                    ctx.fillStyle = `rgba(255,100,20,${a})`;
+                                    ctx.fillRect(sunX + dx, sunY + dy, 1, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Statue torch flicker (section 3)
+                if (sec.torch) {
+                    const torchX = Math.floor(W * 0.12) + 3;
+                    const wY = Math.floor(H * 0.6);
+                    const torchY = wY + 4 - 38; // statueBase - 38
+                    const flicker1 = 0.5 + 0.5 * Math.sin(t * 6);
+                    const flicker2 = 0.5 + 0.5 * Math.sin(t * 9 + 1);
+                    const flicker = flicker1 * 0.6 + flicker2 * 0.4;
+                    // Flickering flame
+                    ctx.fillStyle = `rgba(255,220,50,${0.4 + flicker * 0.4})`;
+                    ctx.fillRect(torchX, torchY, 1, 1);
+                    ctx.fillStyle = `rgba(255,180,30,${0.3 + flicker * 0.3})`;
+                    ctx.fillRect(torchX - 1, torchY, 1, 1);
+                    ctx.fillRect(torchX + 1, torchY, 1, 1);
+                    ctx.fillStyle = `rgba(255,200,40,${0.2 + flicker * 0.4})`;
+                    ctx.fillRect(torchX, torchY - 1, 1, 1);
+                    // Glow
+                    for (let dy = -4; dy <= 4; dy++) {
+                        for (let dx = -4; dx <= 4; dx++) {
+                            const d = Math.sqrt(dx * dx + dy * dy);
+                            if (d > 0 && d <= 4) {
+                                const a = (0.15 - d * 0.03) * flicker;
+                                if (a > 0) {
+                                    ctx.fillStyle = `rgba(255,180,50,${a})`;
+                                    ctx.fillRect(torchX + dx, torchY + dy, 1, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Flickering street lamps (section 2) — lamp 1 and 3
+                if (sec.moon) {
+                    const lampSpacing = Math.floor(W / 4);
+                    const flickerLamps = [0, 1, 2, 3]; // all 4
+                    flickerLamps.forEach(li => {
+                        const lx = Math.floor(lampSpacing * 0.5 + li * lampSpacing) - 2;
+                        const lampTopY = Math.floor(H * 0.855) - 23;
+                        // Erratic flicker
+                        const f1 = Math.sin(t * 8 + li * 5) > 0.2 ? 1 : 0;
+                        const f2 = Math.sin(t * 13 + li * 3) > -0.3 ? 1 : 0;
+                        const f3 = Math.sin(t * 3 + li) > 0 ? 1 : 0;
+                        const on = f1 * f2 * f3;
+                        if (on) {
+                            // Bright flash — light cone
+                            for (let cy = 0; cy < 18; cy++) {
+                                const ct = cy / 18;
+                                const hw = Math.floor(2 + ct * 10);
+                                const a = 0.15 * (1 - ct * 0.6);
+                                ctx.fillStyle = `rgba(255,200,80,${a})`;
+                                ctx.fillRect(lx - hw, lampTopY + cy, hw * 2 + 1, 1);
+                            }
+                            // Bulb bright
+                            ctx.fillStyle = 'rgba(255,220,100,0.5)';
+                            ctx.fillRect(lx - 1, lampTopY, 3, 1);
+                        } else {
+                            // Dark — dim bulb
+                            ctx.fillStyle = 'rgba(60,40,10,0.3)';
+                            ctx.fillRect(lx - 1, lampTopY, 3, 1);
+                        }
+                    });
+                }
+
+                // Moon pulsing aura (section 2)
+                if (sec.moon) {
+                    const pulse = 0.7 + 0.3 * Math.sin(t * 0.5);
+                    for (let dy = -14; dy <= 14; dy++) {
+                        for (let dx = -14; dx <= 14; dx++) {
+                            const d = Math.sqrt(dx * dx + dy * dy);
+                            if (d > 6 && d <= 14) {
+                                const a = (0.1 - (d - 6) * 0.01) * pulse;
+                                if (a > 0) {
+                                    ctx.fillStyle = `rgba(220,220,200,${a})`;
+                                    ctx.fillRect(moonX + dx, moonY + dy, 1, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        });
+    }
+
+    // ====== EAGLE flying across section 1 ======
+    function initEagle() {
+        const PIXEL = 4;
+        const parent = document.querySelector('.section-home .home-bg');
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:6;';
+        const section = parent.closest('.section') || parent;
+        canvas.width = section.offsetWidth || parent.offsetWidth;
+        canvas.height = section.offsetHeight || parent.offsetHeight;
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        // Eagle pixel art sprite — detailed bald eagle
+        function getEagleFrame(wingPhase) {
+            const pixels = [];
+            const body = '#3a2a1a';
+            const bodyLight = '#4a3525';
+            const bodyDark = '#2a1a0e';
+            const wing = '#4a3520';
+            const wingMid = '#5a4530';
+            const wingLight = '#6a5540';
+            const wingTip = '#1a0e05';
+            const wingEdge = '#2a1a0a';
+            const head = '#f0ece0';
+            const headShade = '#d8d4c8';
+            const beak = '#e8a800';
+            const beakTip = '#cc8800';
+            const eye = '#111';
+            const tail = '#3a2a1a';
+            const tailEdge = '#5a4a3a';
+            const feet = '#e8a800';
+
+            // === BODY (thick, 3 rows) ===
+            for (let bx = -3; bx <= 3; bx++) {
+                pixels.push({x:bx, y:0, c: bx < 0 ? bodyDark : bodyLight});
+                pixels.push({x:bx, y:1, c: body});
+            }
+            for (let bx = -2; bx <= 2; bx++) {
+                pixels.push({x:bx, y:-1, c: bodyLight});
+                pixels.push({x:bx, y:2, c: bodyDark});
+            }
+            // Belly detail
+            pixels.push({x:0, y:2, c:'#4a3a28'});
+            pixels.push({x:1, y:2, c:'#4a3a28'});
+
+            // === HEAD (white, larger) ===
+            pixels.push({x:4, y:0, c:head}); pixels.push({x:5, y:0, c:head});
+            pixels.push({x:4, y:-1, c:head}); pixels.push({x:5, y:-1, c:head});
+            pixels.push({x:4, y:-2, c:head}); pixels.push({x:5, y:-2, c:headShade});
+            pixels.push({x:6, y:-1, c:head}); pixels.push({x:6, y:0, c:headShade});
+            pixels.push({x:3, y:-1, c:headShade}); pixels.push({x:3, y:-2, c:headShade});
+            // Eye
+            pixels.push({x:6, y:-1, c:eye});
+            // Brow ridge
+            pixels.push({x:5, y:-2, c:'#e0dcd0'});
+            // Beak (hooked)
+            pixels.push({x:7, y:0, c:beak});
+            pixels.push({x:8, y:0, c:beakTip});
+            pixels.push({x:7, y:1, c:beakTip});
+            pixels.push({x:7, y:-1, c:beak});
+
+            // === TAIL FEATHERS (fan shape) ===
+            for (let i = 0; i < 5; i++) {
+                pixels.push({x:-4-i, y: Math.floor(i*0.3), c: i < 3 ? tail : tailEdge});
+                pixels.push({x:-4-i, y: Math.floor(i*0.3)-1, c: i < 2 ? tail : tailEdge});
+            }
+            pixels.push({x:-5, y:1, c:tailEdge});
+            pixels.push({x:-6, y:1, c:tailEdge});
+            pixels.push({x:-7, y:2, c:'#4a3a2a'});
+            pixels.push({x:-5, y:-1, c:tail});
+            pixels.push({x:-6, y:-1, c:tailEdge});
+            // Tail feather detail lines
+            pixels.push({x:-6, y:0, c:'#3a2a1a'});
+            pixels.push({x:-7, y:1, c:'#3a2a1a'});
+
+            // === FEET (tucked under body) ===
+            pixels.push({x:1, y:3, c:feet});
+            pixels.push({x:2, y:3, c:feet});
+            pixels.push({x:0, y:3, c:'#cc8800'});
+
+            // === WINGS ===
+            const wingAngle = Math.sin(wingPhase * Math.PI * 2);
+
+            // Each wing: 10 segments, fan out from body
+            for (let side = -1; side <= 1; side += 2) {
+                if (side === 0) continue;
+                for (let i = 1; i <= 10; i++) {
+                    const t = i / 10;
+                    const wy = Math.round(wingAngle * 4 * t); // tip moves most
+                    const spreadX = side * Math.floor(i * 0.5);
+                    const spreadY = -1 + wy;
+
+                    // Primary feather color gradient
+                    let c;
+                    if (i <= 3) c = wing;
+                    else if (i <= 5) c = wingMid;
+                    else if (i <= 7) c = wingLight;
+                    else if (i <= 9) c = wingEdge;
+                    else c = wingTip;
+
+                    // Main wing pixel
+                    pixels.push({x: spreadX, y: spreadY - Math.floor(i * 0.15), c: c});
+                    // Wing thickness (2-3 px wide)
+                    pixels.push({x: spreadX, y: spreadY - Math.floor(i * 0.15) - 1, c: i <= 6 ? wingMid : wingEdge});
+                    if (i <= 7) {
+                        pixels.push({x: spreadX + (side > 0 ? -1 : 1), y: spreadY - Math.floor(i * 0.15), c: wing});
+                    }
+                    // Feather detail at tips
+                    if (i >= 7) {
+                        pixels.push({x: spreadX + side, y: spreadY - Math.floor(i * 0.15), c: wingTip});
+                    }
+                }
+                // Wing coverts (shorter feathers near body)
+                for (let i = 1; i <= 5; i++) {
+                    const wy = Math.round(wingAngle * 2 * (i / 5));
+                    pixels.push({x: side * Math.floor(i * 0.4), y: -2 + wy, c: wingMid});
+                }
+            }
+
+            return pixels;
+        }
+
+        // Eagle flight state
+        let eagleX = Math.floor(W * 0.3);
+        let eagleBaseY = H * 0.15;
+        let driftY = 0;
+        let driftTarget = 0;
+        let driftAngle = 0;
+        let driftAngleTarget = 0;
+        let nextDriftChange = 0;
+        const eagleSpeed = 0.2;
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            const t = Date.now() * 0.001;
+
+            // Change drift direction rarely and gently
+            if (t > nextDriftChange) {
+                driftTarget = (Math.random() - 0.5) * 0.08;
+                nextDriftChange = t + 5 + Math.random() * 8;
+            }
+
+            // Very smooth drift
+            driftY += (driftTarget - driftY) * 0.005;
+            eagleBaseY += driftY;
+
+            // Keep in sky bounds
+            if (eagleBaseY < H * 0.06) { eagleBaseY = H * 0.06; driftY = Math.abs(driftY); }
+            if (eagleBaseY > H * 0.3) { eagleBaseY = H * 0.3; driftY = -Math.abs(driftY); }
+
+            // Move eagle across screen
+            eagleX += eagleSpeed;
+            if (eagleX > W + 25) {
+                eagleX = -25;
+                eagleBaseY = H * 0.08 + Math.random() * H * 0.18;
+            }
+
+            // Gentle vertical bobbing
+            const bobY = Math.sin(t * 0.3) * 1;
+            const ex = Math.floor(eagleX);
+            const ey = Math.floor(eagleBaseY + bobY);
+
+            // Wing flap — slow, majestic, with glide pauses
+            const flapCycle = (t * 0.4) % 1;
+            // Glide for part of the cycle (wings level)
+            let wingPhase;
+            if (flapCycle < 0.6) {
+                wingPhase = flapCycle / 0.6; // flap
+            } else {
+                wingPhase = 0.5; // glide (wings level)
+            }
+
+            const pixels = getEagleFrame(wingPhase);
+
+            pixels.forEach(p => {
+                ctx.fillStyle = p.c;
+                ctx.fillRect(ex + p.x, ey + p.y, 1, 1);
+            });
+
+            // Shadow on ground (moves with eagle, gets bigger when higher)
+            const shadowY = Math.floor(H * 0.56);
+            const shadowSize = 3 + Math.floor((shadowY - ey) * 0.05);
+            ctx.fillStyle = 'rgba(0,0,0,0.05)';
+            for (let dx = -shadowSize; dx <= shadowSize; dx++) {
+                const sy = shadowY + (Math.abs(dx) > shadowSize - 1 ? 0 : 1);
+                ctx.fillRect(ex + dx, sy, 1, 1);
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // ====== TUMBLEWEED rolling across section 1 ======
+    function initTumbleweed() {
+        const PIXEL = 4;
+        const parent = document.querySelector('.section-home .home-bg');
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;';
+        const section = parent.closest('.section') || parent;
+        canvas.width = section.offsetWidth || parent.offsetWidth;
+        canvas.height = section.offsetHeight || parent.offsetHeight;
+        parent.insertBefore(canvas, parent.children[1]);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        const groundY = H * 0.68;
+        let twX = -10;
+        let twBaseY = groundY;
+        let twDrift = 0;
+        let twDriftTarget = 0;
+        let twNextDrift = 0;
+        let twRotation = 0;
+        const twSpeed = 0.15;
+
+        // Wind streaks
+        const winds = [];
+
+        function drawTumbleweedSprite(x, y, rot) {
+            const colors = ['#8b6914', '#7b5904', '#6b4904', '#9b7924', '#5b3904'];
+            // Rotating circle of sticks
+            for (let a = 0; a < Math.PI * 2; a += 0.4) {
+                const r = 3;
+                const px = Math.floor(x + Math.cos(a + rot) * r);
+                const py = Math.floor(y + Math.sin(a + rot) * r);
+                const c = colors[Math.floor(a * 2) % colors.length];
+                ctx.fillStyle = c;
+                ctx.fillRect(px, py, 1, 1);
+                // Inner stick
+                const px2 = Math.floor(x + Math.cos(a + rot) * (r - 1.5));
+                const py2 = Math.floor(y + Math.sin(a + rot) * (r - 1.5));
+                ctx.fillRect(px2, py2, 1, 1);
+            }
+            // Core
+            ctx.fillStyle = '#6b4904';
+            ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
+            ctx.fillRect(Math.floor(x) - 1, Math.floor(y), 1, 1);
+            ctx.fillRect(Math.floor(x), Math.floor(y) - 1, 1, 1);
+            // Outer wisps
+            for (let a = 0; a < Math.PI * 2; a += 0.8) {
+                const r = 3.5 + Math.sin(a * 3 + rot) * 0.5;
+                const px = Math.floor(x + Math.cos(a + rot) * r);
+                const py = Math.floor(y + Math.sin(a + rot) * r);
+                ctx.fillStyle = '#5b3904';
+                ctx.fillRect(px, py, 1, 1);
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            const t = Date.now() * 0.001;
+
+            // Drift vertically — gentle random changes
+            if (t > twNextDrift) {
+                twDriftTarget = (Math.random() - 0.5) * 0.06;
+                twNextDrift = t + 3 + Math.random() * 5;
+            }
+            twDrift += (twDriftTarget - twDrift) * 0.01;
+            twBaseY += twDrift;
+            if (twBaseY < groundY - 3) { twBaseY = groundY - 3; twDrift = Math.abs(twDrift); }
+            if (twBaseY > groundY + 2) { twBaseY = groundY + 2; twDrift = -Math.abs(twDrift); }
+
+            // Move and rotate
+            twX += twSpeed;
+            twRotation += 0.05;
+
+            // Bounce slightly
+            const bounceY = Math.abs(Math.sin(t * 3)) * 1.5;
+
+            if (twX > W + 10) {
+                twX = -10;
+                twBaseY = groundY - 1 + Math.random() * 3;
+            }
+
+            const twY = twBaseY - bounceY;
+            drawTumbleweedSprite(twX, twY, twRotation);
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.08)';
+            ctx.fillRect(Math.floor(twX) - 2, Math.floor(groundY) + 1, 5, 1);
+
+            // Wind streaks near tumbleweed
+            // Spawn new wind lines
+            if (Math.random() > 0.85) {
+                winds.push({
+                    x: twX - 5 - Math.random() * 8,
+                    y: twY - 2 + Math.random() * 5,
+                    len: 3 + Math.floor(Math.random() * 6),
+                    life: 0.3 + Math.random() * 0.4,
+                    born: t
+                });
+            }
+
+            // Draw and cleanup winds
+            for (let i = winds.length - 1; i >= 0; i--) {
+                const w = winds[i];
+                const age = t - w.born;
+                if (age > w.life) {
+                    winds.splice(i, 1);
+                    continue;
+                }
+                const alpha = (1 - age / w.life) * 0.25;
+                ctx.fillStyle = `rgba(200,180,140,${alpha})`;
+                // Wind line moving right
+                const wx = w.x + age * 15;
+                ctx.fillRect(Math.floor(wx), Math.floor(w.y), w.len, 1);
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // ====== PLANES flying across section 2 sky ======
+    function initPlanes() {
+        const PIXEL = 4;
+        const parent = document.querySelector('.section-about .about-bg');
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;';
+        const section = parent.closest('.section') || parent;
+        canvas.width = section.offsetWidth || parent.offsetWidth;
+        canvas.height = section.offsetHeight || parent.offsetHeight;
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        // Plane 1: left to right
+        const plane1 = { x: -20, y: H * 0.06, speed: 0.18, angle: 0.001 };
+        // Plane 2: right to left
+        const plane2 = { x: W + 20, y: H * 0.04, speed: -0.15, angle: -0.001 };
+
+        function drawPlane(px, py, facingRight) {
+            const x = Math.floor(px);
+            const y = Math.floor(py);
+            const d = facingRight ? 1 : -1;
+            // Fuselage
+            ctx.fillStyle = '#555';
+            ctx.fillRect(x - 2, y, 5, 1);
+            ctx.fillStyle = '#666';
+            ctx.fillRect(x - 1, y - 1, 3, 1);
+            // Nose
+            ctx.fillStyle = '#777';
+            ctx.fillRect(x + 3 * d, y, 1, 1);
+            // Wings (perpendicular to fuselage)
+            ctx.fillStyle = '#444';
+            ctx.fillRect(x - 1, y - 2, 1, 5);
+            ctx.fillRect(x, y - 2, 1, 5);
+            // Tail fin
+            ctx.fillStyle = '#555';
+            ctx.fillRect(x - 3 * d, y - 2, 1, 3);
+        }
+
+        let beaconPhase = 0;
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            const t = Date.now() * 0.001;
+            beaconPhase = t;
+
+            // Move planes
+            plane1.x += plane1.speed;
+            plane1.y += plane1.angle;
+            plane2.x += plane2.speed;
+            plane2.y += plane2.angle;
+
+            // Keep in safe zone: top 12% only
+            if (plane1.y > H * 0.12) plane1.y = H * 0.12;
+            if (plane1.y < H * 0.03) plane1.y = H * 0.03;
+            if (plane2.y > H * 0.10) plane2.y = H * 0.10;
+            if (plane2.y < H * 0.02) plane2.y = H * 0.02;
+
+            // Loop
+            if (plane1.x > W + 25) { plane1.x = -25; plane1.y = H * 0.05 + Math.random() * H * 0.04; }
+            if (plane2.x < -25) { plane2.x = W + 25; plane2.y = H * 0.03 + Math.random() * H * 0.04; }
+
+            drawPlane(plane1.x, plane1.y, true);
+            drawPlane(plane2.x, plane2.y, false);
+
+            // Blinking beacon lights
+            const blink = Math.sin(beaconPhase * 4) > 0.3;
+            if (blink) {
+                // Plane 1 beacon — red
+                ctx.fillStyle = '#ff2200';
+                ctx.fillRect(Math.floor(plane1.x), Math.floor(plane1.y) - 2, 1, 1);
+                ctx.fillStyle = 'rgba(255,34,0,0.3)';
+                ctx.fillRect(Math.floor(plane1.x) - 1, Math.floor(plane1.y) - 2, 3, 1);
+
+                // Plane 2 beacon — red
+                ctx.fillStyle = '#ff2200';
+                ctx.fillRect(Math.floor(plane2.x), Math.floor(plane2.y) - 2, 1, 1);
+                ctx.fillStyle = 'rgba(255,34,0,0.3)';
+                ctx.fillRect(Math.floor(plane2.x) - 1, Math.floor(plane2.y) - 2, 3, 1);
+            }
+
+            // White strobe (faster blink)
+            if (Math.sin(beaconPhase * 8) > 0.7) {
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(Math.floor(plane1.x) + 1, Math.floor(plane1.y), 1, 1);
+                ctx.fillRect(Math.floor(plane2.x) - 1, Math.floor(plane2.y), 1, 1);
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // ====== PIGEON flying between buildings in section 2 ======
+    function initPigeon() {
+        const PIXEL = 4;
+        const parent = document.querySelector('.section-about .about-bg');
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9;';
+        const section = parent.closest('.section') || parent;
+        canvas.width = section.offsetWidth || parent.offsetWidth;
+        canvas.height = section.offsetHeight || parent.offsetHeight;
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        // Scan background canvas to find real rooftop positions
+        const perches = [];
+        try {
+            const bgCanvas = parent.querySelector('canvas');
+            if (bgCanvas) {
+                const bgCtx = bgCanvas.getContext('2d');
+                for (let sx = 30; sx < canvas.width - 30; sx += 20 * PIXEL) {
+                    const col = bgCtx.getImageData(sx, 0, 1, canvas.height);
+                    let roofPixelY = -1;
+                    for (let py = Math.floor(canvas.height * 0.15); py < canvas.height * 0.8; py++) {
+                        const idx = py * 4;
+                        const r = col.data[idx];
+                        const g = col.data[idx + 1];
+                        const b = col.data[idx + 2];
+                        if (r > 60 && r > b && g < 80) {
+                            roofPixelY = py;
+                            break;
+                        }
+                    }
+                    if (roofPixelY > 0) {
+                        perches.push({ x: sx / PIXEL, y: roofPixelY / PIXEL - 1 });
+                    }
+                }
+            }
+        } catch(e) {}
+        // Fallback
+        if (perches.length < 3) {
+            const groundY = Math.floor(H * 0.82);
+            for (let i = 0; i < 8; i++) {
+                perches.push({ x: Math.floor(W * (0.08 + i * 0.12)), y: groundY - 65 - (i % 3) * 12 });
+            }
+        }
+
+        // Pigeon state — offset start for variety
+        let currentPerch = Math.floor(Math.random() * perches.length)
+        let targetPerch = currentPerch;
+        let pigeonX = perches[currentPerch].x;
+        let pigeonY = perches[currentPerch].y;
+        let isFlying = false;
+        let flyProgress = 0;
+        let startX, startY, endX, endY;
+        let waitUntil = Date.now() * 0.001 + 2;
+        let facingRight = true;
+
+        function pickNewTarget() {
+            let newPerch;
+            do {
+                newPerch = Math.floor(Math.random() * perches.length);
+            } while (newPerch === currentPerch && perches.length > 1);
+            targetPerch = newPerch;
+            startX = pigeonX;
+            startY = pigeonY;
+            endX = perches[targetPerch].x;
+            endY = perches[targetPerch].y;
+            facingRight = endX > startX;
+            isFlying = true;
+            flyProgress = 0;
+        }
+
+        function drawPigeonSprite(px, py, wingPhase, right) {
+            const x = Math.floor(px);
+            const y = Math.floor(py);
+            const d = right ? 1 : -1;
+
+            // Body
+            ctx.fillStyle = '#667';
+            ctx.fillRect(x - 2, y, 5, 3);
+            ctx.fillStyle = '#778';
+            ctx.fillRect(x - 1, y, 3, 2);
+            // Belly (lighter)
+            ctx.fillStyle = '#889';
+            ctx.fillRect(x - 1, y + 2, 3, 1);
+
+            // Head
+            ctx.fillStyle = '#778';
+            ctx.fillRect(x + 2 * d, y - 1, 2, 2);
+            ctx.fillStyle = '#889';
+            ctx.fillRect(x + 2 * d, y - 1, 2, 1);
+            // Eye
+            ctx.fillStyle = '#ff6600';
+            ctx.fillRect(x + 3 * d, y - 1, 1, 1);
+            // Beak
+            ctx.fillStyle = '#aa8855';
+            ctx.fillRect(x + 4 * d, y, 1, 1);
+
+            // Neck iridescence (green/purple shimmer)
+            ctx.fillStyle = '#4a6650';
+            ctx.fillRect(x + 1 * d, y, 1, 2);
+            ctx.fillStyle = '#5a5068';
+            ctx.fillRect(x + 2 * d, y, 1, 1);
+
+            // Tail
+            ctx.fillStyle = '#556';
+            ctx.fillRect(x - 3 * d, y + 1, 2, 1);
+            ctx.fillRect(x - 4 * d, y + 2, 2, 1);
+
+            // Wings
+            if (isFlying) {
+                const wingY = Math.round(Math.sin(wingPhase * Math.PI * 2) * 3);
+                // Left wing
+                ctx.fillStyle = '#556';
+                ctx.fillRect(x - 1, y - 1 + wingY, 1, 1);
+                ctx.fillRect(x, y - 2 + wingY, 1, 1);
+                ctx.fillRect(x + 1, y - 2 + wingY, 1, 1);
+                ctx.fillStyle = '#667';
+                ctx.fillRect(x - 1, y + wingY, 1, 1);
+                ctx.fillRect(x, y - 1 + wingY, 1, 1);
+                // Wing tips (darker)
+                ctx.fillStyle = '#445';
+                ctx.fillRect(x, y - 3 + wingY, 1, 1);
+                ctx.fillRect(x + 1, y - 3 + wingY, 1, 1);
+                // Feather detail
+                ctx.fillStyle = '#99a';
+                ctx.fillRect(x, y - 2 + wingY, 1, 1);
+            } else {
+                // Folded wings
+                ctx.fillStyle = '#556';
+                ctx.fillRect(x - 2, y + 1, 4, 1);
+                ctx.fillStyle = '#667';
+                ctx.fillRect(x - 1, y, 2, 1);
+                // Wing bar
+                ctx.fillStyle = '#334';
+                ctx.fillRect(x - 2, y + 1, 1, 1);
+                ctx.fillRect(x + 1, y + 1, 1, 1);
+            }
+
+            // Feet (only when perched)
+            if (!isFlying) {
+                ctx.fillStyle = '#cc5544';
+                ctx.fillRect(x - 1, y + 3, 1, 1);
+                ctx.fillRect(x + 1, y + 3, 1, 1);
+                ctx.fillRect(x - 2, y + 4, 2, 1);
+                ctx.fillRect(x, y + 4, 2, 1);
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            const t = Date.now() * 0.001;
+
+            if (!isFlying) {
+                // Sitting on building
+                if (t > waitUntil) {
+                    pickNewTarget();
+                }
+                // Slight head bob while sitting
+                const bobX = Math.sin(t * 2) * 0.3;
+                drawPigeonSprite(pigeonX + bobX, pigeonY, 0, facingRight);
+            } else {
+                // Flying — arc between buildings
+                flyProgress += 0.002;
+                if (flyProgress >= 1) {
+                    flyProgress = 1;
+                    isFlying = false;
+                    currentPerch = targetPerch;
+                    pigeonX = endX;
+                    pigeonY = endY;
+                    waitUntil = t + 2 + Math.random() * 5;
+                } else {
+                    // Smooth interpolation with arc
+                    const ft = flyProgress;
+                    const eased = ft < 0.5 ? 2 * ft * ft : 1 - Math.pow(-2 * ft + 2, 2) / 2;
+                    pigeonX = startX + (endX - startX) * eased;
+                    // Low arc — just above rooftops, capped
+                    const arcHeight = Math.min(Math.abs(endX - startX) * 0.1, 10);
+                    const arc = Math.sin(ft * Math.PI) * arcHeight;
+                    pigeonY = startY + (endY - startY) * eased - arc;
+                }
+
+                const wingPhase = (t * 3) % 1;
+                drawPigeonSprite(pigeonX, pigeonY, wingPhase, facingRight);
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // ====== RAT on road in section 2 ======
+    function initRat() {
+        const PIXEL = 4;
+        const parent = document.querySelector('.section-about .about-bg');
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:7;';
+        const section = parent.closest('.section') || parent;
+        canvas.width = section.offsetWidth || parent.offsetWidth;
+        canvas.height = section.offsetHeight || parent.offsetHeight;
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        const roadY = Math.floor(H * 0.855);
+
+        // Rat state
+        let ratX = Math.floor(W * (0.2 + Math.random() * 0.6));
+        let ratScale = 1;
+        let ratDir = 1; // 1 = right, -1 = left
+        let ratSpeed = 0.3;
+        let state = 'run'; // run, goDeep, comeBack, wait
+        let stateTimer = 0;
+        let waitUntil = 0;
+        let deepProgress = 0;
+
+        function drawRatSprite(px, py, s, right, frame) {
+            const x = Math.floor(px);
+            const y = Math.floor(py);
+            const sz = Math.max(0.3, s);
+
+            // Scale helper — flip horizontally for left-facing
+            const r = (rx, ry, rw, rh, c) => {
+                ctx.fillStyle = c;
+                const sx = right ? Math.floor(rx * sz) : Math.floor(-rx * sz - rw * sz);
+                ctx.fillRect(
+                    x + sx,
+                    y + Math.floor(ry * sz),
+                    Math.max(1, Math.floor(rw * sz)),
+                    Math.max(1, Math.floor(rh * sz))
+                );
+            };
+
+            // Body
+            r(-2, 0, 5, 2, '#555');
+            r(-1, -1, 3, 1, '#666');
+            // Dark belly
+            r(-1, 1, 3, 1, '#444');
+            // Nose
+            r(3, 0, 1, 1, '#777');
+            // Eye — red
+            r(2, -1, 1, 1, '#ff0000');
+            // Ears
+            r(1, -2, 1, 1, '#665');
+            r(2, -2, 1, 1, '#776');
+            // Tail — wavy
+            const tailWave = Math.sin(frame * 5) * 0.5;
+            r(-3, 1 + tailWave, 1, 1, '#888');
+            r(-4, 1 + tailWave * 0.5, 1, 1, '#777');
+            r(-5, 1, 1, 1, '#666');
+            // Legs (animated)
+            const legOff = Math.floor(Math.sin(frame * 8) * 1);
+            r(-1, 2, 1, 1, '#555');
+            r(1, 2 + legOff, 1, 1, '#555');
+            // Whiskers
+            if (sz > 0.6) {
+                r(3, -1, 1, 1, '#888');
+                r(4, 0, 1, 1, '#888');
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            const t = Date.now() * 0.001;
+
+            if (state === 'run') {
+                // Run along road
+                ratX += ratSpeed * ratDir;
+                ratScale = 1;
+
+                // Random chance to go deep
+                if (Math.random() > 0.998) {
+                    state = 'goDeep';
+                    deepProgress = 0;
+                }
+                // Turn at edges
+                if (ratX > W - 5) ratDir = -1;
+                if (ratX < 5) ratDir = 1;
+                // Random direction change
+                if (Math.random() > 0.995) ratDir *= -1;
+
+            } else if (state === 'goDeep') {
+                // Shrink and move up (going into distance)
+                deepProgress += 0.008;
+                ratScale = 1 - deepProgress * 0.7;
+                ratX += ratSpeed * ratDir * 0.3;
+                if (deepProgress >= 1) {
+                    state = 'wait';
+                    waitUntil = t + 1 + Math.random() * 3;
+                    // Reappear at random position
+                    ratX = Math.floor(10 + Math.random() * (W - 20));
+                    ratDir = Math.random() > 0.5 ? 1 : -1;
+                }
+
+            } else if (state === 'wait') {
+                ratScale = 0.3;
+                if (t > waitUntil) {
+                    state = 'comeBack';
+                    deepProgress = 1;
+                }
+
+            } else if (state === 'comeBack') {
+                // Grow back (coming from distance)
+                deepProgress -= 0.008;
+                ratScale = 1 - deepProgress * 0.7;
+                ratX += ratSpeed * ratDir * 0.3;
+                if (deepProgress <= 0) {
+                    state = 'run';
+                    ratScale = 1;
+                }
+            }
+
+            const ratY = roadY - 2 - Math.floor((1 - ratScale) * 8);
+            drawRatSprite(ratX, ratY, ratScale, ratDir > 0, t);
+
+            // Shadow
+            const shadowW = Math.floor(3 * ratScale);
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(Math.floor(ratX) - 1, roadY - 1, shadowW, 1);
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // ====== FERRY moving slowly in section 3 ======
+    function initFerry() {
+        const PIXEL = 4;
+        const parent = document.querySelector('.section-live .live-bg');
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;';
+        const section = parent.closest('.section') || parent;
+        canvas.width = section.offsetWidth || parent.offsetWidth;
+        canvas.height = section.offsetHeight || parent.offsetHeight;
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        const waterY = Math.floor(H * 0.6);
+        // Ferry zone — right side of bridge, open water
+        const zoneLeft = Math.floor(W * 0.72);
+        const zoneRight = W - 5;
+        const zoneTop = waterY + 4;
+        const zoneBottom = Math.floor(H * 0.88);
+
+        let ferryX = Math.floor(zoneLeft + 5);
+        let ferryY = zoneTop + Math.floor((zoneBottom - zoneTop) * 0.3);
+        let ferryDir = 1; // 1 = right, -1 = left
+        const ferrySpeed = 0.03;
+
+        const ripples = [];
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            const t = Date.now() * 0.001;
+
+            // Move right then left
+            ferryX += ferrySpeed * ferryDir;
+
+            // Turn at edges
+            if (ferryX > zoneRight - 24) { ferryDir = -1; }
+            if (ferryX < zoneLeft) { ferryDir = 1; }
+
+            const fx = Math.floor(ferryX);
+            const bob = Math.sin(t * 0.8) * 0.5;
+            const fy = Math.floor(ferryY + bob);
+
+            {
+            // Draw ferry — detailed Staten Island Ferry
+            // Black outline under hull
+            ctx.fillStyle = '#000';
+            ctx.fillRect(fx - 1, fy + 1, 24, 8);
+            // Hull — orange with gradient
+            ctx.fillStyle = '#dd6600';
+            ctx.fillRect(fx, fy + 2, 22, 5);
+            ctx.fillStyle = '#ee7711'; // hull highlight top
+            ctx.fillRect(fx + 1, fy + 2, 20, 1);
+            ctx.fillStyle = '#cc5500'; // hull mid
+            ctx.fillRect(fx + 1, fy + 3, 20, 2);
+            ctx.fillStyle = '#bb4400'; // hull dark bottom
+            ctx.fillRect(fx + 1, fy + 5, 20, 1);
+            ctx.fillStyle = '#993300'; // waterline
+            ctx.fillRect(fx + 2, fy + 6, 18, 1);
+            // Bow shape
+            ctx.fillStyle = '#cc5500';
+            ctx.fillRect(fx - 1, fy + 3, 1, 3);
+            ctx.fillStyle = '#dd6600';
+            ctx.fillRect(fx - 2, fy + 4, 1, 1);
+
+            // Main deck — white with outline
+            ctx.fillStyle = '#000';
+            ctx.fillRect(fx + 1, fy - 3, 20, 6);
+            ctx.fillStyle = '#eee8dd';
+            ctx.fillRect(fx + 2, fy - 2, 18, 4);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(fx + 3, fy - 1, 16, 2);
+            // Deck shadow
+            ctx.fillStyle = '#ccc8bb';
+            ctx.fillRect(fx + 2, fy + 1, 18, 1);
+
+            // Pilot house
+            ctx.fillStyle = '#000';
+            ctx.fillRect(fx + 7, fy - 6, 8, 4);
+            ctx.fillStyle = '#ddd8cc';
+            ctx.fillRect(fx + 8, fy - 5, 6, 3);
+            ctx.fillStyle = '#eee';
+            ctx.fillRect(fx + 8, fy - 5, 6, 1);
+            // Pilot windows
+            ctx.fillStyle = '#66aadd';
+            ctx.fillRect(fx + 9, fy - 4, 2, 1);
+            ctx.fillRect(fx + 12, fy - 4, 2, 1);
+
+            // Windows on main deck — warm glow
+            for (let wx = fx + 4; wx < fx + 18; wx += 2) {
+                ctx.fillStyle = '#88ccff';
+                ctx.fillRect(wx, fy - 1, 1, 1);
+                ctx.fillStyle = '#ffcc66'; // warm interior
+                ctx.fillRect(wx, fy, 1, 1);
+            }
+
+            // Smokestacks with bands
+            ctx.fillStyle = '#000';
+            ctx.fillRect(fx + 6, fy - 9, 4, 4);
+            ctx.fillRect(fx + 12, fy - 9, 4, 4);
+            ctx.fillStyle = '#dd6600';
+            ctx.fillRect(fx + 7, fy - 8, 2, 3);
+            ctx.fillRect(fx + 13, fy - 8, 2, 3);
+            // Black band on stacks
+            ctx.fillStyle = '#222';
+            ctx.fillRect(fx + 7, fy - 7, 2, 1);
+            ctx.fillRect(fx + 13, fy - 7, 2, 1);
+            // Smoke puffs
+            const smokeOff = Math.sin(t * 2) * 1;
+            ctx.fillStyle = 'rgba(100,100,100,0.3)';
+            ctx.fillRect(fx + 7, fy - 10 + Math.floor(smokeOff), 2, 1);
+            ctx.fillRect(fx + 13, fy - 11 + Math.floor(smokeOff * 0.7), 2, 1);
+            ctx.fillStyle = 'rgba(80,80,80,0.15)';
+            ctx.fillRect(fx + 6, fy - 11 + Math.floor(smokeOff), 3, 1);
+            ctx.fillRect(fx + 12, fy - 12 + Math.floor(smokeOff * 0.7), 3, 1);
+
+            // Railing posts
+            for (let rx = fx + 2; rx < fx + 20; rx += 2) {
+                ctx.fillStyle = '#999';
+                ctx.fillRect(rx, fy - 3, 1, 1);
+            }
+            // Railing bar
+            ctx.fillStyle = '#888';
+            ctx.fillRect(fx + 2, fy - 3, 18, 1);
+
+            // Life preservers
+            ctx.fillStyle = '#ff4422';
+            ctx.fillRect(fx + 5, fy + 3, 1, 1);
+            ctx.fillRect(fx + 16, fy + 3, 1, 1);
+            // Flag at stern
+            ctx.fillStyle = '#888';
+            ctx.fillRect(fx + 21, fy - 1, 1, 3);
+            ctx.fillStyle = '#0033aa';
+            ctx.fillRect(fx + 22, fy - 1, 2, 1);
+            ctx.fillStyle = '#cc0000';
+            ctx.fillRect(fx + 22, fy, 2, 1);
+
+            } // end if !underBridge
+
+            // Wake behind ferry
+            for (let wi = 0; wi < 15; wi++) {
+                const wx = fx + 22 + wi * 2;
+                const alpha = 0.2 - wi * 0.012;
+                if (alpha > 0) {
+                    ctx.fillStyle = `rgba(150,180,220,${alpha})`;
+                    ctx.fillRect(wx, fy + 4 + Math.floor(Math.sin(wi * 0.6 + t * 2) * 1), 2, 1);
+                }
+            }
+
+            // Spawn ripples near ferry
+            if (Math.random() > 0.85) {
+                ripples.push({
+                    x: fx + Math.floor(Math.random() * 22),
+                    y: fy + 5 + Math.floor(Math.random() * 4),
+                    radius: 0,
+                    maxRadius: 3 + Math.random() * 3,
+                    born: t
+                });
+            }
+            // Bow wave ripples
+            if (Math.random() > 0.7) {
+                ripples.push({
+                    x: fx - 1,
+                    y: fy + 3 + Math.floor(Math.random() * 3),
+                    radius: 0,
+                    maxRadius: 2 + Math.random() * 2,
+                    born: t
+                });
+            }
+
+            // Draw and update ripples
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const r = ripples[i];
+                const age = t - r.born;
+                r.radius = age * 4;
+                if (r.radius > r.maxRadius) {
+                    ripples.splice(i, 1);
+                    continue;
+                }
+                const alpha = 0.15 * (1 - r.radius / r.maxRadius);
+                const rad = Math.floor(r.radius);
+                // Draw circle outline
+                ctx.fillStyle = `rgba(120,160,200,${alpha})`;
+                ctx.fillRect(r.x - rad, r.y, rad * 2 + 1, 1);
+                ctx.fillRect(r.x, r.y - rad, 1, rad * 2 + 1);
+                if (rad > 1) {
+                    ctx.fillRect(r.x - rad + 1, r.y - 1, 1, 1);
+                    ctx.fillRect(r.x + rad - 1, r.y - 1, 1, 1);
+                    ctx.fillRect(r.x - rad + 1, r.y + 1, 1, 1);
+                    ctx.fillRect(r.x + rad - 1, r.y + 1, 1, 1);
+                }
+            }
+
+            // Ferry reflection
+            for (let ry = 0; ry < 5; ry++) {
+                const alpha = 0.08 - ry * 0.015;
+                if (alpha > 0) {
+                    ctx.fillStyle = `rgba(200,100,0,${alpha})`;
+                    ctx.fillRect(fx + 2, fy + 8 + ry, 18, 1);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
     // ====== INIT ======
     function init() {
         initRandomFlashes();
         initExtraStars();
         initRiverReflections();
+        initTwinklingStars();
+        initEagle();
+        initTumbleweed();
+        initPlanes();
+        initPigeon();
+        initPigeon();
+        initRat();
+        initRat();
+        initFerry();
     }
 
     if (document.readyState === 'loading') {

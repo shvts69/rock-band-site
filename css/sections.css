@@ -29,32 +29,55 @@
 
 .logo-text {
     font-family: 'Press Start 2P', monospace;
-    font-size: 64px;
-    color: #ff0000;
+    font-size: 84px;
+    color: #ff1111;
+    letter-spacing: 14px;
+    position: relative;
+    -webkit-text-stroke: 5px #000;
+    paint-order: stroke fill;
     text-shadow:
-        4px 4px 0 #000,
-        8px 8px 0 rgba(0,0,0,0.3),
-        0 0 20px #ff0000,
-        0 0 40px #ff4444,
-        0 0 80px #ff0000;
-    line-height: 1.3;
-    letter-spacing: 8px;
+        0 0 0 #000,
+        3px 3px 0 #000,
+        6px 6px 0 #000,
+        9px 9px 0 rgba(0,0,0,0.5),
+        0 0 30px rgba(255,0,0,0.5);
     animation: logoPulse 3s ease-in-out infinite alternate;
+}
+
+/* Inner highlight — top-left light source */
+.logo-text::before {
+    content: '5051';
+    position: absolute;
+    top: -2px;
+    left: -1px;
+    color: #ff5544;
+    -webkit-text-stroke: 5px #000;
+    paint-order: stroke fill;
+    text-shadow: none;
+    z-index: -1;
+    letter-spacing: 14px;
+}
+
+.logo-text::after {
+    content: '';
+    display: none;
 }
 
 @keyframes logoPulse {
     from {
         text-shadow:
-            4px 4px 0 #000,
-            0 0 20px #ff0000,
-            0 0 40px #ff4444;
+            3px 3px 0 #000,
+            6px 6px 0 #000,
+            9px 9px 0 rgba(0,0,0,0.5),
+            0 0 20px rgba(255,0,0,0.4);
     }
     to {
         text-shadow:
-            4px 4px 0 #000,
-            0 0 40px #ff0000,
-            0 0 80px #ff4444,
-            0 0 120px #ff6666;
+            3px 3px 0 #000,
+            6px 6px 0 #000,
+            9px 9px 0 rgba(0,0,0,0.5),
+            0 0 50px rgba(255,0,0,0.7),
+            0 0 100px rgba(255,0,0,0.3);
     }
 }
 
@@ -62,16 +85,34 @@
     font-family: 'Press Start 2P', monospace;
     font-size: 14px;
     color: #ffcc00;
-    margin-top: 20px;
+    margin-top: 30px;
     letter-spacing: 6px;
-    text-shadow: 2px 2px 0 #000;
+    -webkit-text-stroke: 2px #000;
+    paint-order: stroke fill;
+    text-shadow:
+        3px 3px 0 #000,
+        4px 4px 0 rgba(0,0,0,0.4),
+        0 0 15px rgba(255,200,0,0.3);
+}
+
+.logo-sub2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: #ccc;
+    margin-top: 10px;
+    letter-spacing: 4px;
+    -webkit-text-stroke: 1px #000;
+    paint-order: stroke fill;
+    text-shadow:
+        2px 2px 0 #000,
+        3px 3px 0 rgba(0,0,0,0.3);
 }
 
 
 /* ====== СЕКЦІЯ 2: ПРО ГРУПУ ====== */
 .section-about {
     background: #0d0d2b;
-    width: 250vw;
+    width: 150vw;
 }
 
 .about-bg {
@@ -86,10 +127,10 @@
 /* Галерея учасників */
 .members-gallery {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-around;
     height: calc(100% - 100px);
-    padding: 0 80px;
+    padding: 60px 80px 0;
     position: relative;
     z-index: 10;
 }
@@ -239,24 +280,35 @@
 }
 
 .member-name {
-    font-size: 14px;
+    font-size: 16px;
     color: #ffcc00;
-    text-shadow: 2px 2px 0 #000, 0 0 10px rgba(255,200,0,0.3);
+    -webkit-text-stroke: 2px #000;
+    paint-order: stroke fill;
+    text-shadow:
+        3px 3px 0 #000,
+        4px 4px 0 rgba(0,0,0,0.3),
+        0 0 12px rgba(255,200,0,0.4);
     margin-bottom: 6px;
 }
 
 .member-role {
-    font-size: 10px;
+    font-size: 11px;
     color: #ff6644;
+    -webkit-text-stroke: 1px #000;
+    paint-order: stroke fill;
     margin-bottom: 8px;
-    text-shadow: 1px 1px 0 #000;
+    text-shadow:
+        2px 2px 0 #000,
+        0 0 8px rgba(255,100,60,0.3);
 }
 
 .member-desc {
     font-size: 8px;
     color: #ccc;
     line-height: 1.8;
-    text-shadow: 1px 1px 0 #000;
+    -webkit-text-stroke: 1px #000;
+    paint-order: stroke fill;
+    text-shadow: 2px 2px 0 #000;
 }
 
 .model-placeholder {
@@ -274,7 +326,7 @@
 
 /* ====== СЕКЦІЯ 3: ЖИВІ ВИСТУПИ ====== */
 .section-live {
-    width: 200vw;
+    width: 150vw;
     background: #050510;
 }
 
@@ -286,7 +338,7 @@
 }
 
 /* Приховуємо старі CSS елементи */
-.night-sky, .pixel-star, .bridge, .bridge-tower, .bridge-cables, .bridge-deck, .river { display: none; }
+.night-sky, .pixel-star, .river { display: none; }
 
 /* Фотогалерея */
 .photo-gallery {
@@ -388,11 +440,11 @@
     font-size: 36px;
     text-align: center;
     color: #fff;
+    -webkit-text-stroke: 3px #000;
+    paint-order: stroke fill;
     text-shadow:
         4px 4px 0 #000,
-        -2px -2px 0 #000,
-        2px -2px 0 #000,
-        -2px 2px 0 #000,
+        5px 5px 0 rgba(0,0,0,0.4),
         0 0 20px rgba(255,68,68,0.5);
     position: relative;
     z-index: 10;
