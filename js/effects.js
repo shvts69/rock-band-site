@@ -562,70 +562,170 @@
             return pixels;
         }
 
-        // Eagle flight state
+        // Perched (sitting) eagle sprite
+        function getEaglePerched() {
+            const pixels = [];
+            const body = '#3a2a1a', bodyLight = '#4a3525', bodyDark = '#2a1a0e';
+            const wing = '#4a3520', wingMid = '#5a4530', wingLight = '#6a5540';
+            const head = '#f0ece0', headShade = '#d8d4c8';
+            const beak = '#e8a800', beakTip = '#cc8800', eye = '#111', feet = '#e8a800';
+
+            // Head
+            pixels.push({x:0,y:-6,c:head},{x:1,y:-6,c:head});
+            pixels.push({x:-1,y:-5,c:headShade},{x:0,y:-5,c:head},{x:1,y:-5,c:head},{x:2,y:-5,c:head});
+            pixels.push({x:-1,y:-4,c:headShade},{x:0,y:-4,c:head},{x:1,y:-4,c:head},{x:2,y:-4,c:headShade});
+            pixels.push({x:2,y:-5,c:eye}); // eye
+            pixels.push({x:0,y:-7,c:'#e0dcd0'},{x:1,y:-7,c:'#e0dcd0'}); // brow
+            pixels.push({x:3,y:-5,c:beak},{x:3,y:-4,c:beakTip},{x:4,y:-4,c:beakTip}); // beak
+            // Neck
+            pixels.push({x:0,y:-3,c:headShade},{x:1,y:-3,c:body});
+            // Body
+            for (let by = -2; by <= 2; by++) {
+                pixels.push({x:-1,y:by,c:bodyDark},{x:0,y:by,c:body},{x:1,y:by,c:body},{x:2,y:by,c:bodyLight});
+            }
+            pixels.push({x:1,y:-2,c:'#5a4530'},{x:2,y:-1,c:'#5a4530'});
+            pixels.push({x:0,y:2,c:'#4a3a28'},{x:1,y:2,c:'#4a3a28'});
+            // Folded wings
+            for (let wy = -1; wy <= 3; wy++) { pixels.push({x:-2,y:wy,c:wing},{x:3,y:wy,c:wingMid}); }
+            pixels.push({x:-3,y:1,c:wingMid},{x:-3,y:2,c:wingLight},{x:4,y:1,c:wingLight},{x:4,y:2,c:wingMid});
+            pixels.push({x:-2,y:3,c:wingMid},{x:-1,y:3,c:wing},{x:2,y:3,c:wing},{x:3,y:3,c:wingMid});
+            pixels.push({x:-3,y:3,c:wingLight},{x:4,y:3,c:wingLight});
+            // Tail
+            pixels.push({x:-1,y:4,c:'#3a2a1a'},{x:0,y:4,c:'#4a3a2a'},{x:1,y:4,c:'#3a2a1a'},{x:2,y:4,c:'#4a3a2a'});
+            pixels.push({x:0,y:5,c:'#5a4a3a'},{x:1,y:5,c:'#5a4a3a'});
+            // Feet/talons
+            pixels.push({x:0,y:3,c:feet},{x:1,y:3,c:feet},{x:-1,y:4,c:'#cc8800'},{x:2,y:4,c:'#cc8800'});
+            pixels.push({x:0,y:4,c:feet},{x:1,y:4,c:feet});
+            return pixels;
+        }
+
+        // States
+        const FLY = 0, DIVE = 1, LAND = 2, PERCH = 3, TAKEOFF = 4;
         let eagleX = Math.floor(W * 0.3);
         let eagleBaseY = H * 0.15;
-        let driftY = 0;
-        let driftTarget = 0;
-        let driftAngle = 0;
-        let driftAngleTarget = 0;
-        let nextDriftChange = 0;
+        let driftY = 0, driftTarget = 0, nextDriftChange = 0;
         const eagleSpeed = 0.2;
+        let eagleState = FLY, stateTimer = 0;
+
+        // Logo perch position
+        const logo = document.querySelector('.band-logo');
+        let perchX = W * 0.5, perchY = H * 0.4;
+        if (logo) {
+            const sr = section.getBoundingClientRect();
+            const lr = logo.getBoundingClientRect();
+            perchX = (lr.left + lr.width / 2 - sr.left) / PIXEL;
+            perchY = (lr.top - sr.top) / PIXEL - 2;
+        }
+
+        let diveStartX, diveStartY, diveProgress;
+        let eagleHover = false;
+
+        section.addEventListener('mousemove', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            eagleHover = Math.sqrt((mx - eagleX) ** 2 + (my - eagleBaseY) ** 2) < 15;
+            section.style.cursor = (eagleHover && eagleState === FLY) ? 'pointer' : '';
+        });
+        section.addEventListener('mouseleave', () => { eagleHover = false; });
+
+        section.addEventListener('click', function(e) {
+            if (eagleState !== FLY) return;
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            if (Math.sqrt((mx - eagleX) ** 2 + (my - eagleBaseY) ** 2) < 15) {
+                eagleState = DIVE;
+                diveStartX = eagleX;
+                diveStartY = eagleBaseY;
+                diveProgress = 0;
+            }
+        });
 
         function animate() {
             ctx.clearRect(0, 0, W, H);
             const t = Date.now() * 0.001;
+            let ex, ey, wingPhase, drawPerched = false;
 
-            // Change drift direction rarely and gently
-            if (t > nextDriftChange) {
-                driftTarget = (Math.random() - 0.5) * 0.08;
-                nextDriftChange = t + 5 + Math.random() * 8;
+            if (eagleState === FLY) {
+                if (t > nextDriftChange) { driftTarget = (Math.random() - 0.5) * 0.08; nextDriftChange = t + 5 + Math.random() * 8; }
+                driftY += (driftTarget - driftY) * 0.005;
+                eagleBaseY += driftY;
+                if (eagleBaseY < H * 0.06) { eagleBaseY = H * 0.06; driftY = Math.abs(driftY); }
+                if (eagleBaseY > H * 0.3) { eagleBaseY = H * 0.3; driftY = -Math.abs(driftY); }
+                eagleX += eagleSpeed;
+                if (eagleX > W + 25) { eagleX = -25; eagleBaseY = H * 0.08 + Math.random() * H * 0.18; }
+                const bobY = Math.sin(t * 0.3) * 1;
+                ex = Math.floor(eagleX); ey = Math.floor(eagleBaseY + bobY);
+                const fc = (t * 0.4) % 1;
+                wingPhase = fc < 0.6 ? fc / 0.6 : 0.5;
+
+            } else if (eagleState === DIVE) {
+                diveProgress += 0.012;
+                const dp = Math.min(diveProgress, 1);
+                const eased = dp < 0.5 ? 2 * dp * dp : 1 - Math.pow(-2 * dp + 2, 2) / 2;
+                eagleX = diveStartX + (perchX - diveStartX) * eased;
+                eagleBaseY = diveStartY + (perchY - diveStartY) * eased - Math.sin(dp * Math.PI) * 15;
+                ex = Math.floor(eagleX); ey = Math.floor(eagleBaseY);
+                wingPhase = (t * (1.5 - dp * 1.2)) % 1;
+                if (dp >= 1) { eagleState = LAND; stateTimer = t; eagleX = perchX; eagleBaseY = perchY; }
+
+            } else if (eagleState === LAND) {
+                ex = Math.floor(perchX); ey = Math.floor(perchY);
+                wingPhase = Math.max(0, 0.5 - (t - stateTimer) * 2);
+                if (t - stateTimer > 0.4) { eagleState = PERCH; stateTimer = t; }
+
+            } else if (eagleState === PERCH) {
+                ex = Math.floor(perchX); ey = Math.floor(perchY);
+                drawPerched = true;
+                if (t - stateTimer > 4) { eagleState = TAKEOFF; stateTimer = t; }
+
+            } else if (eagleState === TAKEOFF) {
+                const elapsed = t - stateTimer;
+                const dp = Math.min(elapsed / 1.5, 1);
+                const targetY = H * 0.12;
+                eagleX = perchX + dp * 30;
+                eagleBaseY = perchY + (targetY - perchY) * dp - Math.sin(dp * Math.PI) * 20;
+                ex = Math.floor(eagleX); ey = Math.floor(eagleBaseY);
+                wingPhase = (t * 1.2) % 1;
+                if (dp >= 1) { eagleState = FLY; eagleBaseY = targetY; }
             }
 
-            // Very smooth drift
-            driftY += (driftTarget - driftY) * 0.005;
-            eagleBaseY += driftY;
-
-            // Keep in sky bounds
-            if (eagleBaseY < H * 0.06) { eagleBaseY = H * 0.06; driftY = Math.abs(driftY); }
-            if (eagleBaseY > H * 0.3) { eagleBaseY = H * 0.3; driftY = -Math.abs(driftY); }
-
-            // Move eagle across screen
-            eagleX += eagleSpeed;
-            if (eagleX > W + 25) {
-                eagleX = -25;
-                eagleBaseY = H * 0.08 + Math.random() * H * 0.18;
-            }
-
-            // Gentle vertical bobbing
-            const bobY = Math.sin(t * 0.3) * 1;
-            const ex = Math.floor(eagleX);
-            const ey = Math.floor(eagleBaseY + bobY);
-
-            // Wing flap — slow, majestic, with glide pauses
-            const flapCycle = (t * 0.4) % 1;
-            // Glide for part of the cycle (wings level)
-            let wingPhase;
-            if (flapCycle < 0.6) {
-                wingPhase = flapCycle / 0.6; // flap
+            // Draw
+            if (drawPerched) {
+                const pp = getEaglePerched();
+                pp.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(ex + p.x, ey + p.y, 1, 1); });
+                // Head look-around
+                if (Math.sin(t * 1.5) > 0.8) {
+                    ctx.fillStyle = '#f0ece0';
+                    ctx.fillRect(ex, ey - 7, 2, 1);
+                }
             } else {
-                wingPhase = 0.5; // glide (wings level)
+                const pixels = getEagleFrame(wingPhase);
+                pixels.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(ex + p.x, ey + p.y, 1, 1); });
             }
 
-            const pixels = getEagleFrame(wingPhase);
+            // Hover glow
+            if (eagleHover && eagleState === FLY) {
+                for (let dy = -12; dy <= 12; dy++) {
+                    for (let dx = -12; dx <= 12; dx++) {
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < 12) {
+                            ctx.fillStyle = `rgba(255,230,180,${0.15 * (1 - d / 12)})`;
+                            ctx.fillRect(ex + dx, ey + dy, 1, 1);
+                        }
+                    }
+                }
+            }
 
-            pixels.forEach(p => {
-                ctx.fillStyle = p.c;
-                ctx.fillRect(ex + p.x, ey + p.y, 1, 1);
-            });
-
-            // Shadow on ground (moves with eagle, gets bigger when higher)
-            const shadowY = Math.floor(H * 0.56);
-            const shadowSize = 3 + Math.floor((shadowY - ey) * 0.05);
-            ctx.fillStyle = 'rgba(0,0,0,0.05)';
-            for (let dx = -shadowSize; dx <= shadowSize; dx++) {
-                const sy = shadowY + (Math.abs(dx) > shadowSize - 1 ? 0 : 1);
-                ctx.fillRect(ex + dx, sy, 1, 1);
+            // Shadow
+            if (eagleState !== PERCH) {
+                const shadowY = Math.floor(H * 0.56);
+                const shadowSize = 3 + Math.floor((shadowY - ey) * 0.05);
+                ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                for (let dx = -shadowSize; dx <= shadowSize; dx++) {
+                    ctx.fillRect(ex + dx, shadowY + (Math.abs(dx) > shadowSize - 1 ? 0 : 1), 1, 1);
+                }
             }
 
             requestAnimationFrame(animate);
@@ -921,6 +1021,40 @@
         let waitUntil = Date.now() * 0.001 + 2;
         let facingRight = true;
 
+        // Backflip state
+        let jumpVel = 0;
+        let jumpOffY = 0;
+        let isJumping = false;
+        let flipAngle = 0;
+        let pigeonHover = false;
+
+        // Register position for hover cursor
+        registerAnimal('.section-about', () => ({ x: pigeonX, y: pigeonY + jumpOffY }));
+
+        // Mouse tracking for glow
+        section.addEventListener('mousemove', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            pigeonHover = Math.sqrt((mx - pigeonX) ** 2 + (my - (pigeonY + jumpOffY)) ** 2) < 12;
+        });
+        section.addEventListener('mouseleave', () => { pigeonHover = false; });
+
+        // Click to backflip
+        section.addEventListener('click', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            const curY = pigeonY + jumpOffY;
+            const dist = Math.sqrt((mx - pigeonX) ** 2 + (my - curY) ** 2);
+            if (dist < 20 && !isJumping) {
+                isJumping = true;
+                jumpVel = -2.5;
+                jumpOffY = 0;
+                flipAngle = 0;
+            }
+        });
+
         function pickNewTarget() {
             let newPerch;
             do {
@@ -1017,14 +1151,38 @@
             ctx.clearRect(0, 0, W, H);
             const t = Date.now() * 0.001;
 
+            // Backflip physics
+            if (isJumping) {
+                jumpOffY += jumpVel;
+                jumpVel += 0.08; // gravity
+                flipAngle += 0.25;
+                if (jumpOffY >= 0) {
+                    jumpOffY = 0;
+                    isJumping = false;
+                    jumpVel = 0;
+                    flipAngle = 0;
+                }
+            }
+
             if (!isFlying) {
-                // Sitting on building
-                if (t > waitUntil) {
+                if (t > waitUntil && !isJumping) {
                     pickNewTarget();
                 }
-                // Slight head bob while sitting
                 const bobX = Math.sin(t * 2) * 0.3;
-                drawPigeonSprite(pigeonX + bobX, pigeonY, 0, facingRight);
+                const wingPhaseJump = isJumping ? (t * 6) % 1 : 0;
+                const drawX = pigeonX + bobX;
+                const drawY = pigeonY + jumpOffY;
+
+                if (isJumping) {
+                    ctx.save();
+                    ctx.translate(drawX, drawY);
+                    ctx.rotate(facingRight ? -flipAngle : flipAngle);
+                    ctx.translate(-drawX, -drawY);
+                    drawPigeonSprite(drawX, drawY, wingPhaseJump, facingRight);
+                    ctx.restore();
+                } else {
+                    drawPigeonSprite(drawX, drawY, wingPhaseJump, facingRight);
+                }
             } else {
                 // Flying — arc between buildings
                 flyProgress += 0.002;
@@ -1036,18 +1194,41 @@
                     pigeonY = endY;
                     waitUntil = t + 2 + Math.random() * 5;
                 } else {
-                    // Smooth interpolation with arc
                     const ft = flyProgress;
                     const eased = ft < 0.5 ? 2 * ft * ft : 1 - Math.pow(-2 * ft + 2, 2) / 2;
                     pigeonX = startX + (endX - startX) * eased;
-                    // Low arc — just above rooftops, capped
                     const arcHeight = Math.min(Math.abs(endX - startX) * 0.1, 10);
                     const arc = Math.sin(ft * Math.PI) * arcHeight;
                     pigeonY = startY + (endY - startY) * eased - arc;
                 }
 
                 const wingPhase = (t * 3) % 1;
-                drawPigeonSprite(pigeonX, pigeonY, wingPhase, facingRight);
+                const flyDrawY = pigeonY + jumpOffY;
+                if (isJumping) {
+                    ctx.save();
+                    ctx.translate(pigeonX, flyDrawY);
+                    ctx.rotate(facingRight ? -flipAngle : flipAngle);
+                    ctx.translate(-pigeonX, -flyDrawY);
+                    drawPigeonSprite(pigeonX, flyDrawY, wingPhase, facingRight);
+                    ctx.restore();
+                } else {
+                    drawPigeonSprite(pigeonX, flyDrawY, wingPhase, facingRight);
+                }
+            }
+
+            // Hover glow
+            if (pigeonHover) {
+                const glowR = 8;
+                const drawY = isFlying ? pigeonY : pigeonY + jumpOffY;
+                for (let dy = -glowR; dy <= glowR; dy++) {
+                    for (let dx = -glowR; dx <= glowR; dx++) {
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < glowR) {
+                            ctx.fillStyle = `rgba(255,255,200,${0.2 * (1 - d / glowR)})`;
+                            ctx.fillRect(Math.floor(pigeonX + dx), Math.floor(drawY + dy), 1, 1);
+                        }
+                    }
+                }
             }
 
             requestAnimationFrame(animate);
@@ -1085,6 +1266,44 @@
         let stateTimer = 0;
         let waitUntil = 0;
         let deepProgress = 0;
+
+        // Backflip state
+        let jumpVel = 0;
+        let jumpOffY = 0;
+        let isJumping = false;
+        let flipAngle = 0;
+        let ratHover = false;
+
+        // Register position for hover cursor
+        registerAnimal('.section-about', () => {
+            const ratY = roadY - 2 - Math.floor((1 - ratScale) * 8);
+            return { x: ratX, y: ratY + jumpOffY };
+        });
+
+        // Mouse tracking for glow
+        section.addEventListener('mousemove', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            const ratY = roadY - 2 - Math.floor((1 - ratScale) * 8);
+            ratHover = Math.sqrt((mx - ratX) ** 2 + (my - (ratY + jumpOffY)) ** 2) < 12;
+        });
+        section.addEventListener('mouseleave', () => { ratHover = false; });
+
+        // Click to jump
+        section.addEventListener('click', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            const ratY = roadY - 2 - Math.floor((1 - ratScale) * 8);
+            const dist = Math.sqrt((mx - ratX) ** 2 + (my - ratY) ** 2);
+            if (dist < 15 && !isJumping) {
+                isJumping = true;
+                jumpVel = -2.2;
+                jumpOffY = 0;
+                flipAngle = 0;
+            }
+        });
 
         function drawRatSprite(px, py, s, right, frame) {
             const x = Math.floor(px);
@@ -1182,13 +1401,52 @@
                 }
             }
 
-            const ratY = roadY - 2 - Math.floor((1 - ratScale) * 8);
-            drawRatSprite(ratX, ratY, ratScale, ratDir > 0, t);
+            // Backflip physics
+            if (isJumping) {
+                jumpOffY += jumpVel;
+                jumpVel += 0.07; // gravity
+                flipAngle += 0.22;
+                if (jumpOffY >= 0) {
+                    jumpOffY = 0;
+                    isJumping = false;
+                    jumpVel = 0;
+                    flipAngle = 0;
+                }
+            }
 
-            // Shadow
+            const ratY = roadY - 2 - Math.floor((1 - ratScale) * 8);
+            const ratDrawY = ratY + jumpOffY;
+
+            if (isJumping) {
+                ctx.save();
+                ctx.translate(ratX, ratDrawY);
+                ctx.rotate(ratDir > 0 ? -flipAngle : flipAngle);
+                ctx.translate(-ratX, -ratDrawY);
+                drawRatSprite(ratX, ratDrawY, ratScale, ratDir > 0, t);
+                ctx.restore();
+            } else {
+                drawRatSprite(ratX, ratDrawY, ratScale, ratDir > 0, t);
+            }
+
+            // Shadow (shrinks when jumping)
             const shadowW = Math.floor(3 * ratScale);
-            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            const shadowAlpha = isJumping ? 0.05 : 0.1;
+            ctx.fillStyle = `rgba(0,0,0,${shadowAlpha})`;
             ctx.fillRect(Math.floor(ratX) - 1, roadY - 1, shadowW, 1);
+
+            // Hover glow
+            if (ratHover) {
+                const glowR = 7;
+                for (let dy = -glowR; dy <= glowR; dy++) {
+                    for (let dx = -glowR; dx <= glowR; dx++) {
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < glowR) {
+                            ctx.fillStyle = `rgba(255,255,200,${0.2 * (1 - d / glowR)})`;
+                            ctx.fillRect(Math.floor(ratX + dx), Math.floor(ratY + jumpOffY + dy), 1, 1);
+                        }
+                    }
+                }
+            }
 
             requestAnimationFrame(animate);
         }
@@ -1227,6 +1485,50 @@
         const ferrySpeed = 0.03;
 
         const ripples = [];
+        const smokeRings = [];
+        let ferryHover = false;
+
+        // Hover & click detection
+        section.addEventListener('mousemove', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            const bob = Math.sin(Date.now() * 0.001 * 0.8) * 0.5;
+            const ffx = Math.floor(ferryX);
+            const ffy = Math.floor(ferryY + bob);
+            ferryHover = mx > ffx - 3 && mx < ffx + 24 && my > ffy - 10 && my < ffy + 8;
+            if (ferryHover) section.style.cursor = 'pointer';
+            else if (section.style.cursor === 'pointer') section.style.cursor = '';
+        });
+        section.addEventListener('mouseleave', () => { ferryHover = false; });
+
+        section.addEventListener('click', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            const bob = Math.sin(Date.now() * 0.001 * 0.8) * 0.5;
+            const ffx = Math.floor(ferryX);
+            const ffy = Math.floor(ferryY + bob);
+            if (mx > ffx - 3 && mx < ffx + 24 && my > ffy - 10 && my < ffy + 8) {
+                // Spawn smoke rings from both smokestacks
+                for (let s = 0; s < 2; s++) {
+                    const stackX = ffx + (s === 0 ? 8 : 14);
+                    const stackY = ffy - 10;
+                    for (let r = 0; r < 3; r++) {
+                        smokeRings.push({
+                            x: stackX,
+                            y: stackY - r * 2,
+                            radius: 1,
+                            maxRadius: 5 + Math.random() * 3,
+                            alpha: 0.6,
+                            vy: -0.15 - Math.random() * 0.1,
+                            vx: (Math.random() - 0.5) * 0.1,
+                            delay: r * 8
+                        });
+                    }
+                }
+            }
+        });
 
         function animate() {
             ctx.clearRect(0, 0, W, H);
@@ -1402,6 +1704,744 @@
                 }
             }
 
+            // Hover glow
+            if (ferryHover) {
+                const pulse = 0.7 + 0.3 * Math.sin(t * 3);
+                for (let dy = -12; dy <= 10; dy++) {
+                    for (let dx = -4; dx <= 26; dx++) {
+                        const edgeX = Math.min(dx + 4, 26 - dx) / 5;
+                        const edgeY = Math.min(dy + 12, 10 - dy) / 5;
+                        const edge = Math.min(1, edgeX) * Math.min(1, edgeY);
+                        const a = 0.12 * pulse * edge;
+                        if (a > 0.01) {
+                            ctx.fillStyle = `rgba(255,200,100,${a})`;
+                            ctx.fillRect(fx + dx, fy + dy, 1, 1);
+                        }
+                    }
+                }
+            }
+
+            // Smoke rings
+            for (let i = smokeRings.length - 1; i >= 0; i--) {
+                const sr = smokeRings[i];
+                if (sr.delay > 0) { sr.delay--; continue; }
+                sr.y += sr.vy;
+                sr.x += sr.vx;
+                sr.radius += 0.04;
+                sr.alpha -= 0.005;
+                if (sr.alpha <= 0 || sr.radius > sr.maxRadius) {
+                    smokeRings.splice(i, 1);
+                    continue;
+                }
+                // Draw donut/ring shape
+                const rad = Math.floor(sr.radius);
+                const innerRad = Math.max(0, rad - 1);
+                for (let dy2 = -rad - 1; dy2 <= rad + 1; dy2++) {
+                    for (let dx2 = -rad - 1; dx2 <= rad + 1; dx2++) {
+                        const d = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+                        if (d >= innerRad && d <= rad + 1) {
+                            const ringFade = 1 - Math.abs(d - rad) / 1.5;
+                            if (ringFade > 0) {
+                                ctx.fillStyle = `rgba(180,180,180,${sr.alpha * ringFade * 0.6})`;
+                                ctx.fillRect(Math.floor(sr.x + dx2), Math.floor(sr.y + dy2), 1, 1);
+                            }
+                        }
+                    }
+                }
+                // Bright edge on top of ring
+                ctx.fillStyle = `rgba(220,220,220,${sr.alpha * 0.3})`;
+                ctx.fillRect(Math.floor(sr.x - rad), Math.floor(sr.y), 1, 1);
+                ctx.fillRect(Math.floor(sr.x + rad), Math.floor(sr.y), 1, 1);
+                ctx.fillRect(Math.floor(sr.x), Math.floor(sr.y - rad), 1, 1);
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // ====== HELICOPTER with spotlight in section 3 ======
+    function initHelicopter() {
+        const PIXEL = 4;
+        const section = document.querySelector('.section-live');
+        const parent = section ? section.querySelector('.live-bg') : null;
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:15;';
+        canvas.width = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        // Helicopter position — centered above gallery, under title
+        const heliX = Math.floor(W * 0.5);
+        const heliY = Math.floor(H * 0.18);
+
+        // Slight hover bobbing
+        let hoveredItem = -1;
+
+        // Track which gallery item is hovered
+        const galleryItems = document.querySelectorAll('.section-live .gallery-item');
+        galleryItems.forEach((item, idx) => {
+            item.addEventListener('mouseenter', () => { hoveredItem = idx; });
+            item.addEventListener('mouseleave', () => { hoveredItem = -1; });
+        });
+
+        function drawPixel(x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
+        }
+        function drawRect(x, y, w, h, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(Math.floor(x), Math.floor(y), w, h);
+        }
+
+        function drawHelicopter(cx, cy, t) {
+            // === TAIL BOOM ===
+            // Long tail extending left
+            drawRect(cx - 22, cy - 1, 16, 3, '#2a2a2a'); // tail boom
+            drawRect(cx - 22, cy - 1, 16, 1, '#3a3a3a'); // highlight top
+            // Tail stripes (Punch Club style detail)
+            drawRect(cx - 20, cy, 2, 2, '#cc2200');
+            drawRect(cx - 16, cy, 2, 2, '#cc2200');
+
+            // === TAIL ROTOR (vertical, spinning) ===
+            const tailPhase = t * 12;
+            for (let i = 0; i < 3; i++) {
+                const angle = tailPhase + i * (Math.PI * 2 / 3);
+                const dy = Math.sin(angle) * 4;
+                drawPixel(cx - 23, cy - 1 + Math.floor(dy), '#888');
+                drawPixel(cx - 23, cy - 1 + Math.floor(dy * 0.6), '#777');
+            }
+            // Tail rotor hub
+            drawPixel(cx - 23, cy - 1, '#555');
+
+            // === TAIL FIN ===
+            drawRect(cx - 22, cy - 4, 3, 3, '#333');
+            drawPixel(cx - 22, cy - 5, '#444');
+
+            // === MAIN BODY (fuselage) — Punch Club chunky style ===
+            // Body bottom (belly)
+            drawRect(cx - 6, cy + 2, 16, 3, '#1a1a1a');
+            // Main body
+            drawRect(cx - 7, cy - 2, 18, 5, '#2a2a2a');
+            drawRect(cx - 6, cy - 3, 16, 1, '#333');
+            // Body top curve
+            drawRect(cx - 5, cy - 4, 14, 1, '#383838');
+            drawRect(cx - 3, cy - 5, 10, 1, '#404040');
+
+            // === COCKPIT WINDOW (curved, blue tint) ===
+            drawRect(cx + 6, cy - 3, 5, 4, '#1a3a5a');
+            drawRect(cx + 7, cy - 4, 3, 1, '#2a4a6a');
+            // Window glare
+            drawPixel(cx + 7, cy - 3, '#3a6a9a');
+            drawPixel(cx + 8, cy - 3, '#2a5a8a');
+
+            // === DOOR / PANEL DETAIL ===
+            drawRect(cx - 2, cy - 2, 1, 4, '#444'); // door line
+            drawRect(cx + 3, cy - 2, 1, 4, '#444'); // door line
+            // Door handle
+            drawPixel(cx - 1, cy, '#666');
+            drawPixel(cx + 4, cy, '#666');
+
+            // === PAINT STRIPES (punk style — red accent) ===
+            drawRect(cx - 6, cy + 1, 17, 1, '#8b0000');
+
+            // === ENGINE EXHAUST TOP ===
+            drawRect(cx - 1, cy - 6, 6, 1, '#555');
+            drawRect(cx, cy - 7, 4, 1, '#4a4a4a');
+
+            // === SKIDS (landing gear) ===
+            // Left skid strut
+            drawRect(cx - 3, cy + 5, 1, 3, '#555');
+            drawRect(cx + 5, cy + 5, 1, 3, '#555');
+            // Right skid strut
+            drawRect(cx - 1, cy + 5, 1, 3, '#555');
+            drawRect(cx + 7, cy + 5, 1, 3, '#555');
+            // Skid bars (horizontal)
+            drawRect(cx - 5, cy + 8, 10, 1, '#666');
+            drawRect(cx + 2, cy + 8, 10, 1, '#666');
+            // Skid highlights
+            drawRect(cx - 5, cy + 8, 10, 1, '#777');
+            drawRect(cx + 2, cy + 8, 10, 1, '#777');
+
+            // === MAIN ROTOR (spinning on top) ===
+            const rotorHub = { x: cx + 2, y: cy - 7 };
+            // Rotor mast
+            drawRect(rotorHub.x, cy - 7, 1, 2, '#666');
+            drawPixel(rotorHub.x, rotorHub.y - 1, '#888');
+
+            // Spinning blades — 2 blades, drawn as a blur effect
+            const bladePhase = t * 8;
+            const bladeLen = 22;
+
+            for (let b = 0; b < 2; b++) {
+                const angle = bladePhase + b * Math.PI;
+                const cosA = Math.cos(angle);
+                // Draw blade as series of pixels
+                for (let p = 1; p <= bladeLen; p++) {
+                    const bx = rotorHub.x + Math.floor(cosA * p);
+                    const by = rotorHub.y - 1;
+                    const alpha = 0.7 - (p / bladeLen) * 0.4;
+                    drawPixel(bx, by, `rgba(180,180,180,${alpha})`);
+                    // Blade thickness
+                    if (p < bladeLen - 3) {
+                        drawPixel(bx, by - 1, `rgba(150,150,150,${alpha * 0.5})`);
+                    }
+                }
+            }
+
+            // Rotor blur circle (motion effect)
+            const blurAlpha = 0.06 + Math.sin(t * 3) * 0.02;
+            for (let angle2 = 0; angle2 < Math.PI * 2; angle2 += 0.15) {
+                for (let r = bladeLen * 0.6; r <= bladeLen; r += 2) {
+                    const bx = rotorHub.x + Math.floor(Math.cos(angle2) * r);
+                    const by = rotorHub.y - 1 + Math.floor(Math.sin(angle2) * 0.5);
+                    drawPixel(bx, by, `rgba(200,200,200,${blurAlpha})`);
+                }
+            }
+
+            // === SEARCHLIGHT HOUSING (under belly) ===
+            drawRect(cx + 2, cy + 5, 3, 2, '#888');
+            drawPixel(cx + 3, cy + 7, '#aaa');
+
+            // === NAVIGATION LIGHTS ===
+            const blink = Math.sin(t * 4) > 0.3;
+            if (blink) {
+                drawPixel(cx - 7, cy - 1, '#ff0000'); // red port light
+                drawPixel(cx + 11, cy - 1, '#00ff00'); // green starboard
+            }
+            // Anti-collision beacon on top
+            const beacon = Math.sin(t * 6) > 0.7;
+            if (beacon) {
+                drawPixel(cx + 2, cy - 8, '#ff3333');
+                drawPixel(cx + 1, cy - 8, 'rgba(255,50,50,0.4)');
+                drawPixel(cx + 3, cy - 8, 'rgba(255,50,50,0.4)');
+            }
+        }
+
+        function drawSpotlight(heliCx, heliCy, targetX, targetY, frameTop) {
+            const startX = heliCx + 3;
+            const startY = heliCy + 8;
+
+            // Beam stops at the top edge of the frame
+            const stopY = frameTop;
+            // How far along the full path is the stop point
+            const fullDist = targetY - startY;
+            const stopDist = stopY - startY;
+            const stopT = Math.max(0.1, Math.min(1, stopDist / fullDist));
+
+            const steps = 80;
+
+            // Layer 1: wide outer glow
+            for (let i = 0; i < steps; i++) {
+                const t2 = i / steps * stopT;
+                const mx = startX + (targetX - startX) * t2;
+                const my = startY + (targetY - startY) * t2;
+                const width = Math.floor(2 + t2 * 22);
+                const a = 0.15 * (1 - t2 * 0.3);
+                for (let w = -width; w <= width; w++) {
+                    const edgeFade = 1 - Math.abs(w) / (width + 1);
+                    drawPixel(mx + w, my, `rgba(255,250,200,${a * edgeFade * edgeFade})`);
+                }
+            }
+
+            // Layer 2: solid mid beam
+            for (let i = 0; i < steps; i++) {
+                const t2 = i / steps * stopT;
+                const mx = startX + (targetX - startX) * t2;
+                const my = startY + (targetY - startY) * t2;
+                const width = Math.floor(1 + t2 * 12);
+                const a = 0.3;
+                for (let w = -width; w <= width; w++) {
+                    const edgeFade = 1 - Math.abs(w) / (width + 1);
+                    drawPixel(mx + w, my, `rgba(255,255,220,${a * edgeFade})`);
+                }
+            }
+
+            // Layer 3: bright core
+            for (let i = 0; i < steps; i++) {
+                const t2 = i / steps * stopT;
+                const mx = startX + (targetX - startX) * t2;
+                const my = startY + (targetY - startY) * t2;
+                const width = Math.floor(t2 * 6);
+                const a = 0.4;
+                for (let w = -width; w <= width; w++) {
+                    const edgeFade = 1 - Math.abs(w) / (width + 1);
+                    drawPixel(mx + w, my, `rgba(255,255,240,${a * edgeFade})`);
+                }
+            }
+
+            // Layer 4: white-hot center line
+            for (let i = 0; i < steps; i++) {
+                const t2 = i / steps * stopT;
+                const mx = startX + (targetX - startX) * t2;
+                const my = startY + (targetY - startY) * t2;
+                drawPixel(mx, my, 'rgba(255,255,255,0.25)');
+                drawPixel(mx, my - 1, 'rgba(255,255,255,0.15)');
+            }
+
+            // Bright splash where beam hits the frame edge
+            const splashX = startX + (targetX - startX) * stopT;
+            const splashY = startY + (targetY - startY) * stopT;
+            const splashW = Math.floor(stopT * 14);
+            // Horizontal splash line
+            for (let dx = -splashW; dx <= splashW; dx++) {
+                const fade = 1 - Math.abs(dx) / (splashW + 1);
+                drawPixel(splashX + dx, splashY, `rgba(255,255,220,${0.4 * fade})`);
+                drawPixel(splashX + dx, splashY - 1, `rgba(255,255,200,${0.2 * fade})`);
+                drawPixel(splashX + dx, splashY + 1, `rgba(255,255,200,${0.15 * fade})`);
+            }
+
+            // Searchlight source glow on helicopter
+            const srcR = 5;
+            for (let dy = -srcR; dy <= srcR; dy++) {
+                for (let dx = -srcR; dx <= srcR; dx++) {
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < srcR) {
+                        drawPixel(startX + dx, startY + dy, `rgba(255,255,220,${0.3 * (1 - d / srcR)})`);
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            const t = Date.now() * 0.001;
+
+            // Helicopter hover bobbing
+            const bobX = Math.sin(t * 0.5) * 1.5;
+            const bobY = Math.sin(t * 0.7) * 1;
+            const hx = Math.floor(heliX + bobX);
+            const hy = Math.floor(heliY + bobY);
+
+            // Draw spotlight if hovering a gallery item
+            if (hoveredItem >= 0 && hoveredItem < galleryItems.length) {
+                const item = galleryItems[hoveredItem];
+                const sectionRect = section.getBoundingClientRect();
+                const itemRect = item.getBoundingClientRect();
+
+                // Target = center of frame
+                const targetPxX = (itemRect.left + itemRect.width / 2) - sectionRect.left;
+                const targetPxY = (itemRect.top + itemRect.height / 2) - sectionRect.top;
+                const targetX = targetPxX / PIXEL;
+                const targetY = targetPxY / PIXEL;
+
+                // Frame top edge — beam stops here
+                const frameTopPx = (itemRect.top - sectionRect.top) / PIXEL;
+
+                drawSpotlight(hx, hy, targetX, targetY, frameTopPx);
+            }
+
+            drawHelicopter(hx, hy, t);
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // (sun spotlight removed)
+
+    // ====== STATUE FIREWORK (section 3) ======
+    function initStatueFirework() {
+        const PIXEL = 4;
+        const section = document.querySelector('.section-live');
+        const parent = section ? section.querySelector('.live-bg') : null;
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:14;';
+        canvas.width = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        const waterY = Math.floor(H * 0.6);
+        const statueX = Math.floor(W * 0.12);
+        const torchX = statueX + 3;
+        const torchY = waterY + 4 - 38;
+
+        // Firework state
+        let rocket = null;       // rising phase
+        let particles = [];      // explosion phase
+
+        section.addEventListener('click', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            // Click near statue (generous zone)
+            const dist = Math.sqrt((mx - statueX) ** 2 + (my - (waterY - 15)) ** 2);
+            if (dist < 25 && !rocket) {
+                rocket = {
+                    x: torchX,
+                    y: torchY,
+                    vy: -1.8,
+                    vx: 0.3,
+                    trail: [],
+                    life: 1
+                };
+                particles = [];
+            }
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+
+            // Rocket rising
+            if (rocket) {
+                rocket.x += rocket.vx;
+                rocket.y += rocket.vy;
+                rocket.vy += 0.02; // slow down
+                rocket.trail.push({ x: rocket.x, y: rocket.y, life: 1 });
+
+                // Draw trail
+                for (let i = rocket.trail.length - 1; i >= 0; i--) {
+                    const tr = rocket.trail[i];
+                    tr.life -= 0.04;
+                    if (tr.life <= 0) { rocket.trail.splice(i, 1); continue; }
+                    ctx.fillStyle = `rgba(255,200,100,${tr.life * 0.6})`;
+                    ctx.fillRect(Math.floor(tr.x), Math.floor(tr.y), 1, 1);
+                    ctx.fillStyle = `rgba(255,150,50,${tr.life * 0.3})`;
+                    ctx.fillRect(Math.floor(tr.x) - 1, Math.floor(tr.y), 1, 1);
+                    ctx.fillRect(Math.floor(tr.x) + 1, Math.floor(tr.y), 1, 1);
+                }
+
+                // Draw rocket head
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(Math.floor(rocket.x), Math.floor(rocket.y), 1, 1);
+                ctx.fillStyle = '#ffcc00';
+                ctx.fillRect(Math.floor(rocket.x), Math.floor(rocket.y) + 1, 1, 1);
+
+                // Explode when velocity turns downward
+                if (rocket.vy > -0.3) {
+                    const ex = rocket.x;
+                    const ey = rocket.y;
+                    // Pick random color scheme
+                    const colors = [
+                        ['#ff4444', '#ff8844', '#ffcc44'],
+                        ['#44ff44', '#44ffaa', '#aaffaa'],
+                        ['#4488ff', '#44ccff', '#aaddff'],
+                        ['#ff44ff', '#ff88ff', '#ffaaff'],
+                        ['#ffcc00', '#ffee44', '#ffffff']
+                    ];
+                    const palette = colors[Math.floor(Math.random() * colors.length)];
+                    for (let i = 0; i < 50; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 0.5 + Math.random() * 1.5;
+                        particles.push({
+                            x: ex, y: ey,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            color: palette[Math.floor(Math.random() * palette.length)],
+                            life: 0.8 + Math.random() * 0.5,
+                            size: Math.random() > 0.7 ? 2 : 1
+                        });
+                    }
+                    rocket = null;
+                }
+            }
+
+            // Explosion particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.03; // gravity
+                p.vx *= 0.99;
+                p.life -= 0.012;
+                if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+                const a = Math.min(1, p.life);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = a;
+                ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
+                // Glow
+                ctx.globalAlpha = a * 0.3;
+                ctx.fillRect(Math.floor(p.x) - 1, Math.floor(p.y), 1, 1);
+                ctx.fillRect(Math.floor(p.x) + 1, Math.floor(p.y), 1, 1);
+                ctx.fillRect(Math.floor(p.x), Math.floor(p.y) - 1, 1, 1);
+                ctx.fillRect(Math.floor(p.x), Math.floor(p.y) + 1, 1, 1);
+            }
+            ctx.globalAlpha = 1;
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // ====== HOVER HIGHLIGHTS for interactive objects ======
+    function initHoverHighlights() {
+        const PIXEL = 4;
+
+        // --- STATUE highlight (section 3) ---
+        const liveSection = document.querySelector('.section-live');
+        if (liveSection) {
+            const liveBg = liveSection.querySelector('.live-bg');
+            const stCanvas = document.createElement('canvas');
+            stCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:11;';
+            stCanvas.width = liveSection.offsetWidth;
+            stCanvas.height = liveSection.offsetHeight;
+            liveBg.appendChild(stCanvas);
+            const stCtx = stCanvas.getContext('2d');
+            const lW = stCanvas.width / PIXEL;
+            const lH = stCanvas.height / PIXEL;
+            stCtx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+            stCtx.imageSmoothingEnabled = false;
+            const waterY = Math.floor(lH * 0.6);
+            const statueX = Math.floor(lW * 0.12);
+            const statueCenterY = waterY - 15;
+            let statueHover = false;
+
+            liveSection.addEventListener('mousemove', function(e) {
+                const rect = liveSection.getBoundingClientRect();
+                const mx = (e.clientX - rect.left) / PIXEL;
+                const my = (e.clientY - rect.top) / PIXEL;
+                const d = Math.sqrt((mx - statueX) ** 2 + (my - statueCenterY) ** 2);
+                const isStatue = d < 25;
+                statueHover = isStatue;
+                if (isStatue) liveSection.style.cursor = 'pointer';
+                else if (liveSection.style.cursor === 'pointer') liveSection.style.cursor = '';
+            });
+            liveSection.addEventListener('mouseleave', () => { statueHover = false; });
+
+            (function animStatue() {
+                stCtx.clearRect(0, 0, lW, lH);
+                if (statueHover) {
+                    const t = Date.now() * 0.001;
+                    const pulse = 0.7 + 0.3 * Math.sin(t * 3);
+                    // Green glow around statue
+                    for (let dy = -30; dy <= 10; dy++) {
+                        for (let dx = -12; dx <= 12; dx++) {
+                            const d = Math.sqrt(dx * dx + (dy * 0.5) ** 2);
+                            if (d < 15) {
+                                const a = 0.2 * pulse * (1 - d / 15);
+                                stCtx.fillStyle = `rgba(100,255,150,${a})`;
+                                stCtx.fillRect(statueX + dx, statueCenterY + dy, 1, 1);
+                            }
+                        }
+                    }
+                }
+                requestAnimationFrame(animStatue);
+            })();
+        }
+    }
+
+    // ====== PIGEON/RAT hover cursor — shared mouse tracker ======
+    // Expose pigeon/rat positions for hover detection
+    const animalPositions = [];
+
+    function registerAnimal(sectionSel, getPos) {
+        animalPositions.push({ sectionSel, getPos });
+    }
+
+    function initAnimalHoverCursors() {
+        const aboutSection = document.querySelector('.section-about');
+        if (!aboutSection) return;
+        aboutSection.addEventListener('mousemove', function(e) {
+            const rect = aboutSection.getBoundingClientRect();
+            const PIXEL = 4;
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            let nearAnimal = false;
+            for (const a of animalPositions) {
+                if (a.sectionSel !== '.section-about') continue;
+                const pos = a.getPos();
+                if (!pos) continue;
+                const d = Math.sqrt((mx - pos.x) ** 2 + (my - pos.y) ** 2);
+                if (d < 12) { nearAnimal = true; break; }
+            }
+            aboutSection.style.cursor = nearAnimal ? 'pointer' : '';
+        });
+        aboutSection.addEventListener('mouseleave', () => { aboutSection.style.cursor = ''; });
+    }
+
+    // ====== STAGE LIGHTNING from 5051 logo (section 4) ======
+    function initStageLightning() {
+        const PIXEL = 4;
+        const section = document.querySelector('.section-stage');
+        const parent = section ? section.querySelector('.stage-bg') : null;
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:14;';
+        canvas.width = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+
+        let bolts = [];       // active lightning bolts
+        let flashAlpha = 0;   // screen flash
+        let logoHover = false;
+
+        // Stage logo position (matches pixel-scenes.js)
+        const stageY = Math.floor(H * 0.855);
+        const gs = 3;
+        const logoTotalW = 23 * gs; // 69
+        const logoX = Math.floor(W * 0.5) - Math.floor(logoTotalW / 2);
+        const logoY = stageY - 25 - 6 * gs;
+        const logoCX = logoX + logoTotalW / 2;
+        const logoH = 6 * gs;
+
+        // Click & hover on stage logo area
+        section.addEventListener('click', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            if (mx > logoX - 5 && mx < logoX + logoTotalW + 5 && my > logoY - 5 && my < logoY + logoH + 5) {
+                const count = 3 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < count; i++) {
+                    const startX = logoCX + (Math.random() - 0.5) * 20;
+                    bolts.push(generateBolt(startX, logoY));
+                }
+                flashAlpha = 0.6;
+            }
+        });
+        section.addEventListener('mousemove', function(e) {
+            const rect = section.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) / PIXEL;
+            const my = (e.clientY - rect.top) / PIXEL;
+            logoHover = mx > logoX - 5 && mx < logoX + logoTotalW + 5 && my > logoY - 5 && my < logoY + logoH + 5;
+            section.style.cursor = logoHover ? 'pointer' : '';
+        });
+        section.addEventListener('mouseleave', () => { logoHover = false; section.style.cursor = ''; });
+
+        function generateBolt(startX, startY) {
+            // Build a jagged bolt path going upward
+            const segments = [];
+            let x = startX;
+            let y = startY;
+            const endY = 2 + Math.random() * 10; // near top of section
+            const totalSteps = 15 + Math.floor(Math.random() * 12);
+            const stepY = (startY - endY) / totalSteps;
+
+            for (let i = 0; i < totalSteps; i++) {
+                const nx = x + (Math.random() - 0.5) * 14;
+                const ny = y - stepY - Math.random() * 3;
+                segments.push({ x1: x, y1: y, x2: nx, y2: ny });
+                x = nx;
+                y = ny;
+
+                // Random branch
+                if (Math.random() > 0.7) {
+                    const bx = x + (Math.random() - 0.5) * 20;
+                    const by = y - stepY * 0.5 - Math.random() * 5;
+                    segments.push({ x1: x, y1: y, x2: bx, y2: by, branch: true });
+                }
+            }
+
+            return {
+                segments,
+                life: 1.0,
+                color: Math.random() > 0.5 ? 'blue' : 'white'
+            };
+        }
+
+        function drawBoltSegment(x1, y1, x2, y2, alpha, thickness, color) {
+            const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const steps = Math.max(1, Math.floor(dist));
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const px = Math.floor(x1 + (x2 - x1) * t);
+                const py = Math.floor(y1 + (y2 - y1) * t);
+
+                // Outer glow
+                if (thickness > 1) {
+                    for (let dx = -2; dx <= 2; dx++) {
+                        for (let dy = -2; dy <= 2; dy++) {
+                            const d = Math.abs(dx) + Math.abs(dy);
+                            if (d <= 2) {
+                                const ga = alpha * 0.15 * (1 - d / 3);
+                                if (color === 'blue') {
+                                    ctx.fillStyle = `rgba(100,150,255,${ga})`;
+                                } else {
+                                    ctx.fillStyle = `rgba(200,200,255,${ga})`;
+                                }
+                                ctx.fillRect(px + dx, py + dy, 1, 1);
+                            }
+                        }
+                    }
+                }
+
+                // Mid glow
+                ctx.fillStyle = color === 'blue'
+                    ? `rgba(150,180,255,${alpha * 0.5})`
+                    : `rgba(220,220,255,${alpha * 0.5})`;
+                ctx.fillRect(px - 1, py, 1, 1);
+                ctx.fillRect(px + 1, py, 1, 1);
+                ctx.fillRect(px, py - 1, 1, 1);
+                ctx.fillRect(px, py + 1, 1, 1);
+
+                // Core — bright white
+                ctx.fillStyle = `rgba(255,255,255,${alpha * 0.9})`;
+                ctx.fillRect(px, py, 1, 1);
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+
+            // Screen flash
+            if (flashAlpha > 0) {
+                ctx.fillStyle = `rgba(200,200,255,${flashAlpha * 0.15})`;
+                ctx.fillRect(0, 0, W, H);
+                flashAlpha -= 0.03;
+            }
+
+            // Hover glow on logo
+            if (logoHover) {
+                const t = Date.now() * 0.001;
+                const pulse = 0.7 + 0.3 * Math.sin(t * 3);
+                for (let dy = -6; dy <= logoH + 6; dy++) {
+                    for (let dx = -6; dx <= logoTotalW + 6; dx++) {
+                        const edgeX = Math.min(dx + 6, logoTotalW + 6 - dx) / 6;
+                        const edgeY = Math.min(dy + 6, logoH + 6 - dy) / 6;
+                        const edge = Math.min(1, edgeX) * Math.min(1, edgeY);
+                        const a = 0.2 * pulse * edge;
+                        if (a > 0.01) {
+                            ctx.fillStyle = `rgba(255,50,50,${a})`;
+                            ctx.fillRect(logoX + dx, logoY + dy, 1, 1);
+                        }
+                    }
+                }
+            }
+
+            // Draw & update bolts
+            for (let i = bolts.length - 1; i >= 0; i--) {
+                const bolt = bolts[i];
+                bolt.life -= 0.02;
+                if (bolt.life <= 0) { bolts.splice(i, 1); continue; }
+
+                const alpha = bolt.life;
+                // Flicker effect
+                const flicker = Math.random() > 0.3 ? 1 : 0.3;
+
+                for (const seg of bolt.segments) {
+                    const thickness = seg.branch ? 1 : 2;
+                    drawBoltSegment(
+                        seg.x1, seg.y1, seg.x2, seg.y2,
+                        alpha * flicker,
+                        thickness,
+                        bolt.color
+                    );
+                }
+            }
+
             requestAnimationFrame(animate);
         }
         animate();
@@ -1421,7 +2461,13 @@
         initRat();
         initRat();
         initFerry();
+        initHelicopter();
+        initStatueFirework();
+        initHoverHighlights();
+        initAnimalHoverCursors();
+        initStageLightning();
     }
+
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

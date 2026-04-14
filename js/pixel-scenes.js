@@ -1612,18 +1612,18 @@ function drawLiveScene(canvas) {
             }
         }
     }
-    // Outer cables — left edge to left tower (drooping)
+    // Outer cables — left edge to left tower (leftmost cable reaches tower top)
     for (let x = 0; x < towerL; x++) {
         const t = x / towerL;
-        const sag = towerH * 0.4;
-        const cableY = bridgeDeckY - Math.floor(t * towerH * 0.6) + Math.floor(sag * t * (1 - t) * 2);
+        const sag = towerH * 0.3;
+        const cableY = bridgeDeckY - Math.floor(t * towerH) + Math.floor(sag * t * (1 - t) * 2);
         drawPixel(ctx, x, cableY, '#7a6b5b');
     }
-    // Outer cables — right tower to right edge (drooping)
+    // Outer cables — right tower to right edge (rightmost cable reaches tower top)
     for (let x = towerR; x < W; x++) {
         const t = (x - towerR) / (W - towerR);
-        const sag = towerH * 0.4;
-        const cableY = (bridgeDeckY - towerH * 0.6) + Math.floor(t * towerH * 0.6) + Math.floor(sag * t * (1 - t) * 2);
+        const sag = towerH * 0.3;
+        const cableY = (bridgeDeckY - towerH) + Math.floor(t * towerH) + Math.floor(sag * t * (1 - t) * 2);
         drawPixel(ctx, x, cableY, '#7a6b5b');
     }
 
