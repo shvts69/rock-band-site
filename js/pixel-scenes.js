@@ -2042,7 +2042,7 @@ function drawPubScene(canvas) {
     const wallTop = Math.floor(H * 0.06);
     const wallBot = Math.floor(H * 0.62);
     const isMobilePub = (window.innerWidth <= 768);
-    const barY = Math.floor(H * (isMobilePub ? 0.885 : 0.855));
+    const barY = Math.floor(H * (isMobilePub ? 0.895 : 0.855));
     const barH = 10;
     const barTop = barY - barH;
     const barLeft = Math.floor(W * 0.12);

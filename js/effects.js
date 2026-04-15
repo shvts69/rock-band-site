@@ -2455,6 +2455,9 @@
         const section = document.querySelector('.section-stage');
         if (!section) return;
 
+        // On mobile, walkers are CSS-scaled to 65% but instruments aren't — skip them
+        if (window.innerWidth <= 768) return;
+
         const canvas = document.createElement('canvas');
         canvas.width = section.offsetWidth;
         canvas.height = section.offsetHeight;
@@ -2469,28 +2472,15 @@
 
         const stageY = Math.floor(H * 0.855);
         const centerX = Math.floor(W * 0.5);
-        const isMobile = window.innerWidth <= 768;
         const mic1X = centerX - 32;   // Саша (bass)
         const mic2X = centerX;        // Іван (guitar)
         const drumCX = centerX + 32;  // Денис (drums)
-        const instScale = isMobile ? 0.6 : 1;
 
         // Helper
         const fp = (x, y, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); };
         const fr = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
 
-        // Scale helper for mobile
-        function scaleAround(cx, cy) {
-            ctx.save();
-            if (instScale !== 1) {
-                ctx.translate(cx, cy);
-                ctx.scale(instScale, instScale);
-                ctx.translate(-cx, -cy);
-            }
-        }
-
         // ── MIC STAND 1 (Саша) with bass guitar — foreground ──
-        scaleAround(mic1X, stageY - 5);
         fr(mic1X, stageY - 16, 1, 16, '#888');
         fr(mic1X - 1, stageY, 3, 1, '#666');
         fr(mic1X - 1, stageY - 18, 3, 2, '#444');
@@ -2529,10 +2519,8 @@
         fp(mic1X + 9, stageY - 20, '#ccc');
         fp(mic1X + 9, stageY - 19, '#ccc');
         fp(mic1X + 6, stageY - 21, '#ccc');
-        ctx.restore();
 
         // ── MIC STAND 2 (Іван) with electric guitar — foreground ──
-        scaleAround(mic2X, stageY - 5);
         fr(mic2X, stageY - 16, 1, 16, '#888');
         fr(mic2X - 1, stageY, 3, 1, '#666');
         fr(mic2X - 1, stageY - 18, 3, 2, '#444');
@@ -2573,10 +2561,8 @@
         fp(mic2X - 10, stageY - 20, '#ccc');
         fp(mic2X - 10, stageY - 19, '#ccc');
         fp(mic2X - 7, stageY - 21, '#ccc');
-        ctx.restore();
 
         // ── DRUM KIT (Денис) — foreground ──
-        scaleAround(drumCX, stageY - 5);
         const drumX = drumCX - 5;
         const drumY = stageY;
         // Bass drum
@@ -2601,7 +2587,6 @@
         ctx.fillRect(drumX + 11, drumY, 3, 1);
         ctx.fillRect(drumX - 5, drumY - 9, 1, 9);
         ctx.fillRect(drumX - 6, drumY, 3, 1);
-        ctx.restore();
     }
 
     // ====== PUB: Foreground bar + sliding beer + taxi ======
@@ -2624,7 +2609,7 @@
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
 
         const isMobilePub = (window.innerWidth <= 768);
-        const barY = Math.floor(H * (isMobilePub ? 0.885 : 0.855));
+        const barY = Math.floor(H * (isMobilePub ? 0.895 : 0.855));
         const barH = 10;
         const barTop = barY - barH;
         const centerX = Math.floor(W * 0.5);
