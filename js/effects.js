@@ -2470,9 +2470,9 @@
         const stageY = Math.floor(H * 0.855);
         const centerX = Math.floor(W * 0.5);
         const isMobile = window.innerWidth <= 768;
-        const drumCX = centerX - 32;  // Денис — leftmost walker
-        const mic2X = centerX;        // Іван — center walker
-        const mic1X = centerX + 32;   // Саша — rightmost walker
+        const mic1X = centerX - 32;   // Саша (bass)
+        const mic2X = centerX;        // Іван (guitar)
+        const drumCX = centerX + 32;  // Денис (drums)
         const instScale = isMobile ? 0.6 : 1;
 
         // Helper

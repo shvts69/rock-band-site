@@ -1764,12 +1764,12 @@ function drawStageScene(canvas) {
         drawRect(ctx, spX, 26, 10, 1, '#333');
     });
 
-    // INSTRUMENTS — positioned to match walker order: Денис(left), Іван(center), Саша(right)
+    // INSTRUMENTS — positioned centered on each musician
     const centerX = Math.floor(W * 0.5);
     const isMobileStage = W < 120;
-    const drumCX = centerX - 32;  // Денис (drums) — leftmost walker
-    const mic2X = centerX;        // Іван (vocals/guitar) — center walker
-    const mic1X = centerX + 32;   // Саша (bass) — rightmost walker
+    const mic1X = centerX - 32;   // Саша (bass) — mic + bass guitar
+    const mic2X = centerX;        // Іван (vocals/guitar) — mic + electric guitar
+    const drumCX = centerX + 32;  // Денис (drums) — drum kit
 
     if (!isMobileStage) {
     // ── MIC STAND 1 (Саша) with bass guitar leaning ──
