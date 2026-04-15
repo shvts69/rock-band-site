@@ -79,50 +79,16 @@
     -webkit-text-stroke: 5px #000;
     paint-order: stroke fill;
     text-shadow:
-        0 0 0 #000,
         3px 3px 0 #000,
         6px 6px 0 #000,
-        9px 9px 0 rgba(0,0,0,0.5),
-        0 0 30px rgba(255,0,0,0.5);
-    animation: logoPulse 3s ease-in-out infinite alternate;
+        9px 9px 0 rgba(0,0,0,0.5);
 }
 
-/* Inner highlight — top-left light source */
-.logo-text::before {
-    content: '5051';
-    position: absolute;
-    top: -2px;
-    left: -1px;
-    color: #ff5544;
-    -webkit-text-stroke: 5px #000;
-    paint-order: stroke fill;
-    text-shadow: none;
-    z-index: -1;
-    letter-spacing: 14px;
-}
-
+.logo-text::before,
 .logo-text::after {
-    content: '';
     display: none;
 }
 
-@keyframes logoPulse {
-    from {
-        text-shadow:
-            3px 3px 0 #000,
-            6px 6px 0 #000,
-            9px 9px 0 rgba(0,0,0,0.5),
-            0 0 20px rgba(255,0,0,0.4);
-    }
-    to {
-        text-shadow:
-            3px 3px 0 #000,
-            6px 6px 0 #000,
-            9px 9px 0 rgba(0,0,0,0.5),
-            0 0 50px rgba(255,0,0,0.7),
-            0 0 100px rgba(255,0,0,0.3);
-    }
-}
 
 .logo-subtitle {
     font-family: 'Press Start 2P', monospace;
@@ -134,8 +100,7 @@
     paint-order: stroke fill;
     text-shadow:
         3px 3px 0 #000,
-        4px 4px 0 rgba(0,0,0,0.4),
-        0 0 15px rgba(255,200,0,0.3);
+        4px 4px 0 rgba(0,0,0,0.4);
 }
 
 .logo-sub2 {
@@ -731,4 +696,172 @@
 @keyframes titleGlow {
     from { text-shadow: 4px 4px 0 #000, 0 0 10px #ff4444; }
     to { text-shadow: 4px 4px 0 #000, 0 0 30px #ff4444, 0 0 60px #ff6666; }
+}
+
+/* ====== MOBILE OVERRIDES ====== */
+@media (max-width: 768px) {
+
+    /* ── Logo ── */
+    .logo-text {
+        font-size: 36px;
+        letter-spacing: 6px;
+        -webkit-text-stroke: 3px #000;
+    }
+
+    .logo-subtitle {
+        font-size: 8px;
+        letter-spacing: 2px;
+    }
+
+    .logo-sub2 {
+        font-size: 6px;
+    }
+
+    /* ── Social links (home) ── */
+    .social-links {
+        top: 10px;
+        left: 10px;
+        gap: 8px;
+    }
+
+    .social-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .social-label {
+        font-size: 4px;
+    }
+
+    /* ── Section 2: About ── */
+    .section-about {
+        width: 100vw;
+        overflow: visible;
+    }
+
+    .about-bg {
+        overflow: visible;
+    }
+
+    .members-gallery {
+        padding: 20px 10px 0;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .member-block {
+        max-width: 100px;
+        gap: 6px;
+    }
+
+    .ornate-frame {
+        width: 80px !important;
+        height: 100px !important;
+        padding: 4px !important;
+    }
+
+    .frame-corner {
+        width: 10px !important;
+        height: 10px !important;
+    }
+
+    .member-photo {
+        width: 68px !important;
+        height: 88px !important;
+    }
+
+    .member-name {
+        font-size: 7px !important;
+    }
+
+    .member-role {
+        font-size: 5px !important;
+    }
+
+    .member-desc {
+        font-size: 4px !important;
+        line-height: 1.4 !important;
+    }
+
+    /* ── Section 3: Live Shows ── */
+    .section-live {
+        width: 100vw;
+    }
+
+    .photo-gallery {
+        padding: 10px 10px;
+        gap: 8px;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        height: calc(100% - 60px);
+    }
+
+    .gallery-frame {
+        width: 90px;
+        height: 70px;
+    }
+
+    .gallery-caption {
+        font-size: 4px !important;
+    }
+
+    .section-title {
+        font-size: 14px !important;
+        letter-spacing: 1px !important;
+        padding-top: 10px !important;
+    }
+
+    /* ── Section 4: Stage ── */
+    .music-links {
+        top: 8%;
+        gap: 10px;
+    }
+
+    .music-links-title {
+        font-size: 8px;
+        letter-spacing: 1px;
+    }
+
+    .music-links-row {
+        gap: 16px;
+    }
+
+    .music-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .music-label {
+        font-size: 5px;
+    }
+
+    /* ── Section 5: Pub / Contact ── */
+    .pub-form-container {
+        top: 12%;
+        width: 90%;
+        max-width: 360px;
+    }
+
+    .pub-title {
+        font-size: 11px !important;
+    }
+
+    .pub-form-row {
+        flex-direction: column;
+    }
+
+    .pub-input {
+        font-size: 7px;
+        padding: 8px 10px;
+    }
+
+    .pub-textarea {
+        min-height: 50px;
+    }
+
+    .pub-submit {
+        font-size: 8px;
+        padding: 10px 16px;
+    }
 }

@@ -349,3 +349,39 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #ff2222;
 }
+
+/* ====== MOBILE ====== */
+@media (max-width: 768px) {
+    html {
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body {
+        overflow-x: hidden;
+        overscroll-behavior: none;
+    }
+
+    .section {
+        width: 100vw;
+        overflow: visible;
+    }
+
+    .brick-wall {
+        width: 30px;
+    }
+
+    .road {
+        bottom: 10vh;
+        height: 8px;
+    }
+
+    .road-bridge {
+        height: 10px;
+    }
+
+    .band-walkers canvas {
+        transform: scale(0.65);
+        transform-origin: center bottom;
+    }
+}
