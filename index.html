@@ -4,9 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>5051 — Punk Band</title>
-    <link rel="stylesheet" href="css/style.css?v=12">
-    <link rel="stylesheet" href="css/sections.css?v=12">
-    <link rel="stylesheet" href="css/pixel-art.css?v=12">
+    <link rel="stylesheet" href="css/style.css?v=13">
+    <link rel="stylesheet" href="css/sections.css?v=13">
+    <link rel="stylesheet" href="css/pixel-art.css?v=13">
+    <script>
+        // Force scroll to home — must run before browser restores position
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+        document.addEventListener('DOMContentLoaded', function() {
+            var w = document.getElementById('horizontalWrapper');
+            if (w) w.scrollLeft = 0;
+            window.scrollTo(0, 0);
+        });
+    </script>
 </head>
 <body>
     <div class="horizontal-wrapper" id="horizontalWrapper">
@@ -311,9 +321,9 @@
 
     </div>
 
-    <script src="js/pixel-scenes.js?v=12"></script>
-    <script src="js/scroll.js?v=12"></script>
-    <script src="js/effects.js?v=12"></script>
-    <script src="js/band-walkers.js?v=12"></script>
+    <script src="js/pixel-scenes.js?v=13"></script>
+    <script src="js/scroll.js?v=13"></script>
+    <script src="js/effects.js?v=13"></script>
+    <script src="js/band-walkers.js?v=13"></script>
 </body>
 </html>

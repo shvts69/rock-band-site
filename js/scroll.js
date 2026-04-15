@@ -80,23 +80,15 @@
         });
     }
 
-    // Reset scroll to start on page load (browser/in-app browsers remember old position)
-    if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-    }
+    // Reset scroll — backup for in-app browsers (Telegram etc.) that restore late
     function resetScroll() {
         window.scrollTo(0, 0);
         if (wrapper) wrapper.scrollLeft = 0;
     }
     resetScroll();
-    window.addEventListener('load', resetScroll);
-    // Telegram/Instagram in-app browsers restore scroll AFTER load with unpredictable delay
-    setTimeout(resetScroll, 50);
-    setTimeout(resetScroll, 150);
-    setTimeout(resetScroll, 300);
-    setTimeout(resetScroll, 500);
-    setTimeout(resetScroll, 800);
-    setTimeout(resetScroll, 1200);
+    [100, 300, 600, 1000, 1500, 2000].forEach(function(ms) {
+        setTimeout(resetScroll, ms);
+    });
 
     // ====== MOBILE: native horizontal scroll with snap ======
     function initMobile() {
