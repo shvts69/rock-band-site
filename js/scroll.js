@@ -80,6 +80,12 @@
         });
     }
 
+    // Reset scroll to start on page load (browser remembers old position)
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
     // ====== MOBILE: native horizontal scroll with snap ======
     function initMobile() {
         // Make wrapper a native horizontal scroll container
@@ -104,6 +110,9 @@
         });
 
         positionRoads();
+
+        // Reset to first section on load
+        wrapper.scrollLeft = 0;
 
         // Sync walkers & effects with horizontal scroll position
         wrapper.addEventListener('scroll', onScrollMobile, { passive: true });
