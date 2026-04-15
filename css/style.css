@@ -352,14 +352,9 @@ body {
 
 /* ====== MOBILE ====== */
 @media (max-width: 768px) {
-    html {
+    html, body {
         overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    body {
-        overflow-x: hidden;
-        overscroll-behavior: none;
+        overscroll-behavior-x: none;
     }
 
     .section {
@@ -372,7 +367,6 @@ body {
     }
 
     .road {
-        bottom: 10vh;
         height: 8px;
     }
 

@@ -464,10 +464,9 @@
         // Center of viewport in wrapper coordinates
         const viewportCenterX = translateX + window.innerWidth / 2;
 
-        const isMobile = window.innerWidth <= 768;
         container.style.position = 'absolute';
         container.style.left = (viewportCenterX - canvas.width / 2) + 'px';
-        container.style.bottom = isMobile ? 'calc(10vh + 2px)' : 'calc(13vh + 2px)';
+        container.style.bottom = 'calc(13vh + 2px)';
         container.style.zIndex = '56';
         container.style.pointerEvents = 'none';
     }
