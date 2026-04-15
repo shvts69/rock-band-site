@@ -1530,19 +1530,21 @@
             }
         });
 
+        const isMobile = window.innerWidth <= 768;
+
         function animate() {
             ctx.clearRect(0, 0, W, H);
             const t = Date.now() * 0.001;
 
-            // Move right then left
-            ferryX += ferrySpeed * ferryDir;
-
-            // Turn at edges
-            if (ferryX > zoneRight - 24) { ferryDir = -1; }
-            if (ferryX < zoneLeft) { ferryDir = 1; }
+            if (!isMobile) {
+                // Move right then left (desktop only)
+                ferryX += ferrySpeed * ferryDir;
+                if (ferryX > zoneRight - 24) { ferryDir = -1; }
+                if (ferryX < zoneLeft) { ferryDir = 1; }
+            }
 
             const fx = Math.floor(ferryX);
-            const bob = Math.sin(t * 0.8) * 0.5;
+            const bob = isMobile ? 0 : Math.sin(t * 0.8) * 0.5;
             const fy = Math.floor(ferryY + bob);
 
             {
