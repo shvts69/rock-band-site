@@ -1764,13 +1764,14 @@ function drawStageScene(canvas) {
         drawRect(ctx, spX, 26, 10, 1, '#333');
     });
 
-    // INSTRUMENTS — positioned centered on each musician
-    // Musicians centered at: W*0.5 - 32 (Саша), W*0.5 (Іван), W*0.5 + 32 (Денис)
+    // INSTRUMENTS — positioned to match walker order: Денис(left), Іван(center), Саша(right)
     const centerX = Math.floor(W * 0.5);
-    const mic1X = centerX - 32;   // Саша (bass) — mic + bass guitar
-    const mic2X = centerX;        // Іван (vocals/guitar) — mic + electric guitar
-    const drumCX = centerX + 32;  // Денис (drums) — drum kit
+    const isMobileStage = W < 120;
+    const drumCX = centerX - 32;  // Денис (drums) — leftmost walker
+    const mic2X = centerX;        // Іван (vocals/guitar) — center walker
+    const mic1X = centerX + 32;   // Саша (bass) — rightmost walker
 
+    if (!isMobileStage) {
     // ── MIC STAND 1 (Саша) with bass guitar leaning ──
     drawRect(ctx, mic1X, stageY - 16, 1, 16, '#888');
     drawRect(ctx, mic1X - 1, stageY, 3, 1, '#666');
@@ -1886,6 +1887,7 @@ function drawStageScene(canvas) {
     drawRect(ctx, drumX + 11, drumY, 3, 1, '#666');
     drawRect(ctx, drumX - 5, drumY - 9, 1, 9, '#666');
     drawRect(ctx, drumX - 6, drumY, 3, 1, '#666');
+    } // end if (!isMobileStage)
 
     // STAGE LOGO — BIG "5051" neon style
     const gs = 3; // scale 3x
@@ -2039,7 +2041,8 @@ function drawPubScene(canvas) {
 
     const wallTop = Math.floor(H * 0.06);
     const wallBot = Math.floor(H * 0.62);
-    const barY = Math.floor(H * 0.855);
+    const isMobilePub = (window.innerWidth <= 768);
+    const barY = Math.floor(H * (isMobilePub ? 0.885 : 0.855));
     const barH = 10;
     const barTop = barY - barH;
     const barLeft = Math.floor(W * 0.12);
