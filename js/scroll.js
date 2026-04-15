@@ -90,9 +90,13 @@
     }
     resetScroll();
     window.addEventListener('load', resetScroll);
-    // Telegram/Instagram in-app browsers restore scroll AFTER load — override with delay
-    setTimeout(resetScroll, 100);
+    // Telegram/Instagram in-app browsers restore scroll AFTER load with unpredictable delay
+    setTimeout(resetScroll, 50);
+    setTimeout(resetScroll, 150);
     setTimeout(resetScroll, 300);
+    setTimeout(resetScroll, 500);
+    setTimeout(resetScroll, 800);
+    setTimeout(resetScroll, 1200);
 
     // ====== MOBILE: native horizontal scroll with snap ======
     function initMobile() {
