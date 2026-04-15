@@ -80,11 +80,19 @@
         });
     }
 
-    // Reset scroll to start on page load (browser remembers old position)
+    // Reset scroll to start on page load (browser/in-app browsers remember old position)
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
-    window.scrollTo(0, 0);
+    function resetScroll() {
+        window.scrollTo(0, 0);
+        if (wrapper) wrapper.scrollLeft = 0;
+    }
+    resetScroll();
+    window.addEventListener('load', resetScroll);
+    // Telegram/Instagram in-app browsers restore scroll AFTER load — override with delay
+    setTimeout(resetScroll, 100);
+    setTimeout(resetScroll, 300);
 
     // ====== MOBILE: native horizontal scroll with snap ======
     function initMobile() {
