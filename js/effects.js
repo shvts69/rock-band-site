@@ -2456,9 +2456,6 @@
         const section = document.querySelector('.section-stage');
         if (!section) return;
 
-        // On mobile, walkers are CSS-scaled to 65% but instruments aren't — skip them
-        if (window.innerWidth <= 768) return;
-
         const canvas = document.createElement('canvas');
         canvas.width = section.offsetWidth;
         canvas.height = section.offsetHeight;

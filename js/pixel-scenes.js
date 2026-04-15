@@ -1766,12 +1766,10 @@ function drawStageScene(canvas) {
 
     // INSTRUMENTS — positioned centered on each musician
     const centerX = Math.floor(W * 0.5);
-    const isMobileStage = W < 120;
     const mic1X = centerX - 32;   // Саша (bass) — mic + bass guitar
     const mic2X = centerX;        // Іван (vocals/guitar) — mic + electric guitar
     const drumCX = centerX + 32;  // Денис (drums) — drum kit
 
-    if (!isMobileStage) {
     // ── MIC STAND 1 (Саша) with bass guitar leaning ──
     drawRect(ctx, mic1X, stageY - 16, 1, 16, '#888');
     drawRect(ctx, mic1X - 1, stageY, 3, 1, '#666');
@@ -1887,7 +1885,6 @@ function drawStageScene(canvas) {
     drawRect(ctx, drumX + 11, drumY, 3, 1, '#666');
     drawRect(ctx, drumX - 5, drumY - 9, 1, 9, '#666');
     drawRect(ctx, drumX - 6, drumY, 3, 1, '#666');
-    } // end if (!isMobileStage)
 
     // STAGE LOGO — BIG "5051" neon style
     const gs = 3; // scale 3x
