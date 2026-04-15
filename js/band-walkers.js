@@ -453,15 +453,27 @@
     // Position: absolute inside wrapper, update left on scroll to stay centered
     const wrapper = document.getElementById('horizontalWrapper');
 
-    function updatePosition() {
-        const scrollY = window.scrollY;
-        const maxScrollY = document.body.scrollHeight - window.innerHeight;
-        const totalWidth = wrapper.scrollWidth;
-        const maxScroll = totalWidth - window.innerWidth;
-        const progress = maxScrollY > 0 ? scrollY / maxScrollY : 0;
-        const translateX = progress * maxScroll;
+    const isMobile = window.innerWidth <= 768;
 
-        // Center of viewport in wrapper coordinates
+    function getScrollState() {
+        if (isMobile) {
+            const scrollX = wrapper.scrollLeft || 0;
+            const maxScrollX = wrapper.scrollWidth - wrapper.clientWidth;
+            const translateX = scrollX;
+            return { scrollPos: scrollX, translateX };
+        } else {
+            const scrollY = window.scrollY;
+            const maxScrollY = document.body.scrollHeight - window.innerHeight;
+            const totalWidth = wrapper.scrollWidth;
+            const maxScroll = totalWidth - window.innerWidth;
+            const progress = maxScrollY > 0 ? scrollY / maxScrollY : 0;
+            const translateX = progress * maxScroll;
+            return { scrollPos: scrollY, translateX };
+        }
+    }
+
+    function updatePosition() {
+        const { translateX } = getScrollState();
         const viewportCenterX = translateX + window.innerWidth / 2;
 
         container.style.position = 'absolute';
@@ -472,12 +484,14 @@
     }
 
     // Scroll-driven animation
+    let lastScrollPos = 0;
+
     function onScroll() {
-        const sy = window.scrollY;
+        const { scrollPos } = getScrollState();
         if (!isWalking) { isWalking = true; window._bandWalkersIsWalking = true; render(); }
 
-        scrollAccum += Math.abs(sy - (onScroll._lastY || 0));
-        onScroll._lastY = sy;
+        scrollAccum += Math.abs(scrollPos - lastScrollPos);
+        lastScrollPos = scrollPos;
 
         while (scrollAccum >= PX_PER_FRAME) {
             scrollAccum -= PX_PER_FRAME;
@@ -494,10 +508,14 @@
             render();
         }, STOP_DELAY);
     }
-    onScroll._lastY = window.scrollY;
 
     updatePosition();
     render();
-    window.addEventListener('scroll', onScroll, { passive: true });
+
+    if (isMobile) {
+        wrapper.addEventListener('scroll', onScroll, { passive: true });
+    } else {
+        window.addEventListener('scroll', onScroll, { passive: true });
+    }
     window.addEventListener('resize', updatePosition);
 })();

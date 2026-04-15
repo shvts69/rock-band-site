@@ -2633,9 +2633,16 @@
         let taxiTimer = 0;
 
         function getScrollProgress() {
+            if (window.innerWidth <= 768) {
+                const w = document.getElementById('horizontalWrapper');
+                if (w) {
+                    const maxX = w.scrollWidth - w.clientWidth;
+                    return maxX > 0 ? Math.max(0, Math.min(1, w.scrollLeft / maxX)) : 0;
+                }
+            }
             const scrollY = window.scrollY;
             const maxScrollY = document.body.scrollHeight - window.innerHeight;
-            return maxScrollY > 0 ? scrollY / maxScrollY : 0;
+            return maxScrollY > 0 ? Math.max(0, Math.min(1, scrollY / maxScrollY)) : 0;
         }
 
         function drawBeer(gx, gy) {
@@ -3037,9 +3044,16 @@
         let strobeTimer = 0;
 
         function getScrollProgress() {
+            if (window.innerWidth <= 768) {
+                const w = document.getElementById('horizontalWrapper');
+                if (w) {
+                    const maxX = w.scrollWidth - w.clientWidth;
+                    return maxX > 0 ? Math.max(0, Math.min(1, w.scrollLeft / maxX)) : 0;
+                }
+            }
             const scrollY = window.scrollY;
             const maxScrollY = document.body.scrollHeight - window.innerHeight;
-            return maxScrollY > 0 ? scrollY / maxScrollY : 0;
+            return maxScrollY > 0 ? Math.max(0, Math.min(1, scrollY / maxScrollY)) : 0;
         }
 
         function animate() {
