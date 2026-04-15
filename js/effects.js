@@ -614,7 +614,8 @@
             const sr = section.getBoundingClientRect();
             const lr = logo.getBoundingClientRect();
             perchX = (lr.left + lr.width / 2 - sr.left) / PIXEL;
-            perchY = (lr.top - sr.top) / PIXEL - 8;
+            const perchOffset = window.innerWidth <= 768 ? 2 : 8;
+            perchY = (lr.top - sr.top) / PIXEL - perchOffset;
         }
 
         let diveStartX, diveStartY, diveProgress;
