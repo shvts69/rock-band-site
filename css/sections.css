@@ -14,6 +14,49 @@
     position: relative;
 }
 
+/* Social links — top left of home section */
+.social-links {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    gap: 14px;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.social-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: transform 0.2s, filter 0.2s;
+    image-rendering: pixelated;
+}
+
+.social-link:hover {
+    transform: scale(1.15) translateY(-4px);
+    filter: brightness(1.3);
+}
+
+.social-icon {
+    width: 52px;
+    height: 52px;
+    image-rendering: pixelated;
+}
+
+.social-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 5px;
+    letter-spacing: 1px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+.social-youtube .social-label { color: #ff0000; }
+.social-instagram .social-label { color: #e1306c; }
+
 /* Старі CSS елементи фону — приховуємо, canvas малює */
 .mountains, .cactus, .route-sign, .us-flag, .sky { display: none; }
 
@@ -455,6 +498,209 @@
     position: relative;
     overflow: hidden;
 }
+
+/* ====== СЕКЦІЯ 5: ПАБ ====== */
+.section-pub {
+    background: #1a1008;
+}
+
+.pub-bg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.pub-form-container {
+    position: absolute;
+    top: 28%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 420px;
+    pointer-events: auto;
+}
+
+.pub-title {
+    font-size: 18px !important;
+    color: #ffcc66 !important;
+    margin-bottom: 16px;
+    text-shadow:
+        3px 3px 0 #000,
+        0 0 10px rgba(255,200,100,0.4) !important;
+    -webkit-text-stroke: 0 !important;
+}
+
+.pub-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pub-form-row {
+    display: flex;
+    gap: 8px;
+}
+
+.pub-input {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 10px 12px;
+    background: rgba(20,12,5,0.85);
+    border: 2px solid #5a3a18;
+    color: #ffcc66;
+    flex: 1;
+    outline: none;
+    image-rendering: pixelated;
+    transition: border-color 0.2s;
+}
+
+.pub-input::placeholder {
+    color: #6a5a3a;
+}
+
+.pub-input:focus {
+    border-color: #ff8833;
+    box-shadow: 0 0 8px rgba(255,136,51,0.3);
+}
+
+.pub-select {
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+.pub-select option {
+    background: #1a1008;
+    color: #ffcc66;
+}
+
+.pub-textarea {
+    resize: none;
+    min-height: 60px;
+}
+
+.pub-submit {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    padding: 12px 24px;
+    background: #8b2500;
+    border: 2px solid #cc4400;
+    color: #ffcc66;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    letter-spacing: 2px;
+    align-self: center;
+    margin-top: 4px;
+}
+
+.pub-submit:hover {
+    background: #aa3300;
+    border-color: #ff6622;
+    box-shadow: 0 0 15px rgba(255,100,30,0.4);
+    transform: scale(1.05);
+}
+
+/* ====== MUSIC PLATFORM LINKS ====== */
+.music-links {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 15;
+    pointer-events: auto;
+}
+
+.music-links-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    color: #fff;
+    letter-spacing: 3px;
+    text-shadow:
+        2px 2px 0 #000,
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        0 0 12px rgba(255,50,50,0.5);
+    animation: listenPulse 2s ease-in-out infinite alternate;
+    text-align: center;
+    white-space: nowrap;
+}
+
+@keyframes listenPulse {
+    from {
+        text-shadow:
+            2px 2px 0 #000,
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            0 0 8px rgba(255,50,50,0.4);
+    }
+    to {
+        text-shadow:
+            2px 2px 0 #000,
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            0 0 25px rgba(255,80,80,0.8),
+            0 0 50px rgba(255,50,50,0.3);
+    }
+}
+
+.music-links-row {
+    display: flex;
+    gap: 48px;
+}
+
+.music-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, filter 0.2s;
+    image-rendering: pixelated;
+    animation: iconFloat 3s ease-in-out infinite alternate;
+}
+
+.music-link:nth-child(2) { animation-delay: 0.5s; }
+.music-link:nth-child(3) { animation-delay: 1s; }
+
+@keyframes iconFloat {
+    from { transform: translateY(0); }
+    to { transform: translateY(-5px); }
+}
+
+.music-link:hover {
+    transform: scale(1.2) translateY(-8px) !important;
+    filter: brightness(1.4) drop-shadow(0 0 12px currentColor);
+    animation: none;
+}
+
+.music-icon {
+    width: 80px;
+    height: 80px;
+    image-rendering: pixelated;
+}
+
+.music-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+.music-spotify .music-label { color: #1DB954; }
+.music-youtube .music-label { color: #ff0000; }
+.music-apple .music-label { color: #fc3c44; }
+
+.music-spotify:hover { color: #1DB954; }
+.music-youtube:hover { color: #ff0000; }
+.music-apple:hover { color: #fc3c44; }
 
 /* Приховуємо старі CSS елементи */
 .spotlight, .stage-platform, .stage-floor, .stage-front,

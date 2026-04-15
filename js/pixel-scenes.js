@@ -1764,17 +1764,111 @@ function drawStageScene(canvas) {
         drawRect(ctx, spX, 26, 10, 1, '#333');
     });
 
-    // MICROPHONE STANDS — left and right (moved closer)
-    [W * 0.35, W * 0.48].forEach(mx => {
-        const mxx = Math.floor(mx);
-        drawRect(ctx, mxx, stageY - 16, 1, 16, '#888');
-        drawRect(ctx, mxx - 1, stageY, 3, 1, '#666');
-        // Mic head
-        drawRect(ctx, mxx - 1, stageY - 18, 3, 2, '#444');
-    });
+    // INSTRUMENTS — positioned centered on each musician
+    // Musicians centered at: W*0.5 - 32 (Саша), W*0.5 (Іван), W*0.5 + 32 (Денис)
+    const centerX = Math.floor(W * 0.5);
+    const mic1X = centerX - 32;   // Саша (bass) — mic + bass guitar
+    const mic2X = centerX;        // Іван (vocals/guitar) — mic + electric guitar
+    const drumCX = centerX + 32;  // Денис (drums) — drum kit
 
-    // DRUM KIT (right side) — stands on road surface (stageY)
-    const drumX = Math.floor(W * 0.58);
+    // ── MIC STAND 1 (Саша) with bass guitar leaning ──
+    drawRect(ctx, mic1X, stageY - 16, 1, 16, '#888');
+    drawRect(ctx, mic1X - 1, stageY, 3, 1, '#666');
+    drawRect(ctx, mic1X - 1, stageY - 18, 3, 2, '#444');
+    drawPixel(ctx, mic1X, stageY - 18, '#555');
+    // Bass guitar — Precision Bass style, leaning right (RED)
+    // Body — wider, rounded shape
+    drawRect(ctx, mic1X - 7, stageY - 10, 6, 8, '#cc1111');
+    drawRect(ctx, mic1X - 8, stageY - 9, 1, 6, '#cc1111');
+    drawRect(ctx, mic1X - 1, stageY - 9, 1, 6, '#cc1111');
+    drawRect(ctx, mic1X - 6, stageY - 11, 4, 1, '#cc1111');
+    drawRect(ctx, mic1X - 6, stageY - 2, 4, 1, '#cc1111');
+    // Body highlights
+    drawRect(ctx, mic1X - 6, stageY - 9, 4, 1, '#dd3333');
+    drawPixel(ctx, mic1X - 7, stageY - 8, '#dd2222');
+    // Pickguard
+    drawRect(ctx, mic1X - 6, stageY - 8, 4, 3, '#f0e8d8');
+    drawRect(ctx, mic1X - 5, stageY - 9, 2, 1, '#f0e8d8');
+    // Pickups
+    drawRect(ctx, mic1X - 5, stageY - 7, 3, 1, '#333');
+    drawRect(ctx, mic1X - 5, stageY - 5, 3, 1, '#333');
+    // Bridge
+    drawRect(ctx, mic1X - 5, stageY - 3, 3, 1, '#999');
+    // Knobs
+    drawPixel(ctx, mic1X - 3, stageY - 4, '#ddd');
+    drawPixel(ctx, mic1X - 2, stageY - 4, '#ddd');
+    // Neck — going up-right diagonal (2px wide)
+    for (let i = 0; i < 8; i++) {
+        drawPixel(ctx, mic1X - 1 + i, stageY - 12 - i, '#8b6535');
+        drawPixel(ctx, mic1X + 0 + i, stageY - 12 - i, '#7a5525');
+    }
+    // Fret markers
+    drawPixel(ctx, mic1X + 1, stageY - 14, '#c8b080');
+    drawPixel(ctx, mic1X + 4, stageY - 17, '#c8b080');
+    // Strings (thin line along neck)
+    for (let i = 0; i < 8; i++) {
+        drawPixel(ctx, mic1X - 1 + i, stageY - 12 - i, '#aaa');
+    }
+    // Headstock
+    drawRect(ctx, mic1X + 7, stageY - 21, 2, 3, '#8b6535');
+    drawPixel(ctx, mic1X + 6, stageY - 20, '#8b6535');
+    // Tuning pegs
+    drawPixel(ctx, mic1X + 9, stageY - 21, '#ccc');
+    drawPixel(ctx, mic1X + 9, stageY - 20, '#ccc');
+    drawPixel(ctx, mic1X + 9, stageY - 19, '#ccc');
+    drawPixel(ctx, mic1X + 6, stageY - 21, '#ccc');
+
+    // ── MIC STAND 2 (Іван) with electric guitar leaning ──
+    drawRect(ctx, mic2X, stageY - 16, 1, 16, '#888');
+    drawRect(ctx, mic2X - 1, stageY, 3, 1, '#666');
+    drawRect(ctx, mic2X - 1, stageY - 18, 3, 2, '#444');
+    drawPixel(ctx, mic2X, stageY - 18, '#555');
+    // Electric guitar — Stratocaster style, leaning left (BLACK)
+    // Body — curvy double cutaway
+    drawRect(ctx, mic2X + 2, stageY - 10, 6, 8, '#1a1a1a');
+    drawRect(ctx, mic2X + 8, stageY - 9, 1, 6, '#1a1a1a');
+    drawRect(ctx, mic2X + 1, stageY - 9, 1, 6, '#1a1a1a');
+    drawRect(ctx, mic2X + 3, stageY - 11, 4, 1, '#1a1a1a');
+    drawRect(ctx, mic2X + 3, stageY - 2, 4, 1, '#1a1a1a');
+    // Body highlights
+    drawRect(ctx, mic2X + 3, stageY - 9, 4, 1, '#2a2a2a');
+    drawPixel(ctx, mic2X + 7, stageY - 8, '#222');
+    // Pickguard
+    drawRect(ctx, mic2X + 3, stageY - 8, 4, 3, '#f5f0e0');
+    drawRect(ctx, mic2X + 4, stageY - 9, 2, 1, '#f5f0e0');
+    // Pickups (3 single coils — strat style)
+    drawRect(ctx, mic2X + 4, stageY - 7, 2, 1, '#222');
+    drawRect(ctx, mic2X + 4, stageY - 6, 2, 1, '#222');
+    drawRect(ctx, mic2X + 4, stageY - 5, 2, 1, '#222');
+    // Bridge / tremolo
+    drawRect(ctx, mic2X + 4, stageY - 3, 2, 1, '#aaa');
+    drawPixel(ctx, mic2X + 6, stageY - 3, '#888');
+    // Knobs
+    drawPixel(ctx, mic2X + 3, stageY - 4, '#fff');
+    drawPixel(ctx, mic2X + 7, stageY - 5, '#fff');
+    // Neck — going up-left diagonal (2px wide)
+    for (let i = 0; i < 8; i++) {
+        drawPixel(ctx, mic2X + 1 - i, stageY - 12 - i, '#8b6535');
+        drawPixel(ctx, mic2X + 0 - i, stageY - 12 - i, '#7a5525');
+    }
+    // Fret markers
+    drawPixel(ctx, mic2X - 1, stageY - 14, '#c8b080');
+    drawPixel(ctx, mic2X - 4, stageY - 17, '#c8b080');
+    // Strings
+    for (let i = 0; i < 8; i++) {
+        drawPixel(ctx, mic2X + 1 - i, stageY - 12 - i, '#aaa');
+    }
+    // Headstock — Fender style
+    drawRect(ctx, mic2X - 8, stageY - 21, 2, 3, '#1a1a1a');
+    drawPixel(ctx, mic2X - 6, stageY - 20, '#1a1a1a');
+    // Tuning pegs
+    drawPixel(ctx, mic2X - 10, stageY - 21, '#ccc');
+    drawPixel(ctx, mic2X - 10, stageY - 20, '#ccc');
+    drawPixel(ctx, mic2X - 10, stageY - 19, '#ccc');
+    drawPixel(ctx, mic2X - 7, stageY - 21, '#ccc');
+
+    // ── DRUM KIT (Денис) — centered on his position ──
+    const drumX = drumCX - 5;
     const drumY = stageY;
     // Bass drum
     drawRect(ctx, drumX, drumY - 8, 10, 8, '#8b0000');
@@ -1785,7 +1879,7 @@ function drawStageScene(canvas) {
     drawRect(ctx, drumX + 10, drumY - 14, 6, 1, '#ccaa00');
     // Hi-hat
     drawRect(ctx, drumX - 6, drumY - 10, 4, 1, '#aa8800');
-    // Stands — all reach down to road (drumY) with base plates
+    // Stands
     drawRect(ctx, drumX - 3, drumY - 11, 1, 11, '#666');
     drawRect(ctx, drumX - 4, drumY, 3, 1, '#666');
     drawRect(ctx, drumX + 12, drumY - 13, 1, 13, '#666');
@@ -1793,25 +1887,11 @@ function drawStageScene(canvas) {
     drawRect(ctx, drumX - 5, drumY - 9, 1, 9, '#666');
     drawRect(ctx, drumX - 6, drumY, 3, 1, '#666');
 
-    // DRUM MIC — right of drums, bent left towards drums
-    const dmX = Math.floor(W * 0.65);
-    // Vertical stand
-    drawRect(ctx, dmX, stageY - 14, 1, 14, '#888');
-    drawRect(ctx, dmX - 1, stageY, 3, 1, '#666');
-    // Bent arm going left towards drums
-    drawRect(ctx, dmX - 1, stageY - 14, 1, 1, '#888');
-    drawRect(ctx, dmX - 2, stageY - 13, 1, 1, '#888');
-    drawRect(ctx, dmX - 3, stageY - 12, 1, 1, '#888');
-    drawRect(ctx, dmX - 4, stageY - 11, 1, 1, '#888');
-    drawRect(ctx, dmX - 5, stageY - 10, 1, 1, '#888');
-    // Mic head (pointing at drums)
-    drawRect(ctx, dmX - 7, stageY - 10, 2, 2, '#444');
-
     // STAGE LOGO — BIG "5051" neon style
     const gs = 3; // scale 3x
     const logoTotalW = (5 + 1 + 5 + 1 + 5 + 1 + 5) * gs; // 23 * 3 = 69
     const logoX = Math.floor(W * 0.5) - Math.floor(logoTotalW / 2);
-    const logoY = stageY - 25 - 6 * gs;
+    const logoY = stageY - 38 - 6 * gs;
 
     const drawChar5 = (ox, oy, c, s) => {
         drawRect(ctx, ox, oy, 5*s, s, c);
@@ -1945,13 +2025,235 @@ function drawStageScene(canvas) {
 }
 
 
+// ====== SECTION 5: MANHATTAN BAR ======
+function drawPubScene(canvas) {
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width / PIXEL;
+    const H = canvas.height / PIXEL;
+
+    // Dark moody interior
+    for (let y = 0; y < H; y++) {
+        const t = y / H;
+        drawRect(ctx, 0, y, W, 1, `rgb(${Math.floor(12+t*8)},${Math.floor(10+t*6)},${Math.floor(14+t*8)})`);
+    }
+
+    const wallTop = Math.floor(H * 0.06);
+    const wallBot = Math.floor(H * 0.62);
+    const barY = Math.floor(H * 0.855);
+    const barH = 10;
+    const barTop = barY - barH;
+    const barLeft = Math.floor(W * 0.12);
+    const barRight = Math.floor(W * 0.88);
+    const barW = barRight - barLeft;
+    const centerX = Math.floor(W * 0.5);
+
+    // ── CEILING ──
+    drawRect(ctx, 0, 0, W, wallTop, '#0e0c10');
+    for (let x = 0; x < W; x += 5) { drawRect(ctx,x,wallTop,4,2,'#3a1a0a'); drawRect(ctx,x,wallTop,4,1,'#4a2a1a'); }
+    for (let x = 0; x < W; x += 8) { drawRect(ctx,x,wallTop-4,7,3,'#1a1820'); drawRect(ctx,x+1,wallTop-3,5,1,'#222028'); }
+
+    // ── BACK WALL ──
+    for (let y = wallTop+2; y < wallBot; y++) {
+        const t=(y-wallTop)/(wallBot-wallTop);
+        drawRect(ctx,0,y,W,1,`rgb(${Math.floor(22+t*4)},${Math.floor(20+t*3)},${Math.floor(25+t*5)})`);
+    }
+    for (let y = wallTop+2; y < wallBot; y += 6) drawRect(ctx,0,y,W,1,'rgba(0,0,0,0.15)');
+
+    // ── SAME STREET in both windows ──
+    // Shared street: buildings, sidewalk, road — continuous scene
+    const winY = wallTop + 14;
+    const winW = 35;
+    const winH = 32;
+    const winX1 = Math.floor(W * 0.05);
+    const win2X = Math.floor(W * 0.82);
+    // Gap between windows in "street world" = wall thickness ~60px
+    const wallGap = 8; // pixels the taxi is hidden between windows
+
+    // Draw window helper
+    function drawWindow(wx) {
+        // Frame
+        drawRect(ctx, wx-2, winY-2, winW+4, winH+4, '#1a1a1a');
+        drawRect(ctx, wx-1, winY-1, winW+2, winH+2, '#2a2a2a');
+        // Night sky
+        for (let y=0; y<winH; y++) {
+            const t=y/winH;
+            drawRect(ctx, wx, winY+y, winW, 1, `rgb(${Math.floor(6+t*12)},${Math.floor(6+t*10)},${Math.floor(18+t*18)})`);
+        }
+        // Skyline — same buildings in both windows
+        const bldgs = [
+            {x:0,w:3,h:16},{x:3,w:4,h:20},{x:7,w:2,h:12},{x:9,w:5,h:24},{x:14,w:3,h:15},
+            {x:17,w:4,h:22},{x:21,w:2,h:10},{x:23,w:3,h:18},{x:26,w:4,h:25},{x:30,w:3,h:14},{x:33,w:2,h:19}
+        ];
+        bldgs.forEach(b => {
+            const bx=wx+b.x, by=winY+winH-4-b.h;
+            drawRect(ctx, bx, by, b.w, b.h, '#080810');
+            for (let wy=by+2; wy<winY+winH-6; wy+=3) for (let bwx=bx+1; bwx<bx+b.w-1; bwx+=2) {
+                if (Math.random()>0.4) drawPixel(ctx, bwx, wy, Math.random()>0.7?'#ffdd66':'#ffe8aa');
+            }
+        });
+        // Antenna
+        drawRect(ctx, wx+27, winY+winH-33, 1, 4, '#080810');
+        // Stars
+        drawPixel(ctx, wx+5, winY+3, '#aaa'); drawPixel(ctx, wx+18, winY+2, '#888');
+        drawPixel(ctx, wx+30, winY+4, '#999'); drawPixel(ctx, wx+12, winY+5, '#777');
+        // Sidewalk + street
+        drawRect(ctx, wx, winY+winH-4, winW, 1, '#444448'); // curb
+        drawRect(ctx, wx, winY+winH-3, winW, 3, '#222228'); // road
+        // Street lamp
+        drawRect(ctx, wx+4, winY+winH-14, 1, 10, '#555');
+        drawRect(ctx, wx+3, winY+winH-15, 3, 1, '#555');
+        drawPixel(ctx, wx+4, winY+winH-15, '#ffcc66');
+        // Lamp glow
+        for (let d=1;d<4;d++) { drawRect(ctx, wx+4-d, winY+winH-15+d, d*2+1, 1, `rgba(255,200,100,${0.04-d*0.01})`); }
+        // Fire hydrant
+        drawRect(ctx, wx+28, winY+winH-7, 2, 3, '#cc2222');
+        drawPixel(ctx, wx+28, winY+winH-8, '#cc2222');
+        // Cross bars
+        drawRect(ctx, wx, winY+Math.floor(winH*0.45), winW, 1, '#2a2a2a');
+    }
+    drawWindow(winX1);
+    drawWindow(win2X);
+    // Moon (only left window)
+    drawPixel(ctx, winX1+3, winY+2, '#eeeedd'); drawPixel(ctx, winX1+4, winY+2, '#dddccc');
+
+
+    // ── SHELVES + BOTTLES (3 shelves, more bottles) ──
+    const shelfY = wallBot - 24;
+    // Mirror behind bottles
+    drawRect(ctx, Math.floor(W*0.18), shelfY-12, Math.floor(W*0.64), 11, '#141420');
+    drawRect(ctx, Math.floor(W*0.18), shelfY-12, Math.floor(W*0.64), 1, '#2a2a33');
+    for (let x=Math.floor(W*0.2); x<Math.floor(W*0.8); x+=3) {
+        drawPixel(ctx, x, shelfY-8, 'rgba(255,255,255,0.03)');
+        drawPixel(ctx, x, shelfY-5, 'rgba(255,255,255,0.02)');
+    }
+    // 3 shelves
+    for (let s=0; s<3; s++) {
+        const sy2 = shelfY + s * 9;
+        drawRect(ctx, Math.floor(W*0.18), sy2-1, Math.floor(W*0.64), 1, 'rgba(255,200,100,0.05)');
+        drawRect(ctx, Math.floor(W*0.18), sy2, Math.floor(W*0.64), 1, '#222');
+    }
+    const bColors = ['#1a5a2a','#7a1800','#cc8800','#0a3a7a','#5a0a3a','#aa6600','#0a4422','#771818','#2a6688','#665522','#2a2a8a','#8a4400','#336633','#993355','#bb7700'];
+    for (let i=0; i<42; i++) {
+        const row = Math.floor(i/14);
+        const col = i % 14;
+        const bx = Math.floor(W*0.20) + col * Math.floor(W*0.043);
+        const shelf = shelfY + row * 9;
+        const bc = bColors[i % bColors.length];
+        const bH = 4 + (col%4);
+        drawRect(ctx, bx, shelf-bH, 2, bH, bc);
+        drawRect(ctx, bx, shelf-bH-2, 1, 2, bc);
+        drawPixel(ctx, bx, shelf-bH-3, '#aaa');
+        drawRect(ctx, bx, shelf-bH+1, 2, 1, 'rgba(255,255,255,0.15)');
+        drawPixel(ctx, bx+1, shelf-bH, 'rgba(255,255,255,0.1)');
+    }
+
+    // ── BAR COUNTER ──
+    for (let y=barTop+3; y<barY; y++) {
+        const t=(y-barTop)/barH; const c=Math.floor(16+t*5+Math.sin(t*10)*2);
+        drawRect(ctx, barLeft, y, barW, 1, `rgb(${c},${c-2},${c+2})`);
+    }
+    for (let x=barLeft; x<barRight; x+=8) for (let y=barTop+4;y<barY;y++) drawPixel(ctx,x,y,'rgba(0,0,0,0.1)');
+    drawRect(ctx, barLeft, barTop+4, barW, 1, '#6a5828');
+    // Marble top
+    drawRect(ctx, barLeft-1, barTop-1, barW+2, 1, '#333340');
+    drawRect(ctx, barLeft-1, barTop, barW+2, 1, '#1a1a22');
+    drawRect(ctx, barLeft-1, barTop+1, barW+2, 1, '#222230');
+    drawRect(ctx, barLeft-1, barTop+2, barW+2, 1, '#181820');
+    for (let x=barLeft; x<barRight; x+=5) drawPixel(ctx,x,barTop+1,'rgba(255,255,255,0.05)');
+    // Foot rail
+    drawRect(ctx, barLeft+2, barY-2, barW-4, 1, '#aa8822');
+    drawRect(ctx, barLeft+2, barY-1, barW-4, 1, '#886618');
+
+    // ── BEER TAPS (5) ──
+    [centerX-10,centerX-4,centerX+2,centerX+8,centerX+14].forEach((tx,i) => {
+        const tapC=['#222','#cc7700','#aa1100','#1a4a1a','#884411'][i];
+        drawRect(ctx,tx,barTop-6,2,5,tapC); drawRect(ctx,tx-1,barTop-7,4,1,tapC);
+        drawPixel(ctx,tx,barTop-7,'#ddd'); drawRect(ctx,tx-1,barTop-1,4,1,'#555');
+    });
+    drawRect(ctx, centerX-12, barTop-1, 28, 1, '#444');
+    drawRect(ctx, centerX-11, barTop+1, 26, 1, '#333');
+
+    // ── BAR STOOLS ──
+    [centerX-32, centerX, centerX+32].forEach(sx => {
+        drawRect(ctx,sx-4,barY+1,8,1,'#1a1a1a'); drawRect(ctx,sx-3,barY+2,6,2,'#222');
+        drawRect(ctx,sx-4,barY+2,1,1,'#2a2a2a'); drawRect(ctx,sx+3,barY+2,1,1,'#2a2a2a');
+        drawRect(ctx,sx-1,barY+4,2,5,'#555'); drawRect(ctx,sx-3,barY+9,6,1,'#444');
+    });
+
+    // ── FLOOR ──
+    for (let y=barY; y<H; y++) {
+        const t=(y-barY)/(H-barY);
+        drawRect(ctx,0,y,W,1,`rgb(${Math.floor(20+t*4)},${Math.floor(16+t*3)},${Math.floor(12+t*2)})`);
+    }
+    for (let x=0;x<W;x+=10) for (let y=barY;y<H;y++) drawPixel(ctx,x,y,'rgba(0,0,0,0.08)');
+
+    // ── PENDANT LIGHTS ──
+    [W*0.15, W*0.35, W*0.5, W*0.65, W*0.85].forEach(lx => {
+        const x=Math.floor(lx);
+        for (let y=0;y<wallTop+4;y++) drawPixel(ctx,x,y,'#444');
+        drawRect(ctx,x-2,wallTop+4,5,1,'#333'); drawRect(ctx,x-3,wallTop+5,7,4,'#222');
+        drawRect(ctx,x-2,wallTop+9,5,1,'#333');
+        drawPixel(ctx,x-3,wallTop+6,'#444'); drawPixel(ctx,x+3,wallTop+6,'#444');
+        drawPixel(ctx,x-3,wallTop+8,'#444'); drawPixel(ctx,x+3,wallTop+8,'#444');
+        drawRect(ctx,x-1,wallTop+6,3,2,'#ffbb44'); drawPixel(ctx,x,wallTop+5,'#ffcc66');
+        for (let d=1;d<30;d++) { const w=Math.floor(d*0.7), a=0.04*(1-d/30); for (let dx=-w;dx<=w;dx++) drawPixel(ctx,x+dx,wallTop+10+d,`rgba(255,190,80,${a})`); }
+    });
+
+    // ── DARTBOARD (right wall) ──
+    const dartX=Math.floor(W*0.93), dartY=Math.floor(H*0.45);
+    // Backboard
+    drawRect(ctx, dartX-9, dartY-9, 18, 18, '#2a1a0a');
+    for (let dy=-8;dy<=8;dy++) for (let dx=-8;dx<=8;dx++) {
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if (dist<=8) {
+            let c;
+            if(dist<=1) c='#ee1111';
+            else if(dist<=2) c='#11aa44';
+            else if(dist<=3.5) c='#ee1111';
+            else if(dist<=4.5) c='#eeeedd';
+            else if(dist<=5.5) c='#11aa44';
+            else if(dist<=6.5) c='#ee1111';
+            else if(dist<=7.5) c='#1a1a1a';
+            else c='#eeeedd';
+            drawPixel(ctx,dartX+dx,dartY+dy,c);
+        }
+    }
+    // Wire frame
+    for (let a=0;a<Math.PI*2;a+=Math.PI/6) {
+        for (let r=2;r<=8;r++) drawPixel(ctx,dartX+Math.round(Math.cos(a)*r),dartY+Math.round(Math.sin(a)*r),'rgba(150,150,150,0.3)');
+    }
+    // Darts stuck in board
+    drawPixel(ctx,dartX+3,dartY-2,'#888'); drawPixel(ctx,dartX+4,dartY-3,'#aaa');
+    drawPixel(ctx,dartX+5,dartY-4,'#cc3333'); drawPixel(ctx,dartX+5,dartY-5,'#cc3333');
+    drawPixel(ctx,dartX-2,dartY+1,'#888'); drawPixel(ctx,dartX-3,dartY+1,'#aaa');
+    drawPixel(ctx,dartX-4,dartY+1,'#3366cc'); drawPixel(ctx,dartX-5,dartY+1,'#3366cc');
+
+    // ── FRAMED PHOTOS (2) ──
+    const photoX=Math.floor(W*0.05), photoY=Math.floor(H*0.50);
+    drawRect(ctx,photoX-1,photoY-1,14,12,'#2a2a2a'); drawRect(ctx,photoX,photoY,12,10,'#181818');
+    drawRect(ctx,photoX+2,photoY+4,2,5,'#444'); drawRect(ctx,photoX+2,photoY+3,2,1,'#555');
+    drawRect(ctx,photoX+5,photoY+3,2,6,'#444'); drawRect(ctx,photoX+5,photoY+2,2,1,'#555');
+    drawRect(ctx,photoX+8,photoY+4,2,5,'#444'); drawRect(ctx,photoX+8,photoY+3,2,1,'#555');
+    // Second photo
+    const p2x=Math.floor(W*0.05), p2y=photoY-16;
+    drawRect(ctx,p2x-1,p2y-1,14,12,'#3a2a1a'); drawRect(ctx,p2x,p2y,12,10,'#1a1a1a');
+    drawRect(ctx,p2x+1,p2y+2,10,6,'#333'); // concert shot
+    for (let i=0;i<5;i++) drawPixel(ctx,p2x+2+i*2,p2y+6,'#ffdd66');
+
+
+    // ── EXPOSED BRICK (left wall only) ──
+    for (let y=wallBot-12;y<wallBot;y+=3) for (let x=0;x<Math.floor(W*0.05);x+=5) { drawRect(ctx,x,y,4,2,'#3a1a0a'); drawRect(ctx,x,y,4,1,'#4a2a15'); }
+
+}
+
 // ====== INITIALIZATION ======
 function initScenes() {
     const sections = [
         { selector: '.section-home .home-bg', draw: drawHomeScene },
         { selector: '.section-about .about-bg', draw: drawBrooklynScene },
         { selector: '.section-live .live-bg', draw: drawLiveScene },
-        { selector: '.section-stage .stage-bg', draw: drawStageScene }
+        { selector: '.section-stage .stage-bg', draw: drawStageScene },
+        { selector: '.section-pub .pub-bg', draw: drawPubScene }
     ];
 
     const canvases = [];
@@ -1990,7 +2292,7 @@ let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        document.querySelectorAll('.home-bg canvas, .about-bg canvas, .live-bg canvas, .stage-bg canvas').forEach(c => c.remove());
+        document.querySelectorAll('.home-bg canvas, .about-bg canvas, .live-bg canvas, .stage-bg canvas, .pub-bg canvas').forEach(c => c.remove());
         initScenes();
     }, 300);
 });

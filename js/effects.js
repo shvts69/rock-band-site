@@ -149,7 +149,7 @@
             const logoTotalW = 23 * gs;
             const logoStageY = Math.floor(H * 0.855);
             const logoLX = Math.floor(W * 0.5) - Math.floor(logoTotalW / 2);
-            const logoLY = logoStageY - 25 - 6 * gs;
+            const logoLY = logoStageY - 38 - 6 * gs;
 
             // Intense neon flicker
             const flick = Math.sin(t * 12) > -0.2 ? 1 : 0;
@@ -614,7 +614,7 @@
             const sr = section.getBoundingClientRect();
             const lr = logo.getBoundingClientRect();
             perchX = (lr.left + lr.width / 2 - sr.left) / PIXEL;
-            perchY = (lr.top - sr.top) / PIXEL - 2;
+            perchY = (lr.top - sr.top) / PIXEL - 8;
         }
 
         let diveStartX, diveStartY, diveProgress;
@@ -2294,7 +2294,7 @@
         const gs = 3;
         const logoTotalW = 23 * gs; // 69
         const logoX = Math.floor(W * 0.5) - Math.floor(logoTotalW / 2);
-        const logoY = stageY - 25 - 6 * gs;
+        const logoY = stageY - 38 - 6 * gs;
         const logoCX = logoX + logoTotalW / 2;
         const logoH = 6 * gs;
 
@@ -2447,6 +2447,877 @@
         animate();
     }
 
+    // ====== FOREGROUND INSTRUMENTS (on top of musicians) ======
+    function initForegroundInstruments() {
+        const PIXEL = 4;
+        const section = document.querySelector('.section-stage');
+        if (!section) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:57;';
+        section.querySelector('.stage-bg').appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.imageSmoothingEnabled = false;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+
+        const stageY = Math.floor(H * 0.855);
+        const centerX = Math.floor(W * 0.5);
+        const mic1X = centerX - 32;
+        const mic2X = centerX;
+        const drumCX = centerX + 32;
+
+        // Helper
+        const fp = (x, y, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); };
+        const fr = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+
+        // ── MIC STAND 1 (Саша) with bass guitar — foreground ──
+        fr(mic1X, stageY - 16, 1, 16, '#888');
+        fr(mic1X - 1, stageY, 3, 1, '#666');
+        fr(mic1X - 1, stageY - 18, 3, 2, '#444');
+        fp(mic1X, stageY - 18, '#555');
+        // Bass guitar — Precision Bass style, leaning right (RED)
+        fr(mic1X - 7, stageY - 10, 6, 8, '#cc1111');
+        fr(mic1X - 8, stageY - 9, 1, 6, '#cc1111');
+        fr(mic1X - 1, stageY - 9, 1, 6, '#cc1111');
+        fr(mic1X - 6, stageY - 11, 4, 1, '#cc1111');
+        fr(mic1X - 6, stageY - 2, 4, 1, '#cc1111');
+        fr(mic1X - 6, stageY - 9, 4, 1, '#dd3333');
+        fp(mic1X - 7, stageY - 8, '#dd2222');
+        // Pickguard
+        fr(mic1X - 6, stageY - 8, 4, 3, '#f0e8d8');
+        fr(mic1X - 5, stageY - 9, 2, 1, '#f0e8d8');
+        // Pickups
+        fr(mic1X - 5, stageY - 7, 3, 1, '#333');
+        fr(mic1X - 5, stageY - 5, 3, 1, '#333');
+        // Bridge
+        fr(mic1X - 5, stageY - 3, 3, 1, '#999');
+        // Knobs
+        fp(mic1X - 3, stageY - 4, '#ddd');
+        fp(mic1X - 2, stageY - 4, '#ddd');
+        // Neck
+        for (let i = 0; i < 8; i++) {
+            fp(mic1X - 1 + i, stageY - 12 - i, '#8b6535');
+            fp(mic1X + 0 + i, stageY - 12 - i, '#7a5525');
+        }
+        fp(mic1X + 1, stageY - 14, '#c8b080');
+        fp(mic1X + 4, stageY - 17, '#c8b080');
+        for (let i = 0; i < 8; i++) fp(mic1X - 1 + i, stageY - 12 - i, '#aaa');
+        // Headstock
+        fr(mic1X + 7, stageY - 21, 2, 3, '#8b6535');
+        fp(mic1X + 6, stageY - 20, '#8b6535');
+        fp(mic1X + 9, stageY - 21, '#ccc');
+        fp(mic1X + 9, stageY - 20, '#ccc');
+        fp(mic1X + 9, stageY - 19, '#ccc');
+        fp(mic1X + 6, stageY - 21, '#ccc');
+
+        // ── MIC STAND 2 (Іван) with electric guitar — foreground ──
+        fr(mic2X, stageY - 16, 1, 16, '#888');
+        fr(mic2X - 1, stageY, 3, 1, '#666');
+        fr(mic2X - 1, stageY - 18, 3, 2, '#444');
+        fp(mic2X, stageY - 18, '#555');
+        // Stratocaster style, leaning left (BLACK)
+        fr(mic2X + 2, stageY - 10, 6, 8, '#1a1a1a');
+        fr(mic2X + 8, stageY - 9, 1, 6, '#1a1a1a');
+        fr(mic2X + 1, stageY - 9, 1, 6, '#1a1a1a');
+        fr(mic2X + 3, stageY - 11, 4, 1, '#1a1a1a');
+        fr(mic2X + 3, stageY - 2, 4, 1, '#1a1a1a');
+        fr(mic2X + 3, stageY - 9, 4, 1, '#2a2a2a');
+        fp(mic2X + 7, stageY - 8, '#222');
+        // Pickguard
+        fr(mic2X + 3, stageY - 8, 4, 3, '#f5f0e0');
+        fr(mic2X + 4, stageY - 9, 2, 1, '#f5f0e0');
+        // Pickups (3 single coils)
+        fr(mic2X + 4, stageY - 7, 2, 1, '#222');
+        fr(mic2X + 4, stageY - 6, 2, 1, '#222');
+        fr(mic2X + 4, stageY - 5, 2, 1, '#222');
+        // Bridge
+        fr(mic2X + 4, stageY - 3, 2, 1, '#aaa');
+        fp(mic2X + 6, stageY - 3, '#888');
+        // Knobs
+        fp(mic2X + 3, stageY - 4, '#fff');
+        fp(mic2X + 7, stageY - 5, '#fff');
+        // Neck
+        for (let i = 0; i < 8; i++) {
+            fp(mic2X + 1 - i, stageY - 12 - i, '#8b6535');
+            fp(mic2X + 0 - i, stageY - 12 - i, '#7a5525');
+        }
+        fp(mic2X - 1, stageY - 14, '#c8b080');
+        fp(mic2X - 4, stageY - 17, '#c8b080');
+        for (let i = 0; i < 8; i++) fp(mic2X + 1 - i, stageY - 12 - i, '#aaa');
+        // Headstock
+        fr(mic2X - 8, stageY - 21, 2, 3, '#1a1a1a');
+        fp(mic2X - 6, stageY - 20, '#1a1a1a');
+        fp(mic2X - 10, stageY - 21, '#ccc');
+        fp(mic2X - 10, stageY - 20, '#ccc');
+        fp(mic2X - 10, stageY - 19, '#ccc');
+        fp(mic2X - 7, stageY - 21, '#ccc');
+
+        // ── DRUM KIT (Денис) — foreground ──
+        const drumX = drumCX - 5;
+        const drumY = stageY;
+        // Bass drum
+        ctx.fillStyle = '#8b0000';
+        ctx.fillRect(drumX, drumY - 8, 10, 8);
+        ctx.fillStyle = '#660000';
+        ctx.fillRect(drumX + 1, drumY - 7, 8, 6);
+        ctx.fillStyle = '#440000';
+        ctx.fillRect(drumX + 3, drumY - 6, 4, 4);
+        // Cymbals
+        ctx.fillStyle = '#ccaa00';
+        ctx.fillRect(drumX - 4, drumY - 12, 6, 1);
+        ctx.fillRect(drumX + 10, drumY - 14, 6, 1);
+        // Hi-hat
+        ctx.fillStyle = '#aa8800';
+        ctx.fillRect(drumX - 6, drumY - 10, 4, 1);
+        // Stands
+        ctx.fillStyle = '#666';
+        ctx.fillRect(drumX - 3, drumY - 11, 1, 11);
+        ctx.fillRect(drumX - 4, drumY, 3, 1);
+        ctx.fillRect(drumX + 12, drumY - 13, 1, 13);
+        ctx.fillRect(drumX + 11, drumY, 3, 1);
+        ctx.fillRect(drumX - 5, drumY - 9, 1, 9);
+        ctx.fillRect(drumX - 6, drumY, 3, 1);
+    }
+
+    // ====== PUB: Foreground bar + sliding beer + taxi ======
+    function initPubBar() {
+        const PIXEL = 4;
+        const section = document.querySelector('.section-pub');
+        if (!section) return;
+        const parent = section.querySelector('.pub-bg');
+
+        const canvas = document.createElement('canvas');
+        canvas.width = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:57;';
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.imageSmoothingEnabled = false;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+
+        const barY = Math.floor(H * 0.855);
+        const barH = 10;
+        const barTop = barY - barH;
+        const centerX = Math.floor(W * 0.5);
+        const barLeft = Math.floor(W * 0.12);
+        const barRight = Math.floor(W * 0.88);
+        const barW = barRight - barLeft;
+
+        // Beer glasses
+        const glasses = [
+            { targetX: centerX - 32, x: centerX + 18, arrived: false, delay: 0 },
+            { targetX: centerX, x: centerX - 22, arrived: false, delay: 500 },
+            { targetX: centerX + 32, x: centerX + 5, arrived: false, delay: 1000 },
+        ];
+        let started = false;
+        let startTime = 0;
+
+        // Taxi — continuous street through both windows
+        const wallTop = Math.floor(H * 0.06);
+        const winY = wallTop + 14;
+        const winH = 32;
+        const winX1 = Math.floor(W * 0.05);
+        const win2X = Math.floor(W * 0.82);
+        const winW = 35;
+        const wallGapPx = 40; // virtual gap — taxi hidden for a while between windows
+        const totalStreet = winW + wallGapPx + winW; // total taxi travel distance
+        let taxi = { pos: -15, active: false, nextTime: 2000, dir: 1 };
+        let taxiTimer = 0;
+
+        function getScrollProgress() {
+            const scrollY = window.scrollY;
+            const maxScrollY = document.body.scrollHeight - window.innerHeight;
+            return maxScrollY > 0 ? scrollY / maxScrollY : 0;
+        }
+
+        function drawBeer(gx, gy) {
+            ctx.fillStyle = 'rgba(180,210,230,0.25)';
+            ctx.fillRect(gx-2, gy-9, 1, 9);
+            ctx.fillRect(gx+2, gy-9, 1, 9);
+            ctx.fillStyle = '#daa520';
+            ctx.fillRect(gx-1, gy-7, 3, 6);
+            ctx.fillStyle = '#eebb33';
+            ctx.fillRect(gx-1, gy-7, 1, 5);
+            ctx.fillStyle = '#c89418';
+            ctx.fillRect(gx-1, gy-2, 3, 1);
+            ctx.fillStyle = '#f5eedd';
+            ctx.fillRect(gx-2, gy-9, 5, 2);
+            ctx.fillStyle = '#fffef8';
+            ctx.fillRect(gx-1, gy-9, 3, 1);
+            ctx.fillStyle = '#f5eedd';
+            ctx.fillRect(gx, gy-10, 1, 1);
+            ctx.fillRect(gx-2, gy-10, 1, 1);
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillRect(gx+2, gy-8, 1, 7);
+            ctx.fillStyle = 'rgba(180,210,230,0.35)';
+            ctx.fillRect(gx-2, gy-1, 5, 1);
+            ctx.fillRect(gx-1, gy, 3, 1);
+        }
+
+        function drawTaxi(tx, ty, dir) {
+            // Detailed NYC yellow cab
+            const d = dir;
+            // Body
+            ctx.fillStyle = '#e8c800';
+            ctx.fillRect(tx, ty-4, 14, 4);
+            // Body shadow
+            ctx.fillStyle = '#ccb000';
+            ctx.fillRect(tx, ty-1, 14, 1);
+            // Roof
+            ctx.fillStyle = '#d4b800';
+            ctx.fillRect(tx+3, ty-6, 8, 2);
+            ctx.fillRect(tx+2, ty-5, 1, 1);
+            ctx.fillRect(tx+11, ty-5, 1, 1);
+            // Windshield + rear window
+            ctx.fillStyle = '#335577';
+            ctx.fillRect(tx+3, ty-6, 3, 1);
+            ctx.fillRect(tx+8, ty-6, 3, 1);
+            // Side windows
+            ctx.fillStyle = '#446688';
+            ctx.fillRect(tx+3, ty-5, 3, 1);
+            ctx.fillRect(tx+8, ty-5, 3, 1);
+            // Door line
+            ctx.fillStyle = '#bba800';
+            ctx.fillRect(tx+7, ty-4, 1, 3);
+            // Bumpers
+            ctx.fillStyle = '#888';
+            ctx.fillRect(tx-1, ty-2, 1, 2);
+            ctx.fillRect(tx+14, ty-2, 1, 2);
+            // Headlights
+            ctx.fillStyle = '#ffd';
+            ctx.fillRect(tx + (d>0 ? 13 : 0), ty-3, 1, 1);
+            ctx.fillRect(tx + (d>0 ? 13 : 0), ty-2, 1, 1);
+            // Taillights
+            ctx.fillStyle = '#f22';
+            ctx.fillRect(tx + (d>0 ? 0 : 13), ty-3, 1, 1);
+            // Wheels
+            ctx.fillStyle = '#111';
+            ctx.fillRect(tx+1, ty, 3, 1);
+            ctx.fillRect(tx+10, ty, 3, 1);
+            // Hubcaps
+            ctx.fillStyle = '#555';
+            ctx.fillRect(tx+2, ty, 1, 1);
+            ctx.fillRect(tx+11, ty, 1, 1);
+            // Taxi sign on roof
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(tx+6, ty-7, 3, 1);
+            ctx.fillStyle = '#ffee88';
+            ctx.fillRect(tx+7, ty-7, 1, 1);
+            // License plate
+            ctx.fillStyle = '#eee';
+            ctx.fillRect(tx+5, ty-1, 4, 1);
+        }
+
+        function drawBarTop() {
+            // Marble bar top surface
+            ctx.fillStyle = '#333340';
+            ctx.fillRect(barLeft-1, barTop-1, barW+2, 1);
+            ctx.fillStyle = '#1a1a22';
+            ctx.fillRect(barLeft-1, barTop, barW+2, 1);
+            ctx.fillStyle = '#222230';
+            ctx.fillRect(barLeft-1, barTop+1, barW+2, 1);
+            ctx.fillStyle = '#181820';
+            ctx.fillRect(barLeft-1, barTop+2, barW+2, 1);
+            for (let x=barLeft; x<barRight; x+=5) {
+                ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                ctx.fillRect(x, barTop+1, 1, 1);
+            }
+        }
+
+        function animate() {
+            const progress = getScrollProgress();
+            const pubThreshold = 0.92;
+            const t = Date.now();
+
+            ctx.clearRect(0, 0, W, H);
+            drawBarTop();
+
+            // ── TAXI traveling through both windows as one street ──
+            taxiTimer += 16;
+            if (taxiTimer > taxi.nextTime && !taxi.active) {
+                taxi.active = true;
+                taxi.dir = Math.random() > 0.3 ? 1 : -1; // mostly left to right
+                taxi.pos = taxi.dir > 0 ? -16 : totalStreet + 16;
+            }
+            if (taxi.active) {
+                const streetY = winY + winH - 2;
+                taxi.pos += 0.35 * taxi.dir;
+
+                // Window 1: pos 0..winW maps to winX1
+                // Wall gap: pos winW..winW+wallGapPx (hidden)
+                // Window 2: pos winW+wallGapPx..totalStreet maps to win2X
+                const p = taxi.pos;
+
+                // Draw in window 1
+                if (p > -16 && p < winW + 16) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(winX1, winY, winW, winH);
+                    ctx.clip();
+                    drawTaxi(winX1 + Math.floor(p), streetY, taxi.dir);
+                    ctx.restore();
+                }
+                // Draw in window 2
+                const p2 = p - winW - wallGapPx;
+                if (p2 > -16 && p2 < winW + 16) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(win2X, winY, winW, winH);
+                    ctx.clip();
+                    drawTaxi(win2X + Math.floor(p2), streetY, taxi.dir);
+                    ctx.restore();
+                }
+
+                // Done when fully past both windows
+                if ((taxi.dir > 0 && taxi.pos > totalStreet + 18) ||
+                    (taxi.dir < 0 && taxi.pos < -18)) {
+                    taxi.active = false;
+                    taxiTimer = 0;
+                    taxi.nextTime = 3000 + Math.random() * 5000;
+                }
+            }
+
+            // ── BEER GLASSES — only after musicians stop at the bar ──
+            // Check if musicians are idle (not walking) via the bandWalkers canvas
+            const musiciansIdle = progress >= pubThreshold && !window._bandWalkersIsWalking;
+
+            if (musiciansIdle && !started) {
+                started = true;
+                startTime = Date.now();
+            }
+            if (started) {
+                const elapsed = Date.now() - startTime;
+                glasses.forEach((g) => {
+                    if (elapsed < g.delay) return;
+                    if (!g.arrived) {
+                        const st = elapsed - g.delay;
+                        const dur = 900;
+                        const tt = Math.min(1, st / dur);
+                        const eased = 1 - Math.pow(1-tt, 3);
+                        g.x = g.x + (g.targetX - g.x) * eased;
+                        if (tt >= 1) { g.x = g.targetX; g.arrived = true; }
+                    }
+                    drawBeer(Math.floor(g.x), barTop - 1);
+                });
+            }
+            if (progress < pubThreshold - 0.05) {
+                started = false;
+                glasses[0].x = centerX+18; glasses[0].arrived = false;
+                glasses[1].x = centerX-22; glasses[1].arrived = false;
+                glasses[2].x = centerX+5; glasses[2].arrived = false;
+            }
+
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+    }
+
+    // ====== PIXEL ART MUSIC ICONS (20x20 grid, 4px scale = 80px) ======
+    function initMusicIcons() {
+        const P = 4;
+        const S = 20; // grid size
+
+        function drawIcon(id, drawFn) {
+            const c = document.getElementById(id);
+            if (!c) return;
+            const ctx = c.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            ctx.setTransform(P, 0, 0, P, 0, 0);
+            drawFn(ctx);
+        }
+
+        const px = (ctx, x, y, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); };
+        const rect = (ctx, x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+
+        // ── SPOTIFY — green circle, 3 curved sound bars ──
+        drawIcon('iconSpotify', ctx => {
+            const cx = 10, cy = 10, R = 9;
+            // Circle with shading
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                const dx = x - cx, dy = y - cy;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist <= R) {
+                    if (dist > R - 1) ctx.fillStyle = '#0e6e2e';
+                    else if (dx + dy < -4) ctx.fillStyle = '#22d464'; // highlight
+                    else ctx.fillStyle = '#1DB954';
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+            // Outline
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                const dist = Math.sqrt((x-cx)**2 + (y-cy)**2);
+                if (dist <= R + 0.7 && dist > R) px(ctx, x, y, '#0a4a1a');
+            }
+            // 3 curved sound bars (black, thicker)
+            const bars = [
+                // Top bar — wide arc
+                [[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],[11,5],[12,5],[13,6],[14,6],[15,7]],
+                // Middle bar
+                [[5,9],[6,8],[7,8],[8,8],[9,8],[10,8],[11,8],[12,9],[13,9]],
+                // Bottom bar
+                [[7,11],[8,11],[9,11],[10,11],[11,12],[12,12]],
+            ];
+            bars.forEach(bar => {
+                bar.forEach(([x,y]) => {
+                    px(ctx, x, y, '#191414');
+                    px(ctx, x, y+1, '#191414');
+                });
+            });
+        });
+
+        // ── YOUTUBE MUSIC — red circle, play triangle with inner circle ──
+        drawIcon('iconYoutube', ctx => {
+            const cx = 10, cy = 10, R = 9;
+            // Outer circle
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                const dist = Math.sqrt((x-cx)**2 + (y-cy)**2);
+                if (dist <= R) {
+                    if (dist > R - 1) ctx.fillStyle = '#aa0000';
+                    else if ((x-cx) + (y-cy) < -4) ctx.fillStyle = '#ff2222';
+                    else ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+            // Outline
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                const dist = Math.sqrt((x-cx)**2 + (y-cy)**2);
+                if (dist <= R + 0.7 && dist > R) px(ctx, x, y, '#660000');
+            }
+            // Inner white circle (thin ring)
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                const dist = Math.sqrt((x-cx)**2 + (y-cy)**2);
+                if (dist <= 6.5 && dist > 5.5) px(ctx, x, y, '#fff');
+            }
+            // Play triangle (white, filled)
+            const triRows = [
+                [8, [9]],
+                [9, [9,10]],
+                [10, [9,10,11]],
+                [11, [9,10,11,12]],
+                [12, [9,10,11]],
+                [13, [9,10]],
+                [14, [9]],
+            ];
+            // Offset to center: play starts at x=8
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(8, 7, 1, 6);
+            ctx.fillRect(9, 7, 1, 6);
+            ctx.fillRect(10, 8, 1, 4);
+            ctx.fillRect(11, 8, 1, 4);
+            ctx.fillRect(12, 9, 1, 2);
+            ctx.fillRect(13, 9, 1, 2);
+        });
+
+        // ── APPLE MUSIC — rounded square gradient, music note ──
+        drawIcon('iconApple', ctx => {
+            const R = 3; // corner radius
+            // Rounded rectangle with gradient
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                // Check rounded corners
+                let inside = true;
+                const corners = [[R,R],[S-1-R,R],[R,S-1-R],[S-1-R,S-1-R]];
+                if (x < R && y < R) inside = Math.sqrt((x-R)**2 + (y-R)**2) <= R;
+                else if (x > S-1-R && y < R) inside = Math.sqrt((x-(S-1-R))**2 + (y-R)**2) <= R;
+                else if (x < R && y > S-1-R) inside = Math.sqrt((x-R)**2 + (y-(S-1-R))**2) <= R;
+                else if (x > S-1-R && y > S-1-R) inside = Math.sqrt((x-(S-1-R))**2 + (y-(S-1-R))**2) <= R;
+
+                if (!inside) continue;
+                // Gradient top to bottom: bright red → deep pink
+                const t = y / (S - 1);
+                const r = Math.floor(252 - t * 50);
+                const g = Math.floor(60 - t * 30);
+                const b = Math.floor(68 + t * 30);
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                ctx.fillRect(x, y, 1, 1);
+            }
+            // Subtle highlight top-left
+            for (let y = 1; y < 6; y++) for (let x = 1; x < 6; x++) {
+                if (x < R && y < R && Math.sqrt((x-R)**2 + (y-R)**2) > R) continue;
+                px(ctx, x, y, 'rgba(255,255,255,0.1)');
+            }
+            // Outline
+            ctx.fillStyle = '#8a1a22';
+            // Top & bottom edges
+            rect(ctx, R, 0, S - 2*R, 1, '#8a1a22');
+            rect(ctx, R, S-1, S - 2*R, 1, '#8a1a22');
+            // Left & right edges
+            rect(ctx, 0, R, 1, S - 2*R, '#8a1a22');
+            rect(ctx, S-1, R, 1, S - 2*R, '#8a1a22');
+
+            // ── Music note (white, detailed) ──
+            ctx.fillStyle = '#fff';
+            // Left note head (oval)
+            rect(ctx, 5, 14, 3, 2, '#fff');
+            px(ctx, 4, 14, '#fff');
+            px(ctx, 4, 15, '#fff');
+            px(ctx, 8, 14, '#fff');
+            // Left stem
+            rect(ctx, 8, 4, 1, 11, '#fff');
+            // Beam (top connecting bar, slight angle)
+            rect(ctx, 8, 4, 6, 1, '#fff');
+            rect(ctx, 8, 5, 6, 1, '#fff');
+            rect(ctx, 13, 5, 1, 1, '#fff');
+            // Flag detail
+            rect(ctx, 13, 6, 1, 1, '#eee');
+            // Right stem
+            rect(ctx, 13, 5, 1, 9, '#fff');
+            // Right note head (oval)
+            rect(ctx, 10, 12, 3, 2, '#fff');
+            px(ctx, 9, 12, '#fff');
+            px(ctx, 9, 13, '#fff');
+            px(ctx, 13, 12, '#fff');
+            // Shadow on note heads
+            px(ctx, 5, 15, '#ddd');
+            px(ctx, 10, 13, '#ddd');
+        });
+    }
+
+    // ====== STAGE PARTY MODE ======
+    // Activates when musicians are at the stage section (last ~15% of scroll)
+    function initStageParty() {
+        const PIXEL = 4;
+        const section = document.querySelector('.section-stage');
+        if (!section) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:58;';
+        section.querySelector('.stage-bg').appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.imageSmoothingEnabled = false;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+
+        const stageY = Math.floor(H * 0.855);
+
+        // Confetti particles
+        const confetti = [];
+        const CONFETTI_COLORS = [
+            '#ff1144', '#ff4488', '#ffdd00', '#ffaa00',
+            '#44ff44', '#00ddff', '#4488ff', '#aa44ff',
+            '#ff6600', '#ffffff', '#ff0066', '#00ff88'
+        ];
+
+        // Crowd hands
+        const hands = [];
+        for (let i = 0; i < 30; i++) {
+            hands.push({
+                x: 5 + Math.random() * (W - 10),
+                baseY: stageY + 4 + Math.random() * 8,
+                phase: Math.random() * Math.PI * 2,
+                speed: 1.5 + Math.random() * 2.5,
+                height: 4 + Math.random() * 5,
+                skin: Math.random() > 0.5 ? '#e8b87a' : '#c49458'
+            });
+        }
+
+        // Smoke particles
+        const smoke = [];
+
+        // Laser beams
+        const lasers = [
+            { angle: 0, speed: 0.7, color: '#ff0044', phase: 0 },
+            { angle: 0, speed: 0.5, color: '#00aaff', phase: 2 },
+            { angle: 0, speed: 0.9, color: '#44ff00', phase: 4 },
+        ];
+
+        let partyActive = false;
+        let partyIntensity = 0; // 0 to 1, fades in
+        let strobeTimer = 0;
+
+        function getScrollProgress() {
+            const scrollY = window.scrollY;
+            const maxScrollY = document.body.scrollHeight - window.innerHeight;
+            return maxScrollY > 0 ? scrollY / maxScrollY : 0;
+        }
+
+        function animate() {
+            const progress = getScrollProgress();
+            // Party starts fading in at 62% scroll, full at 78% (stage is now section 4 of 5)
+            const target = progress > 0.62 ? Math.min(1, (progress - 0.62) / 0.16) : 0;
+            partyIntensity += (target - partyIntensity) * 0.05;
+            partyActive = partyIntensity > 0.01;
+
+            ctx.clearRect(0, 0, W, H);
+
+            if (!partyActive) {
+                requestAnimationFrame(animate);
+                return;
+            }
+
+            const t = Date.now() * 0.001;
+            const intensity = partyIntensity;
+
+            // === STROBE FLASH ===
+            strobeTimer += 0.016;
+            if (intensity > 0.7 && Math.sin(t * 15) > 0.92) {
+                ctx.fillStyle = `rgba(255,255,255,${0.04 * intensity})`;
+                ctx.fillRect(0, 0, W, H);
+            }
+
+            // === LASER BEAMS from ceiling ===
+            lasers.forEach(laser => {
+                laser.angle = Math.sin(t * laser.speed + laser.phase) * 0.6;
+                const startX = Math.floor(W * 0.5);
+                const startY = 8;
+                const len = H * 0.75;
+
+                for (let d = 0; d < len; d++) {
+                    const lx = startX + Math.floor(Math.sin(laser.angle) * d);
+                    const ly = startY + Math.floor(Math.cos(laser.angle) * d);
+                    if (ly >= H || lx < 0 || lx >= W) break;
+                    const a = (1 - d / len) * 0.12 * intensity;
+                    ctx.fillStyle = laser.color;
+                    ctx.globalAlpha = a;
+                    ctx.fillRect(lx, ly, 1, 1);
+                    // Beam width
+                    if (d > 10) {
+                        ctx.globalAlpha = a * 0.5;
+                        ctx.fillRect(lx - 1, ly, 1, 1);
+                        ctx.fillRect(lx + 1, ly, 1, 1);
+                    }
+                }
+                ctx.globalAlpha = 1;
+            });
+
+            // === CONFETTI ===
+            // Spawn new confetti
+            if (Math.random() < 0.3 * intensity) {
+                confetti.push({
+                    x: Math.random() * W,
+                    y: -2,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: 0.3 + Math.random() * 0.8,
+                    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+                    rot: Math.random() * Math.PI,
+                    rotSpeed: (Math.random() - 0.5) * 0.2,
+                    size: Math.random() > 0.5 ? 2 : 1,
+                    life: 0
+                });
+            }
+
+            for (let i = confetti.length - 1; i >= 0; i--) {
+                const c = confetti[i];
+                c.x += c.vx + Math.sin(t * 2 + c.rot) * 0.3;
+                c.y += c.vy;
+                c.rot += c.rotSpeed;
+                c.life++;
+                if (c.y > H + 5 || c.life > 400) {
+                    confetti.splice(i, 1);
+                    continue;
+                }
+                const alpha = intensity * (c.y < stageY ? 1 : 0.3);
+                ctx.fillStyle = c.color;
+                ctx.globalAlpha = alpha;
+                // Rotating rectangle effect
+                const w = Math.abs(Math.cos(c.rot)) * c.size + 0.5;
+                ctx.fillRect(Math.floor(c.x), Math.floor(c.y), Math.ceil(w), c.size);
+            }
+            ctx.globalAlpha = 1;
+
+            // === SMOKE / FOG at stage level ===
+            if (Math.random() < 0.15 * intensity) {
+                smoke.push({
+                    x: Math.random() * W,
+                    y: stageY - 2 + Math.random() * 4,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    size: 3 + Math.random() * 6,
+                    life: 0,
+                    maxLife: 60 + Math.random() * 80
+                });
+            }
+
+            for (let i = smoke.length - 1; i >= 0; i--) {
+                const s = smoke[i];
+                s.x += s.vx;
+                s.y -= 0.05;
+                s.size += 0.03;
+                s.life++;
+                if (s.life > s.maxLife) {
+                    smoke.splice(i, 1);
+                    continue;
+                }
+                const fade = 1 - s.life / s.maxLife;
+                const alpha = fade * 0.06 * intensity;
+                const r = Math.floor(s.size);
+                for (let dy = -r; dy <= r; dy++) {
+                    for (let dx = -r; dx <= r; dx++) {
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < r) {
+                            const a = alpha * (1 - dist / r);
+                            ctx.fillStyle = `rgba(200,200,220,${a})`;
+                            ctx.fillRect(Math.floor(s.x + dx), Math.floor(s.y + dy), 1, 1);
+                        }
+                    }
+                }
+            }
+
+            // === CROWD HANDS waving ===
+            hands.forEach(h => {
+                const wave = Math.sin(t * h.speed + h.phase);
+                const handY = h.baseY - h.height * intensity - wave * 2 * intensity;
+                const lean = Math.floor(wave * 1.5);
+
+                // Arm
+                for (let dy = 0; dy < Math.floor(h.height * intensity); dy++) {
+                    const ax = Math.floor(h.x + lean * (dy / h.height));
+                    ctx.fillStyle = h.skin;
+                    ctx.globalAlpha = 0.7 * intensity;
+                    ctx.fillRect(ax, Math.floor(handY + dy), 1, 1);
+                }
+                // Hand / fist at top
+                ctx.fillStyle = h.skin;
+                ctx.globalAlpha = 0.8 * intensity;
+                ctx.fillRect(Math.floor(h.x + lean), Math.floor(handY), 2, 2);
+
+                // Some hands hold phones (white glow)
+                if (h.phase > 4) {
+                    ctx.fillStyle = '#fff';
+                    ctx.globalAlpha = (0.4 + Math.sin(t * 3 + h.phase) * 0.3) * intensity;
+                    ctx.fillRect(Math.floor(h.x + lean), Math.floor(handY) - 1, 1, 2);
+                }
+            });
+            ctx.globalAlpha = 1;
+
+            // === EXTRA camera flashes (more intense) ===
+            if (intensity > 0.5 && Math.random() < 0.2 * intensity) {
+                const fx = Math.floor(5 + Math.random() * (W - 10));
+                const fy = Math.floor(stageY + 3 + Math.random() * 10);
+                ctx.fillStyle = '#fff';
+                ctx.globalAlpha = 0.9;
+                ctx.fillRect(fx, fy, 2, 2);
+                ctx.globalAlpha = 0.4;
+                ctx.fillRect(fx - 1, fy - 1, 4, 4);
+                ctx.globalAlpha = 0.15;
+                ctx.fillRect(fx - 2, fy - 2, 6, 6);
+                ctx.globalAlpha = 1;
+            }
+
+            // === SPOTLIGHT color sweep on floor ===
+            const sweepX = Math.floor(W * 0.5 + Math.sin(t * 0.8) * W * 0.3);
+            const sweepColor = `hsl(${(t * 60) % 360}, 100%, 50%)`;
+            for (let dx = -8; dx <= 8; dx++) {
+                const dist = Math.abs(dx) / 8;
+                ctx.fillStyle = sweepColor;
+                ctx.globalAlpha = (1 - dist) * 0.05 * intensity;
+                ctx.fillRect(sweepX + dx, stageY - 1, 1, 3);
+            }
+            ctx.globalAlpha = 1;
+
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // ====== SOCIAL ICONS (YouTube + Instagram, home section) ======
+    function initSocialIcons() {
+        const P = 4;
+        const S = 20;
+
+        function drawIcon(id, drawFn) {
+            const c = document.getElementById(id);
+            if (!c) return;
+            const ctx = c.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            ctx.setTransform(P, 0, 0, P, 0, 0);
+            drawFn(ctx);
+        }
+
+        const px = (ctx, x, y, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); };
+        const rect = (ctx, x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+
+        // ── YouTube — red rounded rectangle with play button ──
+        drawIcon('iconYoutubeHome', ctx => {
+            // Rounded rectangle
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                let inside = true;
+                const R = 3;
+                if (x < R && y < R) inside = Math.sqrt((x-R)**2 + (y-R)**2) <= R;
+                else if (x > S-1-R && y < R) inside = Math.sqrt((x-(S-1-R))**2 + (y-R)**2) <= R;
+                else if (x < R && y > S-1-R) inside = Math.sqrt((x-R)**2 + (y-(S-1-R))**2) <= R;
+                else if (x > S-1-R && y > S-1-R) inside = Math.sqrt((x-(S-1-R))**2 + (y-(S-1-R))**2) <= R;
+                if (!inside) continue;
+                const t = y / (S - 1);
+                ctx.fillStyle = t < 0.3 ? '#ff1a1a' : t < 0.7 ? '#ee0000' : '#cc0000';
+                ctx.fillRect(x, y, 1, 1);
+            }
+            // Outline
+            rect(ctx, 3, 0, S-6, 1, '#aa0000');
+            rect(ctx, 3, S-1, S-6, 1, '#880000');
+            rect(ctx, 0, 3, 1, S-6, '#aa0000');
+            rect(ctx, S-1, 3, 1, S-6, '#880000');
+            // Play triangle (white)
+            ctx.fillStyle = '#fff';
+            rect(ctx, 7, 5, 1, 10, '#fff');
+            rect(ctx, 8, 6, 1, 8, '#fff');
+            rect(ctx, 9, 7, 1, 6, '#fff');
+            rect(ctx, 10, 7, 1, 6, '#fff');
+            rect(ctx, 11, 8, 1, 4, '#fff');
+            rect(ctx, 12, 8, 1, 4, '#fff');
+            rect(ctx, 13, 9, 1, 2, '#fff');
+            // Shadow on triangle
+            px(ctx, 7, 14, '#ddd');
+            px(ctx, 8, 13, '#ddd');
+        });
+
+        // ── Instagram — gradient rounded square with camera icon ──
+        drawIcon('iconInstagram', ctx => {
+            const R = 3;
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                let inside = true;
+                if (x < R && y < R) inside = Math.sqrt((x-R)**2 + (y-R)**2) <= R;
+                else if (x > S-1-R && y < R) inside = Math.sqrt((x-(S-1-R))**2 + (y-R)**2) <= R;
+                else if (x < R && y > S-1-R) inside = Math.sqrt((x-R)**2 + (y-(S-1-R))**2) <= R;
+                else if (x > S-1-R && y > S-1-R) inside = Math.sqrt((x-(S-1-R))**2 + (y-(S-1-R))**2) <= R;
+                if (!inside) continue;
+                // Instagram gradient: purple bottom-left → orange top-right → yellow
+                const tx = x / (S-1), ty = y / (S-1);
+                const diag = tx * 0.6 + (1 - ty) * 0.4;
+                let r, g, b;
+                if (diag < 0.3) { r = 130 + diag*300; g = 50; b = 180 - diag*100; }
+                else if (diag < 0.6) { r = 220; g = 50 + (diag-0.3)*400; b = 80 - (diag-0.3)*200; }
+                else { r = 240; g = 170 + (diag-0.6)*200; b = 30; }
+                ctx.fillStyle = `rgb(${Math.floor(Math.min(255,r))},${Math.floor(Math.min(255,g))},${Math.floor(Math.max(0,b))})`;
+                ctx.fillRect(x, y, 1, 1);
+            }
+            // Camera body (rounded inner square — white outline)
+            ctx.fillStyle = '#fff';
+            // Top
+            rect(ctx, 5, 4, 10, 1, '#fff');
+            // Bottom
+            rect(ctx, 5, 15, 10, 1, '#fff');
+            // Left
+            rect(ctx, 4, 5, 1, 10, '#fff');
+            // Right
+            rect(ctx, 15, 5, 1, 10, '#fff');
+            // Corners
+            px(ctx, 5, 5, '#fff'); px(ctx, 14, 5, '#fff');
+            px(ctx, 5, 14, '#fff'); px(ctx, 14, 14, '#fff');
+            // Lens circle (white ring)
+            const cx = 10, cy = 10;
+            for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) {
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist <= 3.5 && dist > 2.2) px(ctx, cx+dx, cy+dy, '#fff');
+            }
+            // Flash dot top-right
+            px(ctx, 13, 6, '#fff');
+            px(ctx, 14, 6, '#fff');
+            px(ctx, 13, 7, '#fff');
+        });
+    }
+
     // ====== INIT ======
     function init() {
         initRandomFlashes();
@@ -2466,6 +3337,11 @@
         initHoverHighlights();
         initAnimalHoverCursors();
         initStageLightning();
+        initForegroundInstruments();
+        initStageParty();
+        initMusicIcons();
+        initSocialIcons();
+        initPubBar();
     }
 
 

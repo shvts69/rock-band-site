@@ -37,6 +37,18 @@
                     <p class="logo-subtitle">★ PUNK FROM BELARUS ★</p>
                     <p class="logo-sub2">EST. IN USA</p>
                 </div>
+
+                <!-- Social links -->
+                <div class="social-links">
+                    <a href="https://www.youtube.com/@5051" target="_blank" class="social-link social-youtube" title="YouTube">
+                        <canvas class="social-icon" id="iconYoutubeHome" width="80" height="80"></canvas>
+                        <span class="social-label">YOUTUBE</span>
+                    </a>
+                    <a href="https://instagram.com/5051nyc" target="_blank" class="social-link social-instagram" title="Instagram">
+                        <canvas class="social-icon" id="iconInstagram" width="80" height="80"></canvas>
+                        <span class="social-label">INSTAGRAM</span>
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -210,6 +222,25 @@
                     </div>
                 </div>
 
+                <!-- Music Platform Links -->
+                <div class="music-links" id="musicLinks">
+                    <div class="music-links-title">&#9835; LISTEN NOW &#9835;</div>
+                    <div class="music-links-row">
+                        <a href="https://open.spotify.com/artist/2m5oYkK4jxOBeL59QO9Ia3?si=R7LBEt86SDeRtSzm-7UF4Q" target="_blank" class="music-link music-spotify" title="Spotify">
+                            <canvas class="music-icon" id="iconSpotify" width="80" height="80"></canvas>
+                            <span class="music-label">SPOTIFY</span>
+                        </a>
+                        <a href="https://music.youtube.com/channel/UCC6rSp87G8xQ_HMTuf2egmA?si=cgKNXY1OeBtqK49s" target="_blank" class="music-link music-youtube" title="YouTube Music">
+                            <canvas class="music-icon" id="iconYoutube" width="80" height="80"></canvas>
+                            <span class="music-label">YT MUSIC</span>
+                        </a>
+                        <a href="https://music.apple.com/us/artist/5051/1450855842" target="_blank" class="music-link music-apple" title="Apple Music">
+                            <canvas class="music-icon" id="iconApple" width="80" height="80"></canvas>
+                            <span class="music-label">APPLE</span>
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Натовп -->
                 <div class="crowd">
                     <div class="crowd-row crowd-row-1"></div>
@@ -220,6 +251,39 @@
                     <div class="flash flash-3"></div>
                     <div class="flash flash-4"></div>
                     <div class="flash flash-5"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Стіна з цегли — перехід -->
+        <div class="brick-wall">
+            <div class="brick-pattern"></div>
+        </div>
+
+        <!-- ====== СЕКЦІЯ 5: ПАБ / КОНТАКТ ====== -->
+        <section class="section section-pub" id="pub">
+            <div class="pub-bg">
+                <!-- Contact / Booking form -->
+                <div class="pub-form-container">
+                    <h2 class="section-title pub-title">BOOK US / CONTACT</h2>
+                    <form class="pub-form" id="pubForm" onsubmit="return false;">
+                        <div class="pub-form-row">
+                            <input type="text" class="pub-input" placeholder="YOUR NAME" required>
+                            <input type="email" class="pub-input" placeholder="EMAIL" required>
+                        </div>
+                        <div class="pub-form-row">
+                            <select class="pub-input pub-select">
+                                <option value="" disabled selected>REASON</option>
+                                <option value="booking">BOOKING / SHOW</option>
+                                <option value="collab">COLLABORATION</option>
+                                <option value="press">PRESS / MEDIA</option>
+                                <option value="other">OTHER</option>
+                            </select>
+                            <input type="text" class="pub-input" placeholder="SUBJECT">
+                        </div>
+                        <textarea class="pub-input pub-textarea" placeholder="YOUR MESSAGE..." rows="4"></textarea>
+                        <button type="submit" class="pub-submit">&#9835; SEND IT &#9835;</button>
+                    </form>
                 </div>
             </div>
         </section>
@@ -237,24 +301,17 @@
         <div class="road road-bridge" id="roadBridge"></div>
         <!-- ДОРОГА: темна до сцени (розділ 4) -->
         <div class="road road-venue" id="roadVenue"></div>
+        <!-- ДОРОГА: паб (розділ 5) -->
+        <div class="road road-pub" id="roadPub"></div>
 
-        <!-- Музиканти на дорозі (placeholder, анімацію додамо пізніше) -->
-        <div class="band-walkers" id="bandWalkers">
-            <div class="walker walker-1">
-                <div class="pixel-musician musician-guitar"></div>
-            </div>
-            <div class="walker walker-2">
-                <div class="pixel-musician musician-vocal"></div>
-            </div>
-            <div class="walker walker-3">
-                <div class="pixel-musician musician-bass"></div>
-            </div>
-        </div>
+        <!-- Музиканти на дорозі -->
+        <div class="band-walkers" id="bandWalkers"></div>
 
     </div>
 
     <script src="js/pixel-scenes.js"></script>
     <script src="js/scroll.js"></script>
     <script src="js/effects.js"></script>
+    <script src="js/band-walkers.js"></script>
 </body>
 </html>

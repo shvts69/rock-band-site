@@ -8,6 +8,7 @@
     const roadCity = document.getElementById('roadCity');
     const roadBridge = document.getElementById('roadBridge');
     const roadVenue = document.getElementById('roadVenue');
+    const roadPub = document.getElementById('roadPub');
 
     let maxScroll = 0;
 
@@ -16,7 +17,9 @@
         const firstWall = brickWalls[0];
         const secondWall = brickWalls[1];
         const thirdWall = brickWalls[2];
+        const fourthWall = brickWalls[3];
         const stageSection = document.getElementById('stage');
+        const pubSection = document.getElementById('pub');
 
         if (roadDesert && firstWall) {
             roadDesert.style.left = '0px';
@@ -32,11 +35,16 @@
             roadBridge.style.left = bridgeStart + 'px';
             roadBridge.style.width = (thirdWall.offsetLeft - bridgeStart) + 'px';
         }
-        if (roadVenue && thirdWall && stageSection) {
+        if (roadVenue && thirdWall && fourthWall) {
             const venueStart = thirdWall.offsetLeft + thirdWall.offsetWidth;
-            const venueEnd = stageSection.offsetLeft + stageSection.offsetWidth;
             roadVenue.style.left = venueStart + 'px';
-            roadVenue.style.width = (venueEnd - venueStart) + 'px';
+            roadVenue.style.width = (fourthWall.offsetLeft - venueStart) + 'px';
+        }
+        if (roadPub && fourthWall && pubSection) {
+            const pubStart = fourthWall.offsetLeft + fourthWall.offsetWidth;
+            const pubEnd = pubSection.offsetLeft + pubSection.offsetWidth;
+            roadPub.style.left = pubStart + 'px';
+            roadPub.style.width = (pubEnd - pubStart) + 'px';
         }
     }
 
