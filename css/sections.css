@@ -782,6 +782,10 @@
         gap: 6px;
     }
 
+    .member-info {
+        min-height: 60px;
+    }
+
     .ornate-frame {
         width: 90px !important;
         height: 110px !important;

@@ -2457,6 +2457,7 @@
         if (!section) return;
 
         const canvas = document.createElement('canvas');
+        canvas.className = 'stage-instruments-canvas';
         canvas.width = section.offsetWidth;
         canvas.height = section.offsetHeight;
         canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:57;';
