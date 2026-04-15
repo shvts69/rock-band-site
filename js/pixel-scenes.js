@@ -1770,6 +1770,8 @@ function drawStageScene(canvas) {
     const mic2X = centerX;        // Іван (vocals/guitar) — mic + electric guitar
     const drumCX = centerX + 32;  // Денис (drums) — drum kit
 
+    // On mobile, skip background instruments (foreground JS-scaled ones are shown instead)
+    if (W >= 120) {
     // ── MIC STAND 1 (Саша) with bass guitar leaning ──
     drawRect(ctx, mic1X, stageY - 16, 1, 16, '#888');
     drawRect(ctx, mic1X - 1, stageY, 3, 1, '#666');
@@ -1885,6 +1887,7 @@ function drawStageScene(canvas) {
     drawRect(ctx, drumX + 11, drumY, 3, 1, '#666');
     drawRect(ctx, drumX - 5, drumY - 9, 1, 9, '#666');
     drawRect(ctx, drumX - 6, drumY, 3, 1, '#666');
+    } // end desktop-only instruments
 
     // STAGE LOGO — BIG "5051" neon style
     const gs = 3; // scale 3x

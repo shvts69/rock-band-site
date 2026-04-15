@@ -400,10 +400,4 @@ body {
         transform-origin: center bottom;
     }
 
-    .stage-instruments-canvas {
-        transform: scale(0.65);
-        transform-origin: center bottom;
-        position: absolute !important;
-        z-index: 200 !important;
-    }
 }
