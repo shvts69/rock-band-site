@@ -1383,12 +1383,12 @@
 }
 
 /* Narrow viewports: hide progress bar, shrink player to compact 2-row layout */
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
     .tp-progress { display: none; }
     .tp-screen   { margin-bottom: 6px; }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1280px) {
     .track-player { width: min(230px, 88%); padding: 8px 10px 10px; }
 }
 
