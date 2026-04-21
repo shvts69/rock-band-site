@@ -3178,21 +3178,26 @@
         window.addEventListener('easterEggsComplete', updateVisibility);
         setInterval(updateVisibility, 1000);
 
-        // ── Eagle perch target: standing ON the BOOK US letters ──
-        // .section-title has padding-top (30px desktop / 10px mobile), so
-        // tr.top is well above the visible glyphs. Read padTop at runtime
-        // and offset so feet (ey+10 at 2× scale) land on letter glyph top.
+        // ── Eagle perch target: on the word "BOOK" of the title ──
+        // Use a Range over the first 4 chars ("BOOK") to get the exact pixel
+        // bbox of that word — works regardless of font-size or letter-spacing.
         let eaglePerchX = Math.floor(W * 0.5);
         let eaglePerchY = Math.floor(H * 0.3);
         function updateEaglePerch() {
             const title = section.querySelector('.pub-title');
-            if (!title) return;
+            if (!title || !title.firstChild) return;
             const sr = section.getBoundingClientRect();
-            const tr = title.getBoundingClientRect();
-            const padTop = parseFloat(getComputedStyle(title).paddingTop) || 0;
-            eaglePerchX = Math.floor((tr.left + tr.width / 2 - sr.left) / PIXEL);
-            const letterTopPx = (tr.top - sr.top) + padTop;
-            eaglePerchY = Math.floor(letterTopPx / PIXEL) - 10;
+            const range = document.createRange();
+            try {
+                range.setStart(title.firstChild, 0);
+                range.setEnd(title.firstChild, 4); // "BOOK"
+            } catch (e) { return; }
+            const br = range.getBoundingClientRect();
+            if (br.width === 0) return; // not laid out yet
+            eaglePerchX = Math.floor((br.left + br.width / 2 - sr.left) / PIXEL);
+            // Feet draw at dy=3,4 (last pixel row ey+4). Set ey so feet
+            // sit on letter top: ey + 5 = letter_top → ey = letter_top - 5.
+            eaglePerchY = Math.floor((br.top - sr.top) / PIXEL) - 5;
         }
         updateEaglePerch();
         window.addEventListener('resize', updateEaglePerch);
@@ -3308,51 +3313,51 @@
             const wing = '#4a3520', wingMid = '#5a4530', wingLight = '#6a5540';
             const head = '#f0ece0', headShade = '#d8d4c8';
             const beak = '#e8a800', beakTip = '#cc8800', feet = '#e8a800';
-            const shade = '#0a0a0a', shadeRim = '#1a1a1a', glint = '#ffffff';
+            const shade = '#0a0a0a', glint = '#ffffff';
+            const px = (dx, dy, c) => { ctx.fillStyle = c; ctx.fillRect(ex + dx, ey + dy, 1, 1); };
 
-            // Eagle drawn at 2× sprite scale so sunglasses / details are readable.
-            const S = 2;
-            const px = (dx, dy, c) => { ctx.fillStyle = c; ctx.fillRect(ex + dx * S, ey + dy * S, S, S); };
-
-            // Body (static)
-            for (let by = -2; by <= 2; by++) {
-                px(-1, by, bodyDark); px(0, by, body); px(1, by, body); px(2, by, bodyLight);
-            }
-            px(1, -2, '#5a4530'); px(2, -1, '#5a4530');
-            px(0, 2, '#4a3a28'); px(1, 2, '#4a3a28');
-            // Folded wings
-            for (let wy = -1; wy <= 3; wy++) { px(-2, wy, wing); px(3, wy, wingMid); }
-            px(-3, 1, wingMid); px(-3, 2, wingLight); px(4, 1, wingLight); px(4, 2, wingMid);
-            px(-2, 3, wingMid); px(-1, 3, wing); px(2, 3, wing); px(3, 3, wingMid);
-            px(-3, 3, wingLight); px(4, 3, wingLight);
-            // Tail
-            px(-1, 4, '#3a2a1a'); px(0, 4, '#4a3a2a'); px(1, 4, '#3a2a1a'); px(2, 4, '#4a3a2a');
-            px(0, 5, '#5a4a3a'); px(1, 5, '#5a4a3a');
-            // Feet/talons
-            px(0, 3, feet); px(1, 3, feet); px(-1, 4, '#cc8800'); px(2, 4, '#cc8800');
-            px(0, 4, feet); px(1, 4, feet);
-
-            // HEAD + NECK — shifted by nod (±1 grid units)
             const n = nod;
-            // Neck
-            px(0, -3 + n, headShade); px(1, -3 + n, body);
-            // Head
-            px(0, -6 + n, head); px(1, -6 + n, head);
-            px(-1, -5 + n, headShade); px(0, -5 + n, head); px(1, -5 + n, head); px(2, -5 + n, head);
-            px(-1, -4 + n, headShade); px(0, -4 + n, head); px(1, -4 + n, head); px(2, -4 + n, headShade);
-            px(0, -7 + n, '#e0dcd0'); px(1, -7 + n, '#e0dcd0'); // brow
-            // Beak
-            px(3, -5 + n, beak); px(3, -4 + n, beakTip); px(4, -4 + n, beakTip);
-            // SUNGLASSES — two separate 2×2 lenses with head skin visible between them
-            // Left lens (x=-2,-1 across rows -5,-4)
+
+            // === BODY (symmetric front view — 5 wide at center) ===
+            for (let by = -2; by <= 2; by++) {
+                px(-1, by, bodyDark); px(0, by, body); px(1, by, bodyLight);
+            }
+            // Folded wings — symmetric shoulders on both sides
+            px(-2, -1, wing);    px(-2, 0, wingMid); px(-2, 1, wingLight); px(-2, 2, wingMid);
+            px(2,  -1, wing);    px(2,  0, wingMid); px(2,  1, wingLight); px(2,  2, wingMid);
+            px(-3, 0, wingMid);  px(-3, 1, wingLight);
+            px(3,  0, wingMid);  px(3,  1, wingLight);
+            // Belly shading
+            px(0, 2, '#4a3a28');
+
+            // === FEET (two separate talons under body — front view) ===
+            px(-1, 3, feet); px(1, 3, feet);
+            px(-1, 4, beakTip); px(1, 4, beakTip);
+
+            // === HEAD (symmetric — facing us) ===
+            // Brow
+            px(-1, -7 + n, '#e0dcd0'); px(0, -7 + n, '#e0dcd0'); px(1, -7 + n, '#e0dcd0');
+            // Head top (3 wide)
+            px(-1, -6 + n, head); px(0, -6 + n, head); px(1, -6 + n, head);
+            // Head mid (5 wide — sunglasses row)
+            px(-2, -5 + n, headShade); px(-1, -5 + n, head); px(0, -5 + n, head); px(1, -5 + n, head); px(2, -5 + n, headShade);
+            // Head bottom (5 wide — sunglasses row)
+            px(-2, -4 + n, headShade); px(-1, -4 + n, head); px(0, -4 + n, head); px(1, -4 + n, head); px(2, -4 + n, headShade);
+            // Chin with beak centered (pointing down toward viewer)
+            px(-1, -3 + n, headShade); px(0, -3 + n, beak); px(1, -3 + n, headShade);
+            px(0, -2 + n, beakTip); // beak tip hanging down to body top
+
+            // === SUNGLASSES (facing us — two 2×2 lenses with head skin between them) ===
+            // Left lens
             px(-2, -5 + n, shade); px(-1, -5 + n, shade);
             px(-2, -4 + n, shade); px(-1, -4 + n, shade);
-            // Right lens (x=2,3 across rows -5,-4 — x=3,-4 left as beakTip)
-            px(2, -5 + n, shade); px(3, -5 + n, shade);
-            px(2, -4 + n, shade);
-            // Glints — bright spot on the upper-inner corner of each lens
+            // Right lens (symmetric mirror of left)
+            px(1, -5 + n, shade); px(2, -5 + n, shade);
+            px(1, -4 + n, shade); px(2, -4 + n, shade);
+            // x=0 at rows -5,-4 stays as head skin → visible nose bridge between lenses
+            // Glints on upper-inner corner of each lens
             px(-1, -5 + n, glint);
-            px(2,  -5 + n, glint);
+            px(1,  -5 + n, glint);
         }
 
         function pickNextPerch() {
