@@ -3187,9 +3187,9 @@
             const sr = section.getBoundingClientRect();
             const tr = title.getBoundingClientRect();
             eaglePerchX = Math.floor((tr.left + tr.width / 2 - sr.left) / PIXEL);
-            // Eagle feet (drawn at ey+3, ey+4) should sit at the top edge of the
-            // title letters, so shift perchY so feet land on title top.
-            eaglePerchY = Math.floor((tr.top - sr.top) / PIXEL) - 3;
+            // Eagle drawn at 2× scale: feet at ey+6..ey+10. Offset so feet sit
+            // right on the top edge of the title letters.
+            eaglePerchY = Math.floor((tr.top - sr.top) / PIXEL) - 9;
         }
         updateEaglePerch();
         window.addEventListener('resize', updateEaglePerch);
@@ -3303,7 +3303,9 @@
             const beak = '#e8a800', beakTip = '#cc8800', feet = '#e8a800';
             const shade = '#0a0a0a', shadeRim = '#1a1a1a', glint = '#ffffff';
 
-            const px = (dx, dy, c) => { ctx.fillStyle = c; ctx.fillRect(ex + dx, ey + dy, 1, 1); };
+            // Eagle drawn at 2× sprite scale so sunglasses / details are readable.
+            const S = 2;
+            const px = (dx, dy, c) => { ctx.fillStyle = c; ctx.fillRect(ex + dx * S, ey + dy * S, S, S); };
 
             // Body (static)
             for (let by = -2; by <= 2; by++) {
@@ -3334,15 +3336,14 @@
             px(0, -7 + n, '#e0dcd0'); px(1, -7 + n, '#e0dcd0'); // brow
             // Beak
             px(3, -5 + n, beak); px(3, -4 + n, beakTip); px(4, -4 + n, beakTip);
-            // SUNGLASSES — clearly visible wraparound aviators (2×2 lenses + bridge)
-            // Lens tops
-            px(-2, -5 + n, shade); px(-1, -5 + n, shade);   // left lens top
-            px(0,  -5 + n, shadeRim); px(1, -5 + n, shadeRim); // bridge
-            px(2,  -5 + n, shade); px(3, -5 + n, shade);    // right lens top (sits over beak top)
-            // Lens bottoms (skip x=3 to keep beak tip intact)
-            px(-2, -4 + n, shade); px(-1, -4 + n, shade);   // left lens bottom
-            px(2,  -4 + n, shade);                             // right lens bottom
-            // Glints — bright highlight on each lens
+            // SUNGLASSES — two separate 2×2 lenses with head skin visible between them
+            // Left lens (x=-2,-1 across rows -5,-4)
+            px(-2, -5 + n, shade); px(-1, -5 + n, shade);
+            px(-2, -4 + n, shade); px(-1, -4 + n, shade);
+            // Right lens (x=2,3 across rows -5,-4 — x=3,-4 left as beakTip)
+            px(2, -5 + n, shade); px(3, -5 + n, shade);
+            px(2, -4 + n, shade);
+            // Glints — bright spot on the upper-inner corner of each lens
             px(-1, -5 + n, glint);
             px(2,  -5 + n, glint);
         }
