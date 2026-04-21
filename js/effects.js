@@ -2631,11 +2631,12 @@
         const barRight = Math.floor(W * 0.88);
         const barW = barRight - barLeft;
 
-        // Beer glasses
+        // Beer glasses — offset to musicians' right so beer doesn't cover faces
+        const beerOffset = isMobilePub ? 0 : 10;
         const glasses = [
-            { targetX: centerX - 32, x: centerX + 18, arrived: false, delay: 0 },
-            { targetX: centerX, x: centerX - 22, arrived: false, delay: 500 },
-            { targetX: centerX + 32, x: centerX + 5, arrived: false, delay: 1000 },
+            { targetX: centerX - 32 + beerOffset, x: centerX + 18, arrived: false, delay: 0 },
+            { targetX: centerX + beerOffset, x: centerX - 22, arrived: false, delay: 500 },
+            { targetX: centerX + 32 + beerOffset, x: centerX + 5, arrived: false, delay: 1000 },
         ];
         let started = false;
         let startTime = 0;
