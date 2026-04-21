@@ -1,6 +1,12 @@
 (function () {
     'use strict';
 
+    // Module-level single-run guard. If something ever double-loads this
+    // file (DOM mutation, cached duplicate, etc.), the second IIFE exits
+    // before it can set up a second `played` closure.
+    if (window.__rs5051IntroInit) return;
+    window.__rs5051IntroInit = true;
+
     const SEEN_KEY = 'rs5051_intro_seen_v3';
 
     let seen = false;
@@ -82,12 +88,10 @@
     }
 
     let played = false;
-    let safetyTimer = null;
 
     function playIntro() {
         if (played) return;
         played = true;
-        if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
         try { sessionStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* ignore */ }
         const overlay = build();
         requestAnimationFrame(() => overlay.classList.add('intro-show'));
@@ -120,6 +124,8 @@
     }
 
     // Wait for preloader to finish before showing intro — otherwise they stack.
+    // No safety-timer fallback: `played` guard + observer.disconnect is enough,
+    // and a late-firing safety was the cause of the double-intro bug.
     function waitForLoaderThenPlay() {
         const loader = document.getElementById('site-loader');
         if (!loader) return playIntro();
@@ -133,7 +139,6 @@
         });
         obs.observe(document.body, { childList: true, subtree: false, attributes: true, attributeFilter: ['class'] });
         obs.observe(loader, { attributes: true, attributeFilter: ['class'] });
-        safetyTimer = setTimeout(() => { obs.disconnect(); if (document.querySelector('.intro-cutscene')) return; playIntro(); }, 6000);
     }
 
     if (document.readyState === 'loading') {
