@@ -9,6 +9,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Default site cursor on html/body so every descendant inherits unless
+   overridden (avoids spans-inside-buttons breaking the pixel-hand). */
+html, body {
     cursor: url('../images/cursor-bass.png') 2 1, auto;
 }
 
