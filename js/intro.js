@@ -4,7 +4,7 @@
     const SEEN_KEY = 'rs5051_intro_seen_v3';
 
     let seen = false;
-    try { seen = localStorage.getItem(SEEN_KEY) === '1'; } catch (e) { /* ignore */ }
+    try { seen = sessionStorage.getItem(SEEN_KEY) === '1'; } catch (e) { /* ignore */ }
     if (seen) return;
 
     const LINES = [
@@ -79,7 +79,7 @@
     }
 
     function playIntro() {
-        try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* ignore */ }
+        try { sessionStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* ignore */ }
         const overlay = build();
         requestAnimationFrame(() => overlay.classList.add('intro-show'));
 
