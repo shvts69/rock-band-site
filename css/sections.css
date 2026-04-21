@@ -636,11 +636,13 @@
 }
 
 @media (max-width: 768px) {
-    .shows-carousel { gap: 6px; padding: 0 6px; }
+    .shows-carousel { gap: 6px; padding: 0 6px; justify-content: center; }
     .shows-carousel .photo-gallery {
-        width: 260px; /* one frame + small padding */
-        padding: 10px 10px;
+        width: auto;           /* collapse to single frame width — no flex-start dead space */
+        max-width: 140px;      /* 110 frame + 2×15 padding */
+        padding: 10px 15px;
         gap: 12px;
+        justify-content: center;
     }
     .shows-arrow {
         width: 32px;
