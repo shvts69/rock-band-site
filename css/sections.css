@@ -1106,3 +1106,63 @@
         padding: 10px 16px;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SITE FOOTER — under the bar at the bottom of the pub section
+   Semi-transparent pixel-style credit line + tiny RS69 mark.
+   SVG uses currentColor so the logo tint always matches the text.
+   ═══════════════════════════════════════════════════════════════════ */
+.site-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 150px;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    letter-spacing: 1.5px;
+    line-height: 1.8;
+    text-transform: uppercase;
+    text-align: center;
+    user-select: none;
+    pointer-events: none;
+}
+.site-footer-logo {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    opacity: 0.85;
+}
+.site-footer-text {
+    margin: 0;
+}
+.site-footer-link {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.4);
+    padding-bottom: 1px;
+    pointer-events: auto;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+.site-footer-link:hover {
+    color: rgba(255, 204, 51, 0.95);
+    border-bottom-color: rgba(255, 204, 51, 0.75);
+}
+
+@media (max-width: 768px) {
+    .site-footer {
+        font-size: 5px;
+        padding: 0 100px;
+        gap: 6px;
+        bottom: 8px;
+        letter-spacing: 1px;
+        line-height: 1.6;
+    }
+    .site-footer-logo { width: 14px; height: 14px; }
+}
