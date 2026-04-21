@@ -60,8 +60,11 @@
                 ci += 1;
                 timer = setTimeout(step, CHAR_MS);
             } else {
-                out = out.replace(/<span class="intro-cursor">_<\/span>$/, '') + '\n';
-                el.innerHTML = out + '<span class="intro-cursor">_</span>';
+                // Keep `out` and innerHTML in sync: strip cursor, add newline,
+                // re-append cursor so next iteration's slice(-cursorLen) lands
+                // on the cursor, not on characters of the previous line.
+                out = out.replace(/<span class="intro-cursor">_<\/span>$/, '') + '\n' + '<span class="intro-cursor">_</span>';
+                el.innerHTML = out;
                 li += 1;
                 ci = 0;
                 if (li >= lines.length) {
