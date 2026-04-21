@@ -162,6 +162,37 @@ body.egg-party .section-pub::after {
     50%      { background: rgba(255, 200, 80, 0.07); }
 }
 
+/* ─── Sound toggle (bottom-left) ─── */
+.sound-toggle {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(10, 6, 14, 0.85);
+    border: 2px solid #ee2222;
+    border-radius: 2px;
+    box-shadow: 0 0 0 2px #000, 0 4px 0 rgba(0, 0, 0, 0.6);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: #fff;
+    letter-spacing: 1px;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.2s ease, transform 0.1s ease;
+}
+.sound-toggle:hover { border-color: #ff4444; }
+.sound-toggle:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 2px #000, 0 2px 0 rgba(0, 0, 0, 0.6);
+}
+.sound-toggle.muted { border-color: #666; color: #999; }
+.sound-icon { font-size: 14px; filter: drop-shadow(0 0 4px #ff4444); }
+.sound-toggle.muted .sound-icon { filter: none; }
+
 /* ─── Mobile tuning ─── */
 @media (max-width: 768px) {
     .egg-counter { font-size: 8px; padding: 8px 10px; right: 8px; bottom: 8px; gap: 6px; }
@@ -171,4 +202,7 @@ body.egg-party .section-pub::after {
     .egg-finale-msg { font-size: 10px; }
     .egg-finale-sub { font-size: 8px; }
     .egg-finale-close { font-size: 9px; padding: 8px 16px; }
+    .sound-toggle { font-size: 8px; padding: 8px 10px; left: 8px; bottom: 8px; gap: 6px; }
+    .sound-icon { font-size: 11px; }
+    .sound-label { display: none; }
 }
