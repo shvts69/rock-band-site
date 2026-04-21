@@ -20,10 +20,12 @@
     letter-spacing: 1px;
     user-select: none;
     pointer-events: auto;
-    cursor: url('../images/cursor-bass.png') 2 1, auto;
+    cursor: url('../images/cursor-bass.png') 2 1, auto !important;
     transition: border-color 0.3s ease, transform 0.3s ease;
 }
-.egg-counter * { cursor: inherit; }
+.egg-counter, .egg-counter * {
+    cursor: url('../images/cursor-bass.png') 2 1, auto !important;
+}
 .egg-counter-icon { font-size: 14px; filter: drop-shadow(0 0 4px #ff4444); }
 .egg-counter-text { line-height: 1.4; }
 .egg-counter .egg-count { color: #ffcc33; padding: 0 2px; }
@@ -182,11 +184,13 @@ body.egg-party .section-pub::after {
     font-size: 10px;
     color: #fff;
     letter-spacing: 1px;
-    cursor: url('../images/cursor-bass.png') 2 1, pointer;
+    cursor: url('../images/cursor-bass.png') 2 1, pointer !important;
     user-select: none;
     transition: border-color 0.2s ease, transform 0.1s ease;
 }
-.sound-toggle * { cursor: inherit; }
+.sound-toggle, .sound-toggle * {
+    cursor: url('../images/cursor-bass.png') 2 1, pointer !important;
+}
 .sound-toggle:hover { border-color: #ff4444; }
 .sound-toggle:active {
     transform: translateY(2px);
