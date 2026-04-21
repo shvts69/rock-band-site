@@ -636,13 +636,15 @@
 }
 
 @media (max-width: 768px) {
-    .shows-carousel { gap: 6px; padding: 0 6px; justify-content: center; }
+    .shows-carousel { gap: 10px; padding: 0 6px; justify-content: center; }
     .shows-carousel .photo-gallery {
-        width: auto;           /* collapse to single frame width — no flex-start dead space */
-        max-width: 140px;      /* 110 frame + 2×15 padding */
-        padding: 10px 15px;
+        width: 130px;          /* 110 frame + 10 padding each side — exactly one item */
+        padding: 10px 10px;
         gap: 12px;
-        justify-content: center;
+        justify-content: flex-start;
+    }
+    .shows-carousel .gallery-item {
+        flex: 0 0 110px;       /* match frame width — kill the 240px desktop dead space */
     }
     .shows-arrow {
         width: 32px;

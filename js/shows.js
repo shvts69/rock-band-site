@@ -74,7 +74,9 @@
 
     function scrollBy(dir) {
         // Page by full visible width (3 frames desktop, 1 frame mobile)
-        const step = Math.max(240, gallery.clientWidth);
+        const firstItem = gallery.querySelector('.gallery-item');
+        const gap = parseFloat(getComputedStyle(gallery).gap) || 0;
+        const step = firstItem ? firstItem.offsetWidth + gap : gallery.clientWidth;
         gallery.scrollBy({ left: dir * step, behavior: 'smooth' });
     }
 
