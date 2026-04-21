@@ -148,14 +148,20 @@
             initDesktop();
         }
 
-        // Reload on resize
-        let lastSize = window.innerWidth + 'x' + window.innerHeight;
+        // Reload only when crossing the mobile/desktop boundary (layout engines
+        // swap between vertical and horizontal scroll). Ignore in-bucket resizes
+        // so dragging a window between sizes doesn't re-run loader + intro.
+        let wasMobile = window.innerWidth <= 768;
+        let resizeTimer = null;
         window.addEventListener('resize', () => {
-            const newSize = window.innerWidth + 'x' + window.innerHeight;
-            if (newSize !== lastSize) {
-                lastSize = newSize;
-                location.reload();
-            }
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const isMobileNow = window.innerWidth <= 768;
+                if (isMobileNow !== wasMobile) {
+                    wasMobile = isMobileNow;
+                    location.reload();
+                }
+            }, 300);
         });
     }
 

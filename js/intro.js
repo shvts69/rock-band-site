@@ -1,12 +1,16 @@
 (function () {
     'use strict';
 
-    const SEEN_KEY = 'rs5051_intro_seen_v2';
-    const HOLD_MS = 2800;
+    const SEEN_KEY = 'rs5051_intro_seen_v3';
 
     let seen = false;
     try { seen = localStorage.getItem(SEEN_KEY) === '1'; } catch (e) { /* ignore */ }
     if (seen) return;
+
+    const LINES = [
+        '> ARIZONA, 04:40 AM',
+        '> Three punks. One way. Next stop: New York.'
+    ];
 
     function build() {
         const overlay = document.createElement('div');
@@ -23,7 +27,7 @@
             '      <span class="intro-chip">5051.sys</span>',
             '      <span class="intro-chip intro-chip-dim">READY</span>',
             '    </div>',
-            '    <pre class="intro-text">&gt; ARIZONA, 04:40 AM\n&gt; Three punks. One way. Next stop: New York.<span class="intro-cursor">_</span></pre>',
+            '    <pre class="intro-text"></pre>',
             '    <div class="intro-actions">',
             '      <span class="intro-hint">[ press any key or click to skip ]</span>',
             '      <button type="button" class="intro-skip">SKIP &#9654;</button>',
@@ -35,15 +39,55 @@
         return overlay;
     }
 
+    function typewriter(el, lines, onDone) {
+        let li = 0;
+        let ci = 0;
+        const CHAR_MS = 24;
+        const LINE_PAUSE = 280;
+        const HOLD_AFTER = 1400;
+        let out = '';
+        let stopped = false;
+        let timer = null;
+
+        function step() {
+            if (stopped) return;
+            const line = lines[li];
+            if (ci <= line.length) {
+                out = out.slice(0, out.length - '<span class="intro-cursor">_</span>'.length);
+                out += line.slice(ci - 1, ci);
+                out += '<span class="intro-cursor">_</span>';
+                el.innerHTML = out;
+                ci += 1;
+                timer = setTimeout(step, CHAR_MS);
+            } else {
+                out = out.replace(/<span class="intro-cursor">_<\/span>$/, '') + '\n';
+                el.innerHTML = out + '<span class="intro-cursor">_</span>';
+                li += 1;
+                ci = 0;
+                if (li >= lines.length) {
+                    timer = setTimeout(onDone, HOLD_AFTER);
+                } else {
+                    timer = setTimeout(step, LINE_PAUSE);
+                }
+            }
+        }
+        step();
+        return function stop() {
+            stopped = true;
+            if (timer) clearTimeout(timer);
+        };
+    }
+
     function playIntro() {
         try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* ignore */ }
         const overlay = build();
         requestAnimationFrame(() => overlay.classList.add('intro-show'));
 
-        let autoTimer = setTimeout(close, HOLD_MS);
+        const textEl = overlay.querySelector('.intro-text');
+        let stop = typewriter(textEl, LINES, close);
 
         function close() {
-            if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+            if (stop) { stop(); stop = null; }
             overlay.classList.remove('intro-show');
             overlay.classList.add('intro-out');
             setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 500);
