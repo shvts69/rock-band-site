@@ -148,20 +148,23 @@
             initDesktop();
         }
 
-        // Reload only when crossing the mobile/desktop boundary (layout engines
-        // swap between vertical and horizontal scroll). Ignore in-bucket resizes
-        // so dragging a window between sizes doesn't re-run loader + intro.
-        let wasMobile = window.innerWidth <= 768;
+        // Reload on resize — canvases are sized once and don't reflow, so the
+        // page needs a fresh init when width or height changes. The loader and
+        // intro both short-circuit on subsequent loads in the same session
+        // (sessionStorage flags), so the user sees an instant re-layout
+        // without a repeated "loading" flash or intro replay. Debounced so
+        // rapid drags don't trigger multiple reloads mid-movement.
+        let lastSize = window.innerWidth + 'x' + window.innerHeight;
         let resizeTimer = null;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                const isMobileNow = window.innerWidth <= 768;
-                if (isMobileNow !== wasMobile) {
-                    wasMobile = isMobileNow;
+                const newSize = window.innerWidth + 'x' + window.innerHeight;
+                if (newSize !== lastSize) {
+                    lastSize = newSize;
                     location.reload();
                 }
-            }, 300);
+            }, 250);
         });
     }
 
