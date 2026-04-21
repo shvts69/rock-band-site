@@ -3179,7 +3179,21 @@
                 drawSpotlights(t);
                 crowd.forEach(c => {
                     const bob = Math.round(Math.sin(t * c.speed + c.phase) * 2);
-                    drawPerson(c.x, c.y + bob, PALS[c.palIdx], c.hairIdx);
+                    if (isMobilePub) {
+                        // Shrink crowd to match foreground musicians' visual size.
+                        // Anchor scale at feet so they stay on the dancefloor line.
+                        const anchorX = c.x + 9;
+                        const anchorY = c.y + 24;
+                        const s = 0.72;
+                        ctx.save();
+                        ctx.translate(anchorX, anchorY);
+                        ctx.scale(s, s);
+                        ctx.translate(-anchorX, -anchorY);
+                        drawPerson(c.x, c.y + bob, PALS[c.palIdx], c.hairIdx);
+                        ctx.restore();
+                    } else {
+                        drawPerson(c.x, c.y + bob, PALS[c.palIdx], c.hairIdx);
+                    }
                 });
             }
             requestAnimationFrame(animate);

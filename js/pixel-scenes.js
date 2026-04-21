@@ -724,8 +724,9 @@ function drawBrooklynScene(canvas) {
         }
     });
 
-    // DELI SHOPS — evenly spread across all buildings (3 total)
-    const deliCount = 3;
+    // DELI SHOPS — evenly spread across all buildings (3 desktop / 2 mobile)
+    const isMobileBK = (window.innerWidth <= 768);
+    const deliCount = isMobileBK ? 2 : 3;
     const deliSpacing = Math.floor(buildings.length / deliCount);
     const deliIndexes = [];
     for (let di = 0; di < deliCount; di++) {
@@ -797,24 +798,22 @@ function drawBrooklynScene(canvas) {
         drawPixel(ctx, winX + 3, shopY + 4, 'rgba(255,50,50,0.3)');
     });
 
-    // TREES — on road level
-    drawTree(ctx, Math.floor(W * 0.08), roadY, 0);
-    drawTree(ctx, Math.floor(W * 0.23), roadY, 1);
-    drawTree(ctx, Math.floor(W * 0.38), roadY, 2);
-    drawTree(ctx, Math.floor(W * 0.52), roadY, 0);
-    drawTree(ctx, Math.floor(W * 0.68), roadY, 1);
-    drawTree(ctx, Math.floor(W * 0.82), roadY, 2);
-    drawTree(ctx, Math.floor(W * 0.95), roadY, 0);
+    // TREES — on road level (7 desktop / 4 mobile, evenly spaced)
+    const treeRatios = isMobileBK
+        ? [0.10, 0.37, 0.63, 0.90]
+        : [0.08, 0.23, 0.38, 0.52, 0.68, 0.82, 0.95];
+    const treeTypes = [0, 1, 2, 0, 1, 2, 0];
+    treeRatios.forEach((r, i) => drawTree(ctx, Math.floor(W * r), roadY, treeTypes[i % treeTypes.length]));
 
-    // HYDRANTS — on road level (fewer)
-    drawHydrant(ctx, Math.floor(W * 0.18), roadY);
-    drawHydrant(ctx, Math.floor(W * 0.55), roadY);
-    drawHydrant(ctx, Math.floor(W * 0.88), roadY);
+    // HYDRANTS — on road level (3 desktop / 1 mobile)
+    const hydrantRatios = isMobileBK ? [0.50] : [0.18, 0.55, 0.88];
+    hydrantRatios.forEach(r => drawHydrant(ctx, Math.floor(W * r), roadY));
 
-    // Street lamps — detailed with light cones
+    // Street lamps — detailed with light cones (4 desktop / 3 mobile, evenly spaced)
+    const lampCount = isMobileBK ? 3 : 4;
     const lampPositions = [];
-    const lampSpacing = Math.floor(W / 4);
-    for (let li = 0; li < 4; li++) {
+    const lampSpacing = Math.floor(W / lampCount);
+    for (let li = 0; li < lampCount; li++) {
         const lx = Math.floor(lampSpacing * 0.5 + li * lampSpacing);
         lampPositions.push(lx);
 
@@ -908,7 +907,7 @@ function drawBrooklynScene(canvas) {
     }
 
     // TREE ROOTS — multiple roots per tree, starting from trunk center
-    const treeXs = [W * 0.08, W * 0.23, W * 0.38, W * 0.52, W * 0.68, W * 0.82, W * 0.95];
+    const treeXs = treeRatios.map(r => W * r);
     treeXs.forEach((tx) => {
         const cx = Math.floor(tx); // aligned with trunk left edge (trunk is x, x+1)
         const rootTop = roadY; // start right from road surface (under trunk)
@@ -952,7 +951,7 @@ function drawBrooklynScene(canvas) {
     });
 
     // HYDRANT PIPES — connecting down to main sewer pipe
-    const hydrantXs = [W * 0.18, W * 0.55, W * 0.88];
+    const hydrantXs = hydrantRatios.map(r => W * r);
     const mainPipeY = rockTop + Math.floor(rockH * 0.25);
     hydrantXs.forEach(hx => {
         const hxx = Math.floor(hx);
