@@ -3347,17 +3347,19 @@
             px(-1, -3 + n, headShade); px(0, -3 + n, beak); px(1, -3 + n, headShade);
             px(0, -2 + n, beakTip); // beak tip hanging down to body top
 
-            // === SUNGLASSES (facing us — two 2×2 lenses with head skin between them) ===
-            // Left lens
-            px(-2, -5 + n, shade); px(-1, -5 + n, shade);
-            px(-2, -4 + n, shade); px(-1, -4 + n, shade);
-            // Right lens (symmetric mirror of left)
-            px(1, -5 + n, shade); px(2, -5 + n, shade);
-            px(1, -4 + n, shade); px(2, -4 + n, shade);
-            // x=0 at rows -5,-4 stays as head skin → visible nose bridge between lenses
-            // Glints on upper-inner corner of each lens
-            px(-1, -5 + n, glint);
-            px(1,  -5 + n, glint);
+            // === COMICALLY OVERSIZED SUNGLASSES (3×3 lenses overhanging the head) ===
+            // Left lens — 3 wide × 3 tall, overhanging head by 2 px on the left
+            for (let sx = -4; sx <= -2; sx++) {
+                for (let sy = -6; sy <= -4; sy++) px(sx, sy + n, shade);
+            }
+            // Right lens — symmetric mirror
+            for (let sx = 2; sx <= 4; sx++) {
+                for (let sy = -6; sy <= -4; sy++) px(sx, sy + n, shade);
+            }
+            // x=-1,0,1 at rows -5,-4 stays as head skin → visible "nose" between lenses
+            // Highlight on inner-upper corner of each lens
+            px(-2, -6 + n, glint);
+            px(2,  -6 + n, glint);
         }
 
         function pickNextPerch() {
