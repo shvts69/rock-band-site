@@ -3145,6 +3145,308 @@
         requestAnimationFrame(animate);
     }
 
+    // ====== PUB PARTY ANIMALS — pigeon + rat + sunglasses eagle (only in egg-party) ======
+    function initPubParty() {
+        const PIXEL = 4;
+        const section = document.querySelector('.section-pub');
+        if (!section) return;
+        const parent = section.querySelector('.pub-bg');
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+        // z:58 — above bar (57) and walkers (56) so animals roam in front of scene.
+        // display:none until egg-party is active.
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:58;display:none;';
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / PIXEL;
+        const H = canvas.height / PIXEL;
+        ctx.imageSmoothingEnabled = false;
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+
+        const isMobile = window.innerWidth <= 768;
+        const barY = Math.floor(H * (isMobile ? 0.895 : 0.855));
+        const barTop = barY - 10;
+
+        function updateVisibility() {
+            canvas.style.display = document.body.classList.contains('egg-party') ? 'block' : 'none';
+        }
+        updateVisibility();
+        window.addEventListener('easterEggsComplete', updateVisibility);
+        setInterval(updateVisibility, 1000);
+
+        // ── Eagle perch target: centered over the BOOK US title ──
+        let eaglePerchX = Math.floor(W * 0.5);
+        let eaglePerchY = Math.floor(H * 0.3);
+        function updateEaglePerch() {
+            const title = section.querySelector('.pub-title');
+            if (!title) return;
+            const sr = section.getBoundingClientRect();
+            const tr = title.getBoundingClientRect();
+            eaglePerchX = Math.floor((tr.left + tr.width / 2 - sr.left) / PIXEL);
+            eaglePerchY = Math.floor((tr.top - sr.top) / PIXEL) - 6;
+        }
+        updateEaglePerch();
+        window.addEventListener('resize', updateEaglePerch);
+        setTimeout(updateEaglePerch, 500); // after layout settles
+
+        // ── Pigeon state ──
+        const pigeonPerches = [
+            { x: Math.floor(W * 0.12), y: barTop - 2 },
+            { x: Math.floor(W * 0.88), y: barTop - 2 },
+            { x: Math.floor(W * 0.30), y: Math.floor(H * 0.18) },
+            { x: Math.floor(W * 0.70), y: Math.floor(H * 0.18) },
+        ];
+        let pgCurrent = 0, pgTarget = 1;
+        let pgX = pigeonPerches[0].x, pgY = pigeonPerches[0].y;
+        let pgStartX = pgX, pgStartY = pgY;
+        let pgEndX = pgX, pgEndY = pgY;
+        let pgFlying = false, pgProgress = 0;
+        let pgFacingRight = true;
+        let pgWaitUntil = 3;
+        let pgLastFlip = 0, pgFlipping = false;
+        let pgJumpOff = 0, pgJumpVel = 0, pgFlipAngle = 0;
+
+        // ── Rat state ──
+        const ratRoadY = Math.min(H - 2, barY + 12);
+        let ratX = Math.floor(W * 0.25);
+        let ratDir = 1;
+        const ratSpeed = 0.35;
+        let ratLastFlip = 1.5;
+        let ratFlipping = false;
+        let ratJumpOff = 0, ratJumpVel = 0, ratFlipAngle = 0;
+
+        // ── Sprite: pigeon (copied from initPigeon, section 2) ──
+        function drawPigeonSprite(px, py, wingPhase, right, flying) {
+            const x = Math.floor(px);
+            const y = Math.floor(py);
+            const d = right ? 1 : -1;
+            // Body
+            ctx.fillStyle = '#667'; ctx.fillRect(x - 2, y, 5, 3);
+            ctx.fillStyle = '#778'; ctx.fillRect(x - 1, y, 3, 2);
+            ctx.fillStyle = '#889'; ctx.fillRect(x - 1, y + 2, 3, 1);
+            // Head
+            ctx.fillStyle = '#778'; ctx.fillRect(x + 2 * d, y - 1, 2, 2);
+            ctx.fillStyle = '#889'; ctx.fillRect(x + 2 * d, y - 1, 2, 1);
+            ctx.fillStyle = '#ff6600'; ctx.fillRect(x + 3 * d, y - 1, 1, 1);
+            ctx.fillStyle = '#aa8855'; ctx.fillRect(x + 4 * d, y, 1, 1);
+            ctx.fillStyle = '#4a6650'; ctx.fillRect(x + 1 * d, y, 1, 2);
+            ctx.fillStyle = '#5a5068'; ctx.fillRect(x + 2 * d, y, 1, 1);
+            ctx.fillStyle = '#556'; ctx.fillRect(x - 3 * d, y + 1, 2, 1); ctx.fillRect(x - 4 * d, y + 2, 2, 1);
+            if (flying) {
+                const wy = Math.round(Math.sin(wingPhase * Math.PI * 2) * 3);
+                ctx.fillStyle = '#556';
+                ctx.fillRect(x - 1, y - 1 + wy, 1, 1);
+                ctx.fillRect(x, y - 2 + wy, 1, 1);
+                ctx.fillRect(x + 1, y - 2 + wy, 1, 1);
+                ctx.fillStyle = '#667';
+                ctx.fillRect(x - 1, y + wy, 1, 1);
+                ctx.fillRect(x, y - 1 + wy, 1, 1);
+                ctx.fillStyle = '#445';
+                ctx.fillRect(x, y - 3 + wy, 1, 1);
+                ctx.fillRect(x + 1, y - 3 + wy, 1, 1);
+                ctx.fillStyle = '#99a'; ctx.fillRect(x, y - 2 + wy, 1, 1);
+            } else {
+                ctx.fillStyle = '#556'; ctx.fillRect(x - 2, y + 1, 4, 1);
+                ctx.fillStyle = '#667'; ctx.fillRect(x - 1, y, 2, 1);
+                ctx.fillStyle = '#334';
+                ctx.fillRect(x - 2, y + 1, 1, 1);
+                ctx.fillRect(x + 1, y + 1, 1, 1);
+                ctx.fillStyle = '#cc5544';
+                ctx.fillRect(x - 1, y + 3, 1, 1);
+                ctx.fillRect(x + 1, y + 3, 1, 1);
+                ctx.fillRect(x - 2, y + 4, 2, 1);
+                ctx.fillRect(x, y + 4, 2, 1);
+            }
+        }
+
+        // ── Sprite: rat (copied from initRat, section 2) ──
+        function drawRatSprite(px, py, right, frame) {
+            const x = Math.floor(px);
+            const y = Math.floor(py);
+            const r = (rx, ry, rw, rh, c) => {
+                ctx.fillStyle = c;
+                const sx = right ? rx : -rx - rw;
+                ctx.fillRect(x + sx, y + ry, Math.max(1, rw), Math.max(1, rh));
+            };
+            r(-2, 0, 5, 2, '#555');
+            r(-1, -1, 3, 1, '#666');
+            r(-1, 1, 3, 1, '#444');
+            r(3, 0, 1, 1, '#777');
+            r(2, -1, 1, 1, '#ff0000');
+            r(1, -2, 1, 1, '#665');
+            r(2, -2, 1, 1, '#776');
+            const tailWave = Math.sin(frame * 5) * 0.5;
+            r(-3, Math.floor(1 + tailWave), 1, 1, '#888');
+            r(-4, Math.floor(1 + tailWave * 0.5), 1, 1, '#777');
+            r(-5, 1, 1, 1, '#666');
+            const legOff = Math.floor(Math.sin(frame * 8) * 1);
+            r(-1, 2, 1, 1, '#555');
+            r(1, 2 + legOff, 1, 1, '#555');
+            r(3, -1, 1, 1, '#888');
+            r(4, 0, 1, 1, '#888');
+        }
+
+        // ── Sprite: perched eagle with sunglasses + optional head nod ──
+        function drawPubEagle(ex, ey, nod) {
+            const body = '#3a2a1a', bodyLight = '#4a3525', bodyDark = '#2a1a0e';
+            const wing = '#4a3520', wingMid = '#5a4530', wingLight = '#6a5540';
+            const head = '#f0ece0', headShade = '#d8d4c8';
+            const beak = '#e8a800', beakTip = '#cc8800', feet = '#e8a800';
+            const shade = '#0a0a0a', shadeRim = '#1a1a1a', glint = '#ffffff';
+
+            const px = (dx, dy, c) => { ctx.fillStyle = c; ctx.fillRect(ex + dx, ey + dy, 1, 1); };
+
+            // Body (static)
+            for (let by = -2; by <= 2; by++) {
+                px(-1, by, bodyDark); px(0, by, body); px(1, by, body); px(2, by, bodyLight);
+            }
+            px(1, -2, '#5a4530'); px(2, -1, '#5a4530');
+            px(0, 2, '#4a3a28'); px(1, 2, '#4a3a28');
+            // Folded wings
+            for (let wy = -1; wy <= 3; wy++) { px(-2, wy, wing); px(3, wy, wingMid); }
+            px(-3, 1, wingMid); px(-3, 2, wingLight); px(4, 1, wingLight); px(4, 2, wingMid);
+            px(-2, 3, wingMid); px(-1, 3, wing); px(2, 3, wing); px(3, 3, wingMid);
+            px(-3, 3, wingLight); px(4, 3, wingLight);
+            // Tail
+            px(-1, 4, '#3a2a1a'); px(0, 4, '#4a3a2a'); px(1, 4, '#3a2a1a'); px(2, 4, '#4a3a2a');
+            px(0, 5, '#5a4a3a'); px(1, 5, '#5a4a3a');
+            // Feet/talons
+            px(0, 3, feet); px(1, 3, feet); px(-1, 4, '#cc8800'); px(2, 4, '#cc8800');
+            px(0, 4, feet); px(1, 4, feet);
+
+            // HEAD + NECK — shifted by nod (±1 grid units)
+            const n = nod;
+            // Neck
+            px(0, -3 + n, headShade); px(1, -3 + n, body);
+            // Head
+            px(0, -6 + n, head); px(1, -6 + n, head);
+            px(-1, -5 + n, headShade); px(0, -5 + n, head); px(1, -5 + n, head); px(2, -5 + n, head);
+            px(-1, -4 + n, headShade); px(0, -4 + n, head); px(1, -4 + n, head); px(2, -4 + n, headShade);
+            px(0, -7 + n, '#e0dcd0'); px(1, -7 + n, '#e0dcd0'); // brow
+            // Beak
+            px(3, -5 + n, beak); px(3, -4 + n, beakTip); px(4, -4 + n, beakTip);
+            // SUNGLASSES — 2-row dark bar covering eye area, with rim + glint
+            px(-1, -5 + n, shadeRim);
+            px(0, -5 + n, shade); px(1, -5 + n, shade); px(2, -5 + n, shade);
+            px(3, -5 + n, shadeRim);
+            px(0, -4 + n, shade); px(2, -4 + n, shade); // lens bottoms
+            px(1, -4 + n, shadeRim); // nose bridge
+            px(1, -5 + n, glint); // glint on left lens
+        }
+
+        function pickNextPerch() {
+            let next;
+            do { next = Math.floor(Math.random() * pigeonPerches.length); } while (next === pgCurrent);
+            pgTarget = next;
+            pgStartX = pgX; pgStartY = pgY;
+            pgEndX = pigeonPerches[next].x;
+            pgEndY = pigeonPerches[next].y;
+            pgFacingRight = pgEndX >= pgStartX;
+            pgFlying = true;
+            pgProgress = 0;
+        }
+
+        function animate() {
+            if (canvas.style.display !== 'none') {
+                ctx.clearRect(0, 0, W, H);
+                const t = Date.now() * 0.001;
+
+                // ── Pigeon ──
+                if (pgFlipping) {
+                    pgJumpOff += pgJumpVel;
+                    pgJumpVel += 0.08;
+                    pgFlipAngle += 0.25;
+                    if (pgJumpOff >= 0) {
+                        pgJumpOff = 0; pgJumpVel = 0; pgFlipAngle = 0;
+                        pgFlipping = false;
+                    }
+                }
+                if (!pgFlying) {
+                    if (t > pgWaitUntil) {
+                        pickNextPerch();
+                    } else if (!pgFlipping && t - pgLastFlip >= 3) {
+                        pgFlipping = true;
+                        pgJumpVel = -2.2;
+                        pgJumpOff = 0; pgFlipAngle = 0;
+                        pgLastFlip = t;
+                    }
+                    const wingP = pgFlipping ? (t * 6) % 1 : 0;
+                    const dx = pgX, dy = pgY + pgJumpOff;
+                    if (pgFlipping) {
+                        ctx.save();
+                        ctx.translate(dx, dy);
+                        ctx.rotate(pgFacingRight ? -pgFlipAngle : pgFlipAngle);
+                        ctx.translate(-dx, -dy);
+                        drawPigeonSprite(dx, dy, wingP, pgFacingRight, false);
+                        ctx.restore();
+                    } else {
+                        drawPigeonSprite(dx, dy, 0, pgFacingRight, false);
+                    }
+                } else {
+                    pgProgress += 0.012;
+                    if (pgProgress >= 1) {
+                        pgProgress = 1;
+                        pgFlying = false;
+                        pgCurrent = pgTarget;
+                        pgX = pgEndX; pgY = pgEndY;
+                        pgWaitUntil = t + 2 + Math.random() * 3;
+                        pgLastFlip = t; // reset flip timer on landing
+                    } else {
+                        const ft = pgProgress;
+                        const eased = ft < 0.5 ? 2 * ft * ft : 1 - Math.pow(-2 * ft + 2, 2) / 2;
+                        pgX = pgStartX + (pgEndX - pgStartX) * eased;
+                        const arcH = Math.min(Math.abs(pgEndX - pgStartX) * 0.15, 12);
+                        pgY = pgStartY + (pgEndY - pgStartY) * eased - Math.sin(ft * Math.PI) * arcH;
+                    }
+                    drawPigeonSprite(pgX, pgY, (t * 8) % 1, pgFacingRight, true);
+                }
+
+                // ── Rat ──
+                if (ratFlipping) {
+                    ratJumpOff += ratJumpVel;
+                    ratJumpVel += 0.07;
+                    ratFlipAngle += 0.22;
+                    if (ratJumpOff >= 0) {
+                        ratJumpOff = 0; ratJumpVel = 0; ratFlipAngle = 0;
+                        ratFlipping = false;
+                    }
+                } else {
+                    ratX += ratSpeed * ratDir;
+                    if (ratX > W * 0.88 - 2) ratDir = -1;
+                    if (ratX < W * 0.12 + 2) ratDir = 1;
+                    if (t - ratLastFlip >= 3) {
+                        ratFlipping = true;
+                        ratJumpVel = -2;
+                        ratJumpOff = 0; ratFlipAngle = 0;
+                        ratLastFlip = t;
+                    }
+                }
+                const rdx = ratX, rdy = ratRoadY + ratJumpOff;
+                if (ratFlipping) {
+                    ctx.save();
+                    ctx.translate(rdx, rdy);
+                    ctx.rotate(ratDir > 0 ? -ratFlipAngle : ratFlipAngle);
+                    ctx.translate(-rdx, -rdy);
+                    drawRatSprite(rdx, rdy, ratDir > 0, t);
+                    ctx.restore();
+                } else {
+                    drawRatSprite(rdx, rdy, ratDir > 0, t);
+                }
+
+                // ── Eagle (perched, nodding to beat) ──
+                // Nod: ~2 Hz (≈120bpm), amplitude ±1 grid unit
+                const nod = Math.round(Math.sin(t * 4.2) * 1);
+                drawPubEagle(eaglePerchX, eaglePerchY, nod);
+            }
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+    }
+
     // ====== PIXEL ART MUSIC ICONS (20x20 grid, 4px scale = 80px) ======
     function initMusicIcons() {
         const P = 4;
@@ -3699,6 +4001,7 @@
         initSocialIcons();
         initPubBar();
         initPubCrowd();
+        initPubParty();
     }
 
 
