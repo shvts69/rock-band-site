@@ -3347,17 +3347,19 @@
             px(-1, -3 + n, headShade); px(0, -3 + n, beak); px(1, -3 + n, headShade);
             px(0, -2 + n, beakTip); // beak tip hanging down to body top
 
-            // === COMICALLY OVERSIZED SUNGLASSES (3×3 lenses overhanging the head) ===
-            // Left lens — 3 wide × 3 tall, overhanging head by 2 px on the left
-            for (let sx = -4; sx <= -2; sx++) {
+            // === COMICALLY OVERSIZED SUNGLASSES (3×3 lenses + nose-bridge wire) ===
+            // Left lens — 3 wide × 3 tall
+            for (let sx = -3; sx <= -1; sx++) {
                 for (let sy = -6; sy <= -4; sy++) px(sx, sy + n, shade);
             }
-            // Right lens — symmetric mirror
-            for (let sx = 2; sx <= 4; sx++) {
+            // Right lens — symmetric mirror, just 1-pixel gap between lenses
+            for (let sx = 1; sx <= 3; sx++) {
                 for (let sy = -6; sy <= -4; sy++) px(sx, sy + n, shade);
             }
-            // x=-1,0,1 at rows -5,-4 stays as head skin → visible "nose" between lenses
-            // Highlight on inner-upper corner of each lens
+            // Bridge WIRE across the nose (middle row only — top/bottom show head skin
+            // so lenses read as two distinct circles connected by a thin wire)
+            px(0, -5 + n, shade);
+            // Glints — inner-upper corner of each lens
             px(-2, -6 + n, glint);
             px(2,  -6 + n, glint);
         }
