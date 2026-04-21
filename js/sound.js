@@ -5,7 +5,9 @@
     'use strict';
 
     const STORAGE_KEY = 'rs5051_sound_v1';
-    let enabled = localStorage.getItem(STORAGE_KEY) !== '0'; // default ON
+    const HINT_KEY = 'rs5051_sound_hint_seen_v1';
+    // Default OFF — respects autoplay etiquette; user opts in via toggle.
+    let enabled = localStorage.getItem(STORAGE_KEY) === '1';
     let ctx = null;
     let btn = null;
 
@@ -174,9 +176,25 @@
             if (c && c.state === 'suspended') { try { c.resume(); } catch (e) { /* ignore */ } }
             setEnabled(!enabled);
             if (enabled) play('click');
+            dismissHint();
         });
         document.body.appendChild(btn);
         renderBtn();
+        maybeShowHint();
+    }
+
+    function maybeShowHint() {
+        let seen = false;
+        try { seen = localStorage.getItem(HINT_KEY) === '1'; } catch (e) { /* ignore */ }
+        if (seen || enabled || !btn) return;
+        btn.classList.add('sound-toggle-hint');
+        // Remove hint after 10s even if user doesn't click
+        setTimeout(dismissHint, 10000);
+    }
+
+    function dismissHint() {
+        if (btn) btn.classList.remove('sound-toggle-hint');
+        try { localStorage.setItem(HINT_KEY, '1'); } catch (e) { /* ignore */ }
     }
 
     function renderBtn() {

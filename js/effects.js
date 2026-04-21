@@ -4,6 +4,36 @@
 
 (function() {
 
+    // ─── Visibility helper: skip canvas redraws while the section is offscreen.
+    //     Uses IntersectionObserver with a generous rootMargin so scenes
+    //     finish rendering before the user scrolls into view, but go idle
+    //     while they're out of frame. Keeps Lighthouse happy on long pages.
+    const __visCache = new WeakMap();
+    function rsVisible(el) {
+        if (!el) return { visible: true };
+        if (__visCache.has(el)) return __visCache.get(el);
+        const state = { visible: true };
+        __visCache.set(el, state);
+        if (typeof IntersectionObserver === 'function') {
+            try {
+                const io = new IntersectionObserver((entries) => {
+                    for (const e of entries) state.visible = e.isIntersecting;
+                }, { rootMargin: '300px 0px', threshold: 0 });
+                io.observe(el);
+            } catch (e) { /* fall through: stays visible */ }
+        }
+        return state;
+    }
+    // Tab-hidden gate — paired check for document.hidden (browser already
+    // throttles rAF to ~1Hz but we skip the draw work entirely).
+    let __tabVisible = typeof document !== 'undefined' ? !document.hidden : true;
+    if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+            __tabVisible = !document.hidden;
+        });
+    }
+    function rsShouldRender(v) { return __tabVisible && (!v || v.visible); }
+
     // ====== STAGE EFFECTS: flashes + moving spotlights ======
     function initRandomFlashes() {
         const PIXEL = 4;
@@ -35,7 +65,9 @@
             { x: W * 0.8, speed: 0.2, phase: 4.5, r: 255, g: 50, b: 200 },
         ];
 
+        const __vis = rsVisible(section);
         function animate() {
+            if (!rsShouldRender(__vis)) { requestAnimationFrame(animate); return; }
             ctx.clearRect(0, 0, W, H);
             const t = Date.now() * 0.001;
 
@@ -2397,7 +2429,9 @@
             }
         }
 
+        const __visStageLightning = rsVisible(section);
         function animate() {
+            if (!rsShouldRender(__visStageLightning)) { requestAnimationFrame(animate); return; }
             ctx.clearRect(0, 0, W, H);
 
             // Screen flash
@@ -3136,7 +3170,9 @@
             });
         }
 
+        const __visPubCrowd = rsVisible(section);
         function animate() {
+            if (!rsShouldRender(__visPubCrowd)) { requestAnimationFrame(animate); return; }
             if (canvas.style.display !== 'none') {
                 ctx.clearRect(0, 0, W, H);
                 const t = Date.now() / 1000;
@@ -3382,7 +3418,9 @@
             pgProgress = 0;
         }
 
+        const __visPubParty = rsVisible(section);
         function animate() {
+            if (!rsShouldRender(__visPubParty)) { requestAnimationFrame(animate); return; }
             if (canvas.style.display !== 'none') {
                 ctx.clearRect(0, 0, W, H);
                 const t = Date.now() * 0.001;
@@ -3725,7 +3763,9 @@
             return maxScrollY > 0 ? Math.max(0, Math.min(1, scrollY / maxScrollY)) : 0;
         }
 
+        const __visStageParty = rsVisible(section);
         function animate() {
+            if (!rsShouldRender(__visStageParty)) { requestAnimationFrame(animate); return; }
             const progress = getScrollProgress();
             // Party starts fading in at 62% scroll, full at 78% (stage is now section 4 of 5)
             const target = progress > 0.62 ? Math.min(1, (progress - 0.62) / 0.16) : 0;

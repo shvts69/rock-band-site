@@ -4,10 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>5051 — Punk Band</title>
-    <link rel="stylesheet" href="css/style.css?v=13">
-    <link rel="stylesheet" href="css/sections.css?v=17">
+    <meta name="description" content="5051 — a pixel-art punk rock band from NYC. Scroll through a hand-drawn journey from desert to Brooklyn bridge to a secret bar. Find 6 hidden secrets to unlock the after-party.">
+    <meta name="theme-color" content="#0a0608">
+    <link rel="canonical" href="https://rock-band-site.vercel.app/">
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="5051">
+    <meta property="og:title" content="5051 — Punk Rock Band">
+    <meta property="og:description" content="A pixel-art journey through NYC with a 3-piece punk band. Horizontal scroll, hidden secrets, 8-bit sound — built for rockers and explorers.">
+    <meta property="og:url" content="https://rock-band-site.vercel.app/">
+    <meta property="og:image" content="https://rock-band-site.vercel.app/images/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="5051 — pixel-art punk rock band — equalizer bars over a NYC skyline">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="5051 — Punk Rock Band">
+    <meta name="twitter:description" content="Pixel-art punk journey through NYC. Scroll, click, find secrets, rock out.">
+    <meta name="twitter:image" content="https://rock-band-site.vercel.app/images/og-image.png">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/images/favicon-64x64.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <link rel="stylesheet" href="css/style.css?v=16">
+    <link rel="stylesheet" href="css/sections.css?v=20">
     <link rel="stylesheet" href="css/pixel-art.css?v=13">
-    <link rel="stylesheet" href="css/easter-eggs.css?v=4">
+    <link rel="stylesheet" href="css/easter-eggs.css?v=7">
 
     <!-- ═══ Preloader (inline so it paints instantly, no FOUC) ═══ -->
     <style>
@@ -240,9 +267,7 @@
                             <div class="frame-corner frame-bl"></div>
                             <div class="frame-corner frame-br"></div>
                             <div class="member-photo">
-                                <div class="photo-placeholder">
-                                    <span class="no-photo-text">no photo</span>
-                                </div>
+                                <img class="member-img" src="images/sasha.png?v=2" alt="Sasha — Bass" width="120" height="144">
                             </div>
                         </div>
                         <div class="member-info">
@@ -260,9 +285,7 @@
                             <div class="frame-corner frame-bl"></div>
                             <div class="frame-corner frame-br"></div>
                             <div class="member-photo">
-                                <div class="photo-placeholder">
-                                    <span class="no-photo-text">no photo</span>
-                                </div>
+                                <img class="member-img" src="images/ivan.png?v=2" alt="Ivan — Vocals / Guitar" width="120" height="144">
                             </div>
                         </div>
                         <div class="member-info">
@@ -280,9 +303,7 @@
                             <div class="frame-corner frame-bl"></div>
                             <div class="frame-corner frame-br"></div>
                             <div class="member-photo">
-                                <div class="photo-placeholder">
-                                    <span class="no-photo-text">no photo</span>
-                                </div>
+                                <img class="member-img" src="images/denis.png?v=2" alt="Denis — Drums" width="120" height="144">
                             </div>
                         </div>
                         <div class="member-info">
@@ -408,27 +429,27 @@
                 <!-- Contact / Booking form -->
                 <div class="pub-form-container">
                     <h2 class="section-title pub-title">BOOK US / CONTACT</h2>
-                    <form class="pub-form" id="pubForm" onsubmit="return false;">
+                    <form class="pub-form" id="pubForm" data-contact-email="5051nyc@gmail.com" onsubmit="return false;">
                         <div class="pub-form-row">
-                            <input type="text" class="pub-input" placeholder="YOUR NAME" required>
-                            <input type="email" class="pub-input" placeholder="EMAIL" required>
+                            <input type="text" class="pub-input" name="name" placeholder="YOUR NAME" required>
+                            <input type="email" class="pub-input" name="email" placeholder="EMAIL" required>
                         </div>
                         <div class="pub-form-row">
-                            <select class="pub-input pub-select">
+                            <select class="pub-input pub-select" name="reason">
                                 <option value="" disabled selected>REASON</option>
                                 <option value="booking">BOOKING / SHOW</option>
                                 <option value="collab">COLLABORATION</option>
                                 <option value="press">PRESS / MEDIA</option>
                                 <option value="other">OTHER</option>
                             </select>
-                            <input type="text" class="pub-input" placeholder="SUBJECT">
+                            <input type="text" class="pub-input" name="subject" placeholder="SUBJECT">
                         </div>
-                        <textarea class="pub-input pub-textarea" placeholder="YOUR MESSAGE..." rows="4"></textarea>
+                        <textarea class="pub-input pub-textarea" name="message" placeholder="YOUR MESSAGE..." rows="4"></textarea>
                         <button type="submit" class="pub-submit">&#9835; SEND IT &#9835;</button>
                     </form>
                 </div>
 
-                <footer class="site-footer" role="contentinfo">
+                <footer class="site-footer" id="rs69Footer" role="contentinfo">
                     <svg class="site-footer-logo" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <g transform="rotate(-18 200 200)">
                             <ellipse cx="200" cy="200" rx="170" ry="82"
@@ -471,13 +492,16 @@
 
     </div>
 
-    <script src="js/sound.js?v=1"></script>
+    <script src="js/sound.js?v=2"></script>
     <script src="js/easter-eggs.js?v=5"></script>
     <script src="js/pixel-scenes.js?v=13"></script>
     <script src="js/scroll.js?v=13"></script>
-    <script src="js/effects.js?v=32"></script>
+    <script src="js/effects.js?v=33"></script>
     <script src="js/band-walkers.js?v=15"></script>
     <script src="js/shows.js?v=4"></script>
+    <script src="js/contact.js?v=1"></script>
+    <script src="js/credits.js?v=1"></script>
+    <script src="js/intro.js?v=1"></script>
 
     <script>
         // Hide preloader once everything is ready; enforce a minimum show
