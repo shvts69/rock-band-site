@@ -31,10 +31,17 @@
     <link rel="icon" type="image/png" sizes="64x64" href="/images/favicon-64x64.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="css/style.css?v=20">
-    <link rel="stylesheet" href="css/sections.css?v=20">
-    <link rel="stylesheet" href="css/pixel-art.css?v=13">
-    <link rel="stylesheet" href="css/easter-eggs.css?v=11">
+    <!-- ═══ Force bass-guitar cursor everywhere, instantly (data URI, !important) ═══ -->
+    <style>
+        html, html *, body, body *, #site-loader, #site-loader * {
+            cursor: url("data:image/png;base64,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") 3 1, auto !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="css/style.css?v=24">
+    <link rel="stylesheet" href="css/sections.css?v=36">
+    <link rel="stylesheet" href="css/pixel-art.css?v=14">
+    <link rel="stylesheet" href="css/easter-eggs.css?v=17">
 
     <!-- ═══ Preloader (inline so it paints instantly, no FOUC) ═══ -->
     <style>
@@ -238,6 +245,7 @@
                         <span class="social-label">FACEBOOK</span>
                     </a>
                 </div>
+
                 <!-- Mobile scroll hint -->
                 <div class="scroll-hint">▶</div>
             </div>
@@ -385,23 +393,45 @@
                     </div>
                 </div>
 
-                <!-- Music Platform Links -->
+                <!-- Music Platform Links — external links to each streaming platform -->
                 <div class="music-links" id="musicLinks">
-                    <div class="music-links-title">&#9835; LISTEN NOW &#9835;</div>
+                    <div class="music-links-title">&#9835; LISTEN ON &#9835;</div>
                     <div class="music-links-row">
-                        <a href="https://open.spotify.com/artist/2m5oYkK4jxOBeL59QO9Ia3?si=R7LBEt86SDeRtSzm-7UF4Q" target="_blank" class="music-link music-spotify" title="Spotify">
+                        <a href="https://open.spotify.com/artist/2m5oYkK4jxOBeL59QO9Ia3?si=R7LBEt86SDeRtSzm-7UF4Q" target="_blank" rel="noopener" class="music-link music-spotify" title="5051 on Spotify">
                             <canvas class="music-icon" id="iconSpotify" width="80" height="80"></canvas>
                             <span class="music-label">SPOTIFY</span>
                         </a>
-                        <a href="https://music.youtube.com/channel/UCC6rSp87G8xQ_HMTuf2egmA?si=cgKNXY1OeBtqK49s" target="_blank" class="music-link music-youtube" title="YouTube Music">
+                        <a href="https://music.youtube.com/channel/UCC6rSp87G8xQ_HMTuf2egmA?si=cgKNXY1OeBtqK49s" target="_blank" rel="noopener" class="music-link music-youtube" title="5051 on YouTube Music">
                             <canvas class="music-icon" id="iconYoutube" width="80" height="80"></canvas>
                             <span class="music-label">YT MUSIC</span>
                         </a>
-                        <a href="https://music.apple.com/us/artist/5051/1450855842" target="_blank" class="music-link music-apple" title="Apple Music">
+                        <a href="https://music.apple.com/us/artist/5051/1450855842" target="_blank" rel="noopener" class="music-link music-apple" title="5051 on Apple Music">
                             <canvas class="music-icon" id="iconApple" width="80" height="80"></canvas>
                             <span class="music-label">APPLE</span>
                         </a>
                     </div>
+                </div>
+
+                <!-- Inline 8-bit audio player — 30s previews of 5051 tracks -->
+                <div class="track-player" id="trackPlayer" aria-label="5051 preview player">
+                    <div class="tp-screen">
+                        <span class="tp-led" aria-hidden="true"></span>
+                        <div class="tp-title-wrap">
+                            <div class="tp-title" id="tpTitle">&mdash; SELECT TRACK &mdash;</div>
+                        </div>
+                        <div class="tp-time">
+                            <span id="tpCurrent">0:00</span>
+                            <span class="tp-time-sep">/</span>
+                            <span id="tpDuration">0:30</span>
+                        </div>
+                    </div>
+                    <input type="range" class="tp-progress" id="tpProgress" min="0" max="1000" value="0" step="1" aria-label="Seek within track">
+                    <div class="tp-controls">
+                        <button type="button" class="tp-btn tp-prev" id="tpPrev" aria-label="Previous track">&#9664;&#9664;</button>
+                        <button type="button" class="tp-btn tp-play" id="tpPlay" aria-label="Play">&#9654;</button>
+                        <button type="button" class="tp-btn tp-next" id="tpNext" aria-label="Next track">&#9654;&#9654;</button>
+                    </div>
+                    <audio id="tpAudio" preload="none" crossorigin="anonymous"></audio>
                 </div>
 
                 <!-- Натовп -->
@@ -502,6 +532,7 @@
     <script src="js/contact.js?v=1"></script>
     <script src="js/credits.js?v=1"></script>
     <script src="js/intro.js?v=1"></script>
+    <script src="js/player-menu.js?v=7"></script>
 
     <script>
         // Hide preloader once everything is ready; enforce a minimum show

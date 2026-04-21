@@ -206,7 +206,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-    .member-block { cursor: pointer; }
+    .member-block { cursor: url('../images/cursor-bass.png') 3 1, pointer; }
 
     .member-block:hover .ornate-frame {
         box-shadow:
@@ -546,7 +546,7 @@
     color: #ff4444;
     font-size: 20px;
     font-family: 'Press Start 2P', monospace;
-    cursor: pointer;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
     z-index: 20;
     transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 0 12px rgba(255,68,68,0.3), inset 0 0 8px rgba(255,68,68,0.2);
@@ -564,7 +564,7 @@
 
 .shows-arrow:disabled {
     opacity: 0.3;
-    cursor: not-allowed;
+    cursor: url('../images/cursor-bass.png') 3 1, not-allowed;
     border-color: #555;
     color: #555;
     box-shadow: none;
@@ -734,7 +734,7 @@
 }
 
 .pub-select {
-    cursor: pointer;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
     -webkit-appearance: none;
 }
 
@@ -755,7 +755,7 @@
     background: #8b2500;
     border: 2px solid #cc4400;
     color: #ffcc66;
-    cursor: pointer;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
     transition: all 0.2s;
     text-align: center;
     letter-spacing: 2px;
@@ -1203,4 +1203,190 @@
 
 @media (max-width: 768px) {
     .pixel-toast { font-size: 8px; padding: 10px 14px; bottom: 18px; }
+}
+
+/* ============================================================
+   INLINE 8-BIT AUDIO PLAYER — below the TAP TO PLAY icons.
+   Compact pixel boombox: LCD title, seek slider, prev/play/next.
+   ============================================================ */
+.track-player {
+    position: absolute;
+    top: 47%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(300px, 72%);
+    margin: 0;
+    padding: 8px 10px 10px;
+    background: rgba(10, 6, 14, 0.94);
+    border: 3px solid #ee2222;
+    box-shadow:
+        0 0 0 2px #000,
+        0 0 18px rgba(238, 34, 34, 0.45),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 6px 0 rgba(0, 0, 0, 0.6);
+    font-family: 'Press Start 2P', monospace;
+    color: #ffcc33;
+    z-index: 16;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.tp-screen {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    background: #0a0404;
+    border: 2px solid #8b0000;
+    box-shadow: inset 0 0 10px rgba(255, 68, 68, 0.2);
+    min-height: 26px;
+    overflow: hidden;
+}
+
+.tp-led {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    background: #555;
+    box-shadow: 0 0 0 1px #000;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+.track-player.playing .tp-led {
+    background: #5cff5c;
+    box-shadow: 0 0 0 1px #000, 0 0 8px rgba(92, 255, 92, 0.8);
+    animation: tp-led-blink 1.2s steps(2) infinite;
+}
+@keyframes tp-led-blink { 50% { opacity: 0.35; } }
+
+.tp-title-wrap {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.tp-title {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #ffcc33;
+    text-shadow: 1px 1px 0 #000;
+    padding-right: 2em;
+}
+
+.tp-time {
+    flex: 0 0 auto;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: #ee5555;
+    text-shadow: 1px 1px 0 #000;
+    white-space: nowrap;
+}
+.tp-time-sep { opacity: 0.55; margin: 0 3px; }
+
+.tp-progress {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    background: #330808;
+    border: 2px solid #8b0000;
+    box-shadow: inset 0 0 4px #000;
+    outline: none;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
+    margin: 0 0 10px;
+    padding: 0;
+    display: block;
+}
+.tp-progress::-webkit-slider-runnable-track {
+    height: 6px;
+    background: linear-gradient(to right,
+        #ee2222 0%,
+        #ee2222 var(--tp-fill, 0%),
+        #1a0606 var(--tp-fill, 0%),
+        #1a0606 100%);
+    border: 0;
+}
+.tp-progress::-moz-range-track {
+    height: 6px;
+    background: #1a0606;
+    border: 0;
+}
+.tp-progress::-moz-range-progress {
+    height: 6px;
+    background: #ee2222;
+}
+.tp-progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -4px;
+    background: #ffcc33;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 0 0 0 1px #ee2222;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
+}
+.tp-progress::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: #ffcc33;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 0 0 0 1px #ee2222;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
+}
+
+.tp-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tp-btn {
+    width: 42px;
+    height: 32px;
+    padding: 0;
+    background: #330808;
+    border: 2px solid #8b0000;
+    color: #ffcc33;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0;
+    box-shadow: 0 3px 0 #000;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
+    text-shadow: 1px 1px 0 #000;
+    transition: transform 0.08s, background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tp-btn:hover { background: #4a0c0c; color: #ffff88; }
+.tp-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
+.tp-btn:focus-visible { outline: 2px solid #ffcc33; outline-offset: 2px; }
+
+.tp-play {
+    width: 50px;
+    background: #ee2222;
+    color: #fff;
+    border-color: #ffcc33;
+    box-shadow: 0 3px 0 #000, 0 0 10px rgba(238, 34, 34, 0.55);
+    font-size: 12px;
+}
+.tp-play:hover { background: #ff3333; color: #fff; }
+.track-player.playing .tp-play {
+    background: #ffcc33;
+    color: #330000;
+    border-color: #ee2222;
+    text-shadow: none;
+    box-shadow: 0 3px 0 #000, 0 0 12px rgba(255, 204, 51, 0.7);
+}
+
+@media (max-width: 768px) {
+    .track-player  { width: min(320px, 90%); padding: 9px 10px 10px; margin: 0; }
+    .tp-screen     { padding: 6px 8px; min-height: 22px; gap: 8px; }
+    .tp-title      { font-size: 8px; letter-spacing: 0; }
+    .tp-time       { font-size: 7px; }
+    .tp-btn        { width: 38px; height: 30px; font-size: 9px; }
+    .tp-play       { width: 46px; font-size: 11px; }
 }

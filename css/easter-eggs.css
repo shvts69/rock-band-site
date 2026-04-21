@@ -4,7 +4,7 @@
 .egg-counter {
     position: fixed;
     right: 16px;
-    bottom: 16px;
+    bottom: 60px;
     z-index: 9000;
     display: flex;
     align-items: center;
@@ -20,11 +20,8 @@
     letter-spacing: 1px;
     user-select: none;
     pointer-events: auto;
-    cursor: url('../images/cursor-bass.png') 2 1, auto !important;
+    cursor: url('../images/cursor-bass.png') 3 1, auto;
     transition: border-color 0.3s ease, transform 0.3s ease;
-}
-.egg-counter, .egg-counter * {
-    cursor: url('../images/cursor-bass.png') 2 1, auto !important;
 }
 .egg-counter-icon { font-size: 14px; filter: drop-shadow(0 0 4px #ff4444); }
 .egg-counter-text { line-height: 1.4; }
@@ -77,7 +74,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.75);
-    cursor: url('../images/cursor-bass.png') 2 1, pointer;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
 }
 .egg-finale.active {
     display: flex;
@@ -140,7 +137,7 @@
     color: #fff;
     border: 2px solid #000;
     box-shadow: 0 4px 0 #000;
-    cursor: url('../images/cursor-bass.png') 2 1, pointer;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
     letter-spacing: 2px;
     text-transform: uppercase;
 }
@@ -170,7 +167,7 @@ body.egg-party .section-pub::after {
 .sound-toggle {
     position: fixed;
     left: 16px;
-    bottom: 16px;
+    bottom: 60px;
     z-index: 9000;
     display: flex;
     align-items: center;
@@ -184,12 +181,9 @@ body.egg-party .section-pub::after {
     font-size: 10px;
     color: #fff;
     letter-spacing: 1px;
-    cursor: url('../images/cursor-bass.png') 2 1, pointer !important;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
     user-select: none;
     transition: border-color 0.2s ease, transform 0.1s ease;
-}
-.sound-toggle, .sound-toggle * {
-    cursor: url('../images/cursor-bass.png') 2 1, pointer !important;
 }
 .sound-toggle:hover { border-color: #ff4444; }
 .sound-toggle:active {
@@ -288,7 +282,7 @@ body.egg-party .section-pub::after {
     color: #ffcc33;
     font-family: 'Press Start 2P', monospace;
     font-size: 10px;
-    cursor: url('../images/cursor-bass.png') 2 1, pointer;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
     line-height: 1;
     padding: 0;
     transition: background 0.15s, border-color 0.15s;
@@ -502,7 +496,7 @@ body.egg-party .section-pub::after {
     font-family: 'Press Start 2P', monospace;
     font-size: 9px;
     letter-spacing: 2px;
-    cursor: url('../images/cursor-bass.png') 2 1, pointer;
+    cursor: url('../images/cursor-bass.png') 3 1, pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .intro-skip:hover { background: #ee2222; color: #fff; border-color: #ffcc33; }
@@ -528,14 +522,14 @@ body.egg-party .section-pub::after {
 
 /* ─── Mobile tuning ─── */
 @media (max-width: 768px) {
-    .egg-counter { font-size: 8px; padding: 8px 10px; right: 8px; bottom: 8px; gap: 6px; }
+    .egg-counter { font-size: 8px; padding: 8px 10px; right: 8px; bottom: 44px; gap: 6px; }
     .egg-counter-icon { font-size: 11px; }
     .egg-toast { font-size: 9px; padding: 8px 12px; }
     .egg-finale-title { font-size: 13px; }
     .egg-finale-msg { font-size: 10px; }
     .egg-finale-sub { font-size: 8px; }
     .egg-finale-close { font-size: 9px; padding: 8px 16px; }
-    .sound-toggle { font-size: 8px; padding: 8px 10px; left: 8px; bottom: 8px; gap: 6px; }
+    .sound-toggle { font-size: 8px; padding: 8px 10px; left: 8px; bottom: 44px; gap: 6px; }
     .sound-icon { font-size: 11px; }
     .sound-label { display: none; }
 }
