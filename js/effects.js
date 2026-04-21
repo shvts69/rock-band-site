@@ -641,6 +641,7 @@
                 diveStartY = eagleBaseY;
                 diveProgress = 0;
                 if (window.EasterEggs) window.EasterEggs.find('eagle');
+                if (window.Sound) window.Sound.play('eagle');
             }
         });
 
@@ -1039,6 +1040,7 @@
                 jumpOffY = 0;
                 flipAngle = 0;
                 if (window.EasterEggs) window.EasterEggs.find('pigeon');
+                if (window.Sound) window.Sound.play('pigeon');
             }
         });
 
@@ -1290,6 +1292,7 @@
                 jumpOffY = 0;
                 flipAngle = 0;
                 if (window.EasterEggs) window.EasterEggs.find('rat');
+                if (window.Sound) window.Sound.play('rat');
             }
         });
 
@@ -1499,6 +1502,7 @@
             const ffy = Math.floor(ferryY + bob);
             if (mx > ffx - 3 && mx < ffx + 24 && my > ffy - 10 && my < ffy + 8) {
                 if (window.EasterEggs) window.EasterEggs.find('ferry');
+                if (window.Sound) window.Sound.play('ferry');
                 // Spawn smoke rings from both smokestacks
                 for (let s = 0; s < 2; s++) {
                     const stackX = ffx + (s === 0 ? 8 : 14);
@@ -2080,6 +2084,7 @@
             const dist = Math.sqrt((mx - statueX) ** 2 + (my - (waterY - 15)) ** 2);
             if (dist < 25 && !rocket) {
                 if (window.EasterEggs) window.EasterEggs.find('liberty');
+                if (window.Sound) window.Sound.play('liberty');
                 rocket = {
                     x: torchX,
                     y: torchY,
@@ -2302,6 +2307,7 @@
             const my = (e.clientY - rect.top) / PIXEL;
             if (mx > logoX - 5 && mx < logoX + logoTotalW + 5 && my > logoY - 5 && my < logoY + logoH + 5) {
                 if (window.EasterEggs) window.EasterEggs.find('logo');
+                if (window.Sound) window.Sound.play('logo');
                 const count = 3 + Math.floor(Math.random() * 3);
                 for (let i = 0; i < count; i++) {
                     const startX = logoCX + (Math.random() - 0.5) * 20;

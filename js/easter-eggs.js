@@ -89,9 +89,6 @@
         if (found.has(cat)) return false;
         found.add(cat);
         save();
-        if (window.Sound && typeof window.Sound.play === 'function') {
-            window.Sound.play(cat);
-        }
         showToast(cat);
         renderCounter();
         window.dispatchEvent(new CustomEvent('easterEggsChanged', { detail: { cat, found: [...found] } }));
