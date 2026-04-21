@@ -3178,7 +3178,7 @@
         window.addEventListener('easterEggsComplete', updateVisibility);
         setInterval(updateVisibility, 1000);
 
-        // ── Eagle perch target: centered over the BOOK US title ──
+        // ── Eagle perch target: standing ON the BOOK US letters ──
         let eaglePerchX = Math.floor(W * 0.5);
         let eaglePerchY = Math.floor(H * 0.3);
         function updateEaglePerch() {
@@ -3187,18 +3187,23 @@
             const sr = section.getBoundingClientRect();
             const tr = title.getBoundingClientRect();
             eaglePerchX = Math.floor((tr.left + tr.width / 2 - sr.left) / PIXEL);
-            eaglePerchY = Math.floor((tr.top - sr.top) / PIXEL) - 6;
+            // Eagle feet (drawn at ey+3, ey+4) should sit at the top edge of the
+            // title letters, so shift perchY so feet land on title top.
+            eaglePerchY = Math.floor((tr.top - sr.top) / PIXEL) - 3;
         }
         updateEaglePerch();
         window.addEventListener('resize', updateEaglePerch);
         setTimeout(updateEaglePerch, 500); // after layout settles
 
         // ── Pigeon state ──
+        // Only real surfaces — bar counter ends and window sills. No mid-air
+        // ceiling perches (pigeon landing on an empty wall looks broken).
+        const winSillY = Math.floor(H * 0.33);
         const pigeonPerches = [
-            { x: Math.floor(W * 0.12), y: barTop - 2 },
-            { x: Math.floor(W * 0.88), y: barTop - 2 },
-            { x: Math.floor(W * 0.30), y: Math.floor(H * 0.18) },
-            { x: Math.floor(W * 0.70), y: Math.floor(H * 0.18) },
+            { x: Math.floor(W * 0.16), y: barTop - 2 },  // bar top, left
+            { x: Math.floor(W * 0.84), y: barTop - 2 },  // bar top, right
+            { x: Math.floor(W * 0.09), y: winSillY },    // left window sill
+            { x: Math.floor(W * 0.87), y: winSillY },    // right window sill
         ];
         let pgCurrent = 0, pgTarget = 1;
         let pgX = pigeonPerches[0].x, pgY = pigeonPerches[0].y;
@@ -3329,13 +3334,17 @@
             px(0, -7 + n, '#e0dcd0'); px(1, -7 + n, '#e0dcd0'); // brow
             // Beak
             px(3, -5 + n, beak); px(3, -4 + n, beakTip); px(4, -4 + n, beakTip);
-            // SUNGLASSES — 2-row dark bar covering eye area, with rim + glint
-            px(-1, -5 + n, shadeRim);
-            px(0, -5 + n, shade); px(1, -5 + n, shade); px(2, -5 + n, shade);
-            px(3, -5 + n, shadeRim);
-            px(0, -4 + n, shade); px(2, -4 + n, shade); // lens bottoms
-            px(1, -4 + n, shadeRim); // nose bridge
-            px(1, -5 + n, glint); // glint on left lens
+            // SUNGLASSES — clearly visible wraparound aviators (2×2 lenses + bridge)
+            // Lens tops
+            px(-2, -5 + n, shade); px(-1, -5 + n, shade);   // left lens top
+            px(0,  -5 + n, shadeRim); px(1, -5 + n, shadeRim); // bridge
+            px(2,  -5 + n, shade); px(3, -5 + n, shade);    // right lens top (sits over beak top)
+            // Lens bottoms (skip x=3 to keep beak tip intact)
+            px(-2, -4 + n, shade); px(-1, -4 + n, shade);   // left lens bottom
+            px(2,  -4 + n, shade);                             // right lens bottom
+            // Glints — bright highlight on each lens
+            px(-1, -5 + n, glint);
+            px(2,  -5 + n, glint);
         }
 
         function pickNextPerch() {
@@ -3387,7 +3396,7 @@
                         drawPigeonSprite(dx, dy, 0, pgFacingRight, false);
                     }
                 } else {
-                    pgProgress += 0.012;
+                    pgProgress += 0.0045;
                     if (pgProgress >= 1) {
                         pgProgress = 1;
                         pgFlying = false;
