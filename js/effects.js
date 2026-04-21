@@ -3179,6 +3179,9 @@
         setInterval(updateVisibility, 1000);
 
         // ── Eagle perch target: standing ON the BOOK US letters ──
+        // .section-title has padding-top (30px desktop / 10px mobile), so
+        // tr.top is well above the visible glyphs. Read padTop at runtime
+        // and offset so feet (ey+10 at 2× scale) land on letter glyph top.
         let eaglePerchX = Math.floor(W * 0.5);
         let eaglePerchY = Math.floor(H * 0.3);
         function updateEaglePerch() {
@@ -3186,24 +3189,28 @@
             if (!title) return;
             const sr = section.getBoundingClientRect();
             const tr = title.getBoundingClientRect();
+            const padTop = parseFloat(getComputedStyle(title).paddingTop) || 0;
             eaglePerchX = Math.floor((tr.left + tr.width / 2 - sr.left) / PIXEL);
-            // Eagle drawn at 2× scale: feet at ey+6..ey+10. Offset so feet sit
-            // right on the top edge of the title letters.
-            eaglePerchY = Math.floor((tr.top - sr.top) / PIXEL) - 9;
+            const letterTopPx = (tr.top - sr.top) + padTop;
+            eaglePerchY = Math.floor(letterTopPx / PIXEL) - 10;
         }
         updateEaglePerch();
         window.addEventListener('resize', updateEaglePerch);
-        setTimeout(updateEaglePerch, 500); // after layout settles
 
         // ── Pigeon state ──
-        // Only real surfaces — bar counter ends and window sills. No mid-air
-        // ceiling perches (pigeon landing on an empty wall looks broken).
-        const winSillY = Math.floor(H * 0.33);
+        // Perches must match surfaces drawn by initPubBar (bar canvas + windows).
+        // Bar constants: barY = H*0.855, barTop = barY - 10
+        // Window constants: wallTop = H*0.06, winY = wallTop+14, winH = 32,
+        //                   winX1 = W*0.05, win2X = W*0.82, winW = 35
+        // Pigeon feet rest 4 px below its center (py + 4 is bottom of sprite),
+        // so subtract 4 to make feet land on the surface.
+        const wallTop = Math.floor(H * 0.06);
+        const sillY = wallTop + 14 + 32;  // window bottom (sill top surface)
         const pigeonPerches = [
-            { x: Math.floor(W * 0.16), y: barTop - 2 },  // bar top, left
-            { x: Math.floor(W * 0.84), y: barTop - 2 },  // bar top, right
-            { x: Math.floor(W * 0.09), y: winSillY },    // left window sill
-            { x: Math.floor(W * 0.87), y: winSillY },    // right window sill
+            { x: Math.floor(W * 0.16), y: barTop - 4 },                       // left bar top
+            { x: Math.floor(W * 0.84), y: barTop - 4 },                       // right bar top
+            { x: Math.floor(W * 0.05) + 17, y: sillY - 4 },                   // left window sill
+            { x: Math.floor(W * 0.82) + 17, y: sillY - 4 },                   // right window sill
         ];
         let pgCurrent = 0, pgTarget = 1;
         let pgX = pigeonPerches[0].x, pgY = pigeonPerches[0].y;
@@ -3448,6 +3455,9 @@
                 }
 
                 // ── Eagle (perched, nodding to beat) ──
+                // Re-read title rect every frame so eagle sticks to BOOK US
+                // even after font loads / layout shifts.
+                updateEaglePerch();
                 // Nod: ~2 Hz (≈120bpm), amplitude ±1 grid unit
                 const nod = Math.round(Math.sin(t * 4.2) * 1);
                 drawPubEagle(eaglePerchX, eaglePerchY, nod);
