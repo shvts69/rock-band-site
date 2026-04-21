@@ -638,13 +638,17 @@
 @media (max-width: 768px) {
     .shows-carousel { gap: 10px; padding: 0 6px; justify-content: center; }
     .shows-carousel .photo-gallery {
-        width: 130px;          /* 110 frame + 10 padding each side — exactly one item */
+        width: 160px;          /* 140 frame + 10 padding each side */
         padding: 10px 10px;
         gap: 12px;
         justify-content: flex-start;
     }
     .shows-carousel .gallery-item {
-        flex: 0 0 110px;       /* match frame width — kill the 240px desktop dead space */
+        flex: 0 0 140px;
+    }
+    .gallery-frame {
+        width: 140px;
+        height: 135px;
     }
     .shows-arrow {
         width: 32px;
@@ -1047,8 +1051,8 @@
     }
 
     .gallery-frame {
-        width: 110px;
-        height: 85px;
+        width: 140px;
+        height: 135px;
     }
 
     .gallery-caption {
