@@ -80,8 +80,16 @@
         });
     }
 
-    // Reset scroll — backup for in-app browsers (Telegram etc.) that restore late
+    // Reset scroll — backup for in-app browsers (Telegram etc.) that restore late.
+    // Bail out once the user has interacted so we don't yank them back mid-scroll.
+    let userInteracted = false;
+    function markInteracted() { userInteracted = true; }
+    ['wheel', 'touchstart', 'keydown', 'mousedown', 'pointerdown'].forEach(function(ev) {
+        window.addEventListener(ev, markInteracted, { passive: true, once: true });
+    });
+
     function resetScroll() {
+        if (userInteracted) return;
         window.scrollTo(0, 0);
         if (wrapper) wrapper.scrollLeft = 0;
     }

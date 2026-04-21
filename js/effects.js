@@ -614,7 +614,7 @@
             const sr = section.getBoundingClientRect();
             const lr = logo.getBoundingClientRect();
             perchX = (lr.left + lr.width / 2 - sr.left) / PIXEL;
-            const perchOffset = window.innerWidth <= 768 ? 2 : 8;
+            const perchOffset = 6;
             perchY = (lr.top - sr.top) / PIXEL - perchOffset;
         }
 
@@ -640,6 +640,7 @@
                 diveStartX = eagleX;
                 diveStartY = eagleBaseY;
                 diveProgress = 0;
+                if (window.EasterEggs) window.EasterEggs.find('eagle');
             }
         });
 
@@ -879,10 +880,8 @@
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
         ctx.imageSmoothingEnabled = false;
 
-        // Plane 1: left to right
+        // Plane 1: left to right (single plane)
         const plane1 = { x: -20, y: H * 0.06, speed: 0.18, angle: 0.001 };
-        // Plane 2: right to left
-        const plane2 = { x: W + 20, y: H * 0.04, speed: -0.15, angle: -0.001 };
 
         function drawPlane(px, py, facingRight) {
             const x = Math.floor(px);
@@ -912,46 +911,32 @@
             const t = Date.now() * 0.001;
             beaconPhase = t;
 
-            // Move planes
+            // Move plane
             plane1.x += plane1.speed;
             plane1.y += plane1.angle;
-            plane2.x += plane2.speed;
-            plane2.y += plane2.angle;
 
             // Keep in safe zone: top 12% only
             if (plane1.y > H * 0.12) plane1.y = H * 0.12;
             if (plane1.y < H * 0.03) plane1.y = H * 0.03;
-            if (plane2.y > H * 0.10) plane2.y = H * 0.10;
-            if (plane2.y < H * 0.02) plane2.y = H * 0.02;
 
             // Loop
             if (plane1.x > W + 25) { plane1.x = -25; plane1.y = H * 0.05 + Math.random() * H * 0.04; }
-            if (plane2.x < -25) { plane2.x = W + 25; plane2.y = H * 0.03 + Math.random() * H * 0.04; }
 
             drawPlane(plane1.x, plane1.y, true);
-            drawPlane(plane2.x, plane2.y, false);
 
-            // Blinking beacon lights
+            // Blinking beacon light
             const blink = Math.sin(beaconPhase * 4) > 0.3;
             if (blink) {
-                // Plane 1 beacon — red
                 ctx.fillStyle = '#ff2200';
                 ctx.fillRect(Math.floor(plane1.x), Math.floor(plane1.y) - 2, 1, 1);
                 ctx.fillStyle = 'rgba(255,34,0,0.3)';
                 ctx.fillRect(Math.floor(plane1.x) - 1, Math.floor(plane1.y) - 2, 3, 1);
-
-                // Plane 2 beacon — red
-                ctx.fillStyle = '#ff2200';
-                ctx.fillRect(Math.floor(plane2.x), Math.floor(plane2.y) - 2, 1, 1);
-                ctx.fillStyle = 'rgba(255,34,0,0.3)';
-                ctx.fillRect(Math.floor(plane2.x) - 1, Math.floor(plane2.y) - 2, 3, 1);
             }
 
             // White strobe (faster blink)
             if (Math.sin(beaconPhase * 8) > 0.7) {
                 ctx.fillStyle = '#fff';
                 ctx.fillRect(Math.floor(plane1.x) + 1, Math.floor(plane1.y), 1, 1);
-                ctx.fillRect(Math.floor(plane2.x) - 1, Math.floor(plane2.y), 1, 1);
             }
 
             requestAnimationFrame(animate);
@@ -1053,6 +1038,7 @@
                 jumpVel = -2.5;
                 jumpOffY = 0;
                 flipAngle = 0;
+                if (window.EasterEggs) window.EasterEggs.find('pigeon');
             }
         });
 
@@ -1303,6 +1289,7 @@
                 jumpVel = -2.2;
                 jumpOffY = 0;
                 flipAngle = 0;
+                if (window.EasterEggs) window.EasterEggs.find('rat');
             }
         });
 
@@ -1511,6 +1498,7 @@
             const ffx = Math.floor(ferryX);
             const ffy = Math.floor(ferryY + bob);
             if (mx > ffx - 3 && mx < ffx + 24 && my > ffy - 10 && my < ffy + 8) {
+                if (window.EasterEggs) window.EasterEggs.find('ferry');
                 // Spawn smoke rings from both smokestacks
                 for (let s = 0; s < 2; s++) {
                     const stackX = ffx + (s === 0 ? 8 : 14);
@@ -1787,13 +1775,19 @@
         const heliY = Math.floor(H * 0.18);
 
         // Slight hover bobbing
-        let hoveredItem = -1;
+        let hoveredEl = null;
 
-        // Track which gallery item is hovered
-        const galleryItems = document.querySelectorAll('.section-live .gallery-item');
-        galleryItems.forEach((item, idx) => {
-            item.addEventListener('mouseenter', () => { hoveredItem = idx; });
-            item.addEventListener('mouseleave', () => { hoveredItem = -1; });
+        // Event delegation on section-live: works for dynamically-added items (shows.js)
+        section.addEventListener('mouseover', (e) => {
+            const item = e.target.closest('.gallery-item');
+            if (item && section.contains(item)) hoveredEl = item;
+        });
+        section.addEventListener('mouseout', (e) => {
+            const item = e.target.closest('.gallery-item');
+            if (!item) return;
+            const related = e.relatedTarget;
+            if (related && item.contains(related)) return;
+            if (hoveredEl === item) hoveredEl = null;
         });
 
         function drawPixel(x, y, color) {
@@ -2025,10 +2019,9 @@
             const hy = Math.floor(heliY + bobY);
 
             // Draw spotlight if hovering a gallery item
-            if (hoveredItem >= 0 && hoveredItem < galleryItems.length) {
-                const item = galleryItems[hoveredItem];
+            if (hoveredEl && document.contains(hoveredEl)) {
                 const sectionRect = section.getBoundingClientRect();
-                const itemRect = item.getBoundingClientRect();
+                const itemRect = hoveredEl.getBoundingClientRect();
 
                 // Target = center of frame
                 const targetPxX = (itemRect.left + itemRect.width / 2) - sectionRect.left;
@@ -2086,6 +2079,7 @@
             // Click near statue (generous zone)
             const dist = Math.sqrt((mx - statueX) ** 2 + (my - (waterY - 15)) ** 2);
             if (dist < 25 && !rocket) {
+                if (window.EasterEggs) window.EasterEggs.find('liberty');
                 rocket = {
                     x: torchX,
                     y: torchY,
@@ -2307,6 +2301,7 @@
             const mx = (e.clientX - rect.left) / PIXEL;
             const my = (e.clientY - rect.top) / PIXEL;
             if (mx > logoX - 5 && mx < logoX + logoTotalW + 5 && my > logoY - 5 && my < logoY + logoH + 5) {
+                if (window.EasterEggs) window.EasterEggs.find('logo');
                 const count = 3 + Math.floor(Math.random() * 3);
                 for (let i = 0; i < count; i++) {
                     const startX = logoCX + (Math.random() - 0.5) * 20;
@@ -2749,7 +2744,30 @@
         }
 
         function drawBarTop() {
-            // Marble bar top surface
+            // Wood apron under marble — hides musicians' (z-index 56) body below
+            // the counter so they appear behind the bar. Sized to the portion
+            // that extends below barTop only (~10 grid rows), NOT to section floor.
+            const apronTop = barTop + 3;
+            const apronH = 10;
+            const apronBottom = apronTop + apronH;
+            for (let y = apronTop; y < apronBottom; y++) {
+                const tt = (y - apronTop) / apronH;
+                const c = Math.max(0, Math.floor(20 - tt * 10));
+                ctx.fillStyle = `rgb(${c + 2},${Math.max(0, c - 1)},${Math.max(0, c - 4)})`;
+                ctx.fillRect(barLeft-1, y, barW+2, 1);
+            }
+            // Vertical wood grain hints
+            for (let x = barLeft; x < barRight; x += 7) {
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                ctx.fillRect(x, apronTop, 1, apronH);
+            }
+            // Upper trim under marble, bottom brass rail
+            ctx.fillStyle = '#6a5828';
+            ctx.fillRect(barLeft-1, apronTop, barW+2, 1);
+            ctx.fillStyle = '#aa8822';
+            ctx.fillRect(barLeft-1, apronBottom - 1, barW+2, 1);
+
+            // Marble bar top surface (original)
             ctx.fillStyle = '#333340';
             ctx.fillRect(barLeft-1, barTop-1, barW+2, 1);
             ctx.fillStyle = '#1a1a22';
@@ -2847,6 +2865,280 @@
                 glasses[2].x = centerX+5; glasses[2].arrived = false;
             }
 
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+    }
+
+    // ====== PUB CROWD — appears only after all 6 easter eggs found ======
+    // Pixel-art crowd on the dancefloor behind musicians, bobbing to the beat.
+    function initPubCrowd() {
+        const P = 4;
+        const STRIPE = '#e8e8e8';
+        const section = document.querySelector('.section-pub');
+        if (!section) return;
+        const parent = section.querySelector('.pub-bg');
+        if (!parent) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:55;display:none;';
+        parent.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width / P;
+        const H = canvas.height / P;
+        ctx.imageSmoothingEnabled = false;
+        ctx.setTransform(P, 0, 0, P, 0, 0);
+
+        const isMobilePub = window.innerWidth <= 768;
+        const barY = Math.floor(H * (isMobilePub ? 0.895 : 0.855));
+        const barH = 10;
+        const barTop = barY - barH;
+        const barLeft = Math.floor(W * 0.12);
+        const barRight = Math.floor(W * 0.88);
+        const barW = barRight - barLeft;
+
+        // Varied palettes — skin tones, hair colors, shirt colors
+        const PALS = [
+            { skin:'#e8b87a', skinDk:'#c49458', skinLt:'#f5d4a0', hair:'#ff3388', hairHi:'#ff66aa', shirt:'#1a1a1a', shirtHi:'#303030', shirtDk:'#0a0a0a', eye:'#1a2a3a' },
+            { skin:'#c08855', skinDk:'#946434', skinLt:'#d8a070', hair:'#ffcc22', hairHi:'#ffee66', shirt:'#cc2233', shirtHi:'#ee4455', shirtDk:'#880818', eye:'#2a1a0a' },
+            { skin:'#e8b87a', skinDk:'#c49458', skinLt:'#f5d4a0', hair:'#44bb88', hairHi:'#66dd99', shirt:'#224488', shirtHi:'#3366aa', shirtDk:'#112266', eye:'#1a1a2a' },
+            { skin:'#9a6b3d', skinDk:'#784a20', skinLt:'#b8854a', hair:'#111111', hairHi:'#2a2a2a', shirt:'#bb5500', shirtHi:'#dd7722', shirtDk:'#884400', eye:'#2a1a0a' },
+            { skin:'#e8b87a', skinDk:'#c49458', skinLt:'#f5d4a0', hair:'#bb3333', hairHi:'#cc5555', shirt:'#cccc44', shirtHi:'#eeee66', shirtDk:'#999922', eye:'#1a2a3a' },
+            { skin:'#d9a877', skinDk:'#b58855', skinLt:'#eac090', hair:'#6622cc', hairHi:'#8844ee', shirt:'#228877', shirtHi:'#44aa99', shirtDk:'#115544', eye:'#1a3020' }
+        ];
+        const OUT = '#080808';
+
+        const wallTop = Math.floor(H * 0.06);
+        const wallBot = Math.floor(H * 0.62);
+        const shelfY = wallBot - 24;
+        const crowdY = shelfY + 22; // between bottles and bar — dancefloor
+
+        const crowdCount = isMobilePub ? 4 : 6;
+        const crowd = [];
+        for (let i = 0; i < crowdCount; i++) {
+            crowd.push({
+                x: Math.floor(barLeft + 10 + i * ((barW - 22) / Math.max(1, crowdCount - 1))) - 9,
+                y: crowdY,
+                phase: i * 0.9,
+                speed: 2.6 + (i % 3) * 0.5,
+                palIdx: i % PALS.length,
+                hairIdx: i % 6
+            });
+        }
+
+        function pp(x, y, c) { if (!c) return; ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); }
+        function hh(x, y, l, c) { if (!c) return; ctx.fillStyle = c; ctx.fillRect(x, y, l, 1); }
+
+        function drawHair(ox, oy, p, style) {
+            const h = p.hair, hi = p.hairHi;
+            if (style === 0) {
+                // Mohawk — tall center
+                hh(ox+8, oy-5, 2, h);
+                hh(ox+8, oy-4, 2, h); pp(ox+8, oy-4, hi);
+                hh(ox+7, oy-3, 4, h); pp(ox+8, oy-3, hi);
+                hh(ox+7, oy-2, 4, h);
+                hh(ox+6, oy-1, 6, h); pp(ox+8, oy-1, hi);
+                hh(ox+5, oy+0, 8, h);
+                hh(ox+5, oy+1, 8, h); pp(ox+6, oy+1, hi);
+                hh(ox+5, oy+2, 8, h);
+                hh(ox+5, oy+3, 8, h);
+            } else if (style === 1) {
+                // Spiky short
+                pp(ox+4, oy-1, h); pp(ox+7, oy-2, h); pp(ox+10, oy-1, h); pp(ox+13, oy-2, h);
+                hh(ox+4, oy+0, 10, h); pp(ox+5, oy+0, hi); pp(ox+9, oy+0, hi);
+                hh(ox+3, oy+1, 12, h); pp(ox+7, oy+1, hi);
+                hh(ox+3, oy+2, 12, h);
+                hh(ox+3, oy+3, 12, h);
+            } else if (style === 2) {
+                // Long hair — frames face, drops down sides
+                hh(ox+4, oy-1, 10, h); pp(ox+6, oy-1, hi);
+                hh(ox+3, oy+0, 12, h); pp(ox+5, oy+0, hi);
+                hh(ox+2, oy+1, 14, h);
+                hh(ox+2, oy+2, 14, h);
+                hh(ox+2, oy+3, 14, h);
+                for (let r = 4; r <= 10; r++) {
+                    pp(ox+2, oy+r, h); pp(ox+3, oy+r, h);
+                    pp(ox+14, oy+r, h); pp(ox+15, oy+r, h);
+                }
+                pp(ox+2, oy+11, h); pp(ox+15, oy+11, h);
+            } else if (style === 3) {
+                // Ponytail trailing right
+                hh(ox+4, oy+0, 10, h); pp(ox+6, oy+0, hi);
+                hh(ox+3, oy+1, 12, h);
+                hh(ox+3, oy+2, 12, h);
+                hh(ox+3, oy+3, 12, h);
+                pp(ox+15, oy+4, h); pp(ox+16, oy+5, h); pp(ox+16, oy+6, h);
+                pp(ox+15, oy+7, h); pp(ox+15, oy+8, h); pp(ox+16, oy+8, hi);
+            } else if (style === 4) {
+                // Buzzed / nearly bald
+                hh(ox+5, oy+2, 8, h); pp(ox+7, oy+2, hi); pp(ox+10, oy+2, hi);
+                hh(ox+4, oy+3, 10, h);
+            } else {
+                // Beanie / cap
+                hh(ox+4, oy-1, 10, h);
+                hh(ox+3, oy+0, 12, h); pp(ox+5, oy+0, hi); pp(ox+6, oy+0, hi);
+                hh(ox+3, oy+1, 12, h);
+                hh(ox+3, oy+2, 12, h);
+                hh(ox+3, oy+3, 12, OUT);
+            }
+        }
+
+        function drawPerson(ox, oy, p, hairStyle) {
+            const S = p.shirt, SH = p.shirtHi, SD = p.shirtDk;
+
+            drawHair(ox, oy, p, hairStyle);
+
+            // Face
+            pp(ox+3, oy+4, OUT); hh(ox+4, oy+4, 10, p.skinLt); pp(ox+14, oy+4, OUT);
+            pp(ox+3, oy+5, OUT); pp(ox+4, oy+5, p.skin);
+            hh(ox+5, oy+5, 3, OUT); pp(ox+8, oy+5, p.skin); pp(ox+9, oy+5, p.skin);
+            hh(ox+10, oy+5, 3, OUT); pp(ox+13, oy+5, p.skin); pp(ox+14, oy+5, OUT);
+            pp(ox+3, oy+6, OUT); pp(ox+4, oy+6, p.skin);
+            pp(ox+5, oy+6, STRIPE); pp(ox+6, oy+6, STRIPE); pp(ox+7, oy+6, p.eye);
+            pp(ox+8, oy+6, p.skin); pp(ox+9, oy+6, p.skin);
+            pp(ox+10, oy+6, STRIPE); pp(ox+11, oy+6, STRIPE); pp(ox+12, oy+6, p.eye);
+            pp(ox+13, oy+6, p.skin); pp(ox+14, oy+6, OUT);
+            pp(ox+3, oy+7, OUT); hh(ox+4, oy+7, 10, p.skin); pp(ox+14, oy+7, OUT);
+            pp(ox+3, oy+8, OUT); hh(ox+4, oy+8, 4, p.skin);
+            pp(ox+8, oy+8, p.skinDk); pp(ox+9, oy+8, p.skinDk);
+            hh(ox+10, oy+8, 4, p.skin); pp(ox+14, oy+8, OUT);
+            pp(ox+4, oy+9, OUT); hh(ox+5, oy+9, 3, p.skin);
+            pp(ox+8, oy+9, '#994433'); pp(ox+9, oy+9, '#994433');
+            hh(ox+10, oy+9, 3, p.skin); pp(ox+13, oy+9, OUT);
+            pp(ox+5, oy+10, OUT); hh(ox+6, oy+10, 6, p.skinDk); pp(ox+12, oy+10, OUT);
+
+            // Neck
+            hh(ox+7, oy+11, 4, p.skinDk);
+
+            // Shirt (visible above bar — feet hidden by bar counter)
+            pp(ox+1, oy+12, OUT);
+            hh(ox+2, oy+12, 14, S); pp(ox+2, oy+12, SH); pp(ox+15, oy+12, SH);
+            pp(ox+16, oy+12, OUT);
+            pp(ox+0, oy+13, OUT);
+            hh(ox+1, oy+13, 16, S); pp(ox+1, oy+13, SH); pp(ox+16, oy+13, SD);
+            pp(ox+17, oy+13, OUT);
+            for (let r = 14; r <= 16; r++) {
+                pp(ox+0, oy+r, OUT);
+                hh(ox+1, oy+r, 16, S);
+                pp(ox+1, oy+r, SH);
+                pp(ox+16, oy+r, SD);
+                pp(ox+17, oy+r, OUT);
+            }
+            // Arms raised in dance (swaying)
+            pp(ox+0, oy+12, OUT); pp(ox+17, oy+12, OUT);
+            pp(ox+0, oy+11, p.skinDk); pp(ox+17, oy+11, p.skinDk);
+
+            // ── Pants (dark jeans) — two legs with gap ──
+            const PC = '#14141e';
+            const PH = '#2a2a38';
+            for (let r = 17; r <= 21; r++) {
+                pp(ox+3, oy+r, OUT);
+                hh(ox+4, oy+r, 4, PC); pp(ox+4, oy+r, PH);
+                pp(ox+8, oy+r, OUT);
+                pp(ox+9, oy+r, OUT);
+                hh(ox+10, oy+r, 4, PC); pp(ox+10, oy+r, PH);
+                pp(ox+14, oy+r, OUT);
+            }
+            // Pants bottom (cuff)
+            pp(ox+3, oy+22, OUT);
+            hh(ox+4, oy+22, 4, PC);
+            pp(ox+8, oy+22, OUT);
+            pp(ox+9, oy+22, OUT);
+            hh(ox+10, oy+22, 4, PC);
+            pp(ox+14, oy+22, OUT);
+
+            // ── Shoes ──
+            const SHOE = '#0a0a0a';
+            const SHOE_HI = '#1a1a1a';
+            pp(ox+2, oy+23, OUT);
+            hh(ox+3, oy+23, 5, SHOE); pp(ox+4, oy+23, SHOE_HI);
+            pp(ox+8, oy+23, OUT);
+            pp(ox+9, oy+23, OUT);
+            hh(ox+10, oy+23, 5, SHOE); pp(ox+11, oy+23, SHOE_HI);
+            pp(ox+15, oy+23, OUT);
+            pp(ox+2, oy+24, OUT);
+            hh(ox+3, oy+24, 5, SHOE);
+            pp(ox+8, oy+24, OUT);
+            pp(ox+9, oy+24, OUT);
+            hh(ox+10, oy+24, 5, SHOE);
+            pp(ox+15, oy+24, OUT);
+        }
+
+        function updateVisibility() {
+            const show = document.body.classList.contains('egg-party');
+            canvas.style.display = show ? 'block' : 'none';
+        }
+        updateVisibility();
+        window.addEventListener('easterEggsComplete', updateVisibility);
+        const visInterval = setInterval(updateVisibility, 1000);
+
+        // ── Ceiling spotlights: colored cones from ceiling to dancefloor ──
+        const spots = [
+            { baseX: Math.floor(W * 0.22), color: [255, 90, 210], phase: 0.0 },
+            { baseX: Math.floor(W * 0.50), color: [90, 220, 255], phase: 1.5 },
+            { baseX: Math.floor(W * 0.78), color: [255, 210, 80], phase: 3.0 }
+        ];
+        const ceilY = wallTop + 2;
+        const beamEndY = crowdY + 22; // hits dancefloor level
+
+        function drawSpotlights(t) {
+            const maxSway = Math.floor(W * 0.08);
+            spots.forEach(s => {
+                const sway = Math.sin(t * 1.3 + s.phase) * maxSway;
+                const tgtX = s.baseX + sway;
+                const r = s.color[0], g = s.color[1], b = s.color[2];
+
+                // Ceiling fixture (housing + bulb)
+                ctx.fillStyle = '#0a0a0a';
+                ctx.fillRect(s.baseX - 3, ceilY - 4, 7, 4);
+                ctx.fillStyle = '#2a2a2a';
+                ctx.fillRect(s.baseX - 2, ceilY - 3, 5, 1);
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                ctx.fillRect(s.baseX - 1, ceilY, 3, 1);
+
+                // Beam cone
+                const beamLen = beamEndY - ceilY;
+                for (let yy = 0; yy < beamLen; yy++) {
+                    const prog = yy / beamLen;
+                    const cx = s.baseX + (tgtX - s.baseX) * prog;
+                    const half = 2 + prog * 11;
+                    const alpha = 0.11 * (1 - prog * 0.4);
+                    const halfI = Math.ceil(half);
+                    for (let dx = -halfI; dx <= halfI; dx++) {
+                        const edge = Math.abs(dx) / half;
+                        if (edge > 1) continue;
+                        const a = alpha * (1 - edge * edge);
+                        if (a < 0.015) continue;
+                        ctx.fillStyle = `rgba(${r},${g},${b},${a.toFixed(3)})`;
+                        ctx.fillRect(Math.floor(cx + dx), ceilY + yy, 1, 1);
+                    }
+                }
+
+                // Floor pool (elliptical glow)
+                const poolR = 11;
+                for (let dy = -3; dy <= 3; dy++) for (let dx = -poolR; dx <= poolR; dx++) {
+                    const d = Math.sqrt((dx / poolR) ** 2 + (dy / 3) ** 2);
+                    if (d > 1) continue;
+                    const a = 0.3 * (1 - d);
+                    ctx.fillStyle = `rgba(${r},${g},${b},${a.toFixed(3)})`;
+                    ctx.fillRect(Math.floor(tgtX + dx), beamEndY + dy, 1, 1);
+                }
+            });
+        }
+
+        function animate() {
+            if (canvas.style.display !== 'none') {
+                ctx.clearRect(0, 0, W, H);
+                const t = Date.now() / 1000;
+                drawSpotlights(t);
+                crowd.forEach(c => {
+                    const bob = Math.round(Math.sin(t * c.speed + c.phase) * 2);
+                    drawPerson(c.x, c.y + bob, PALS[c.palIdx], c.hairIdx);
+                });
+            }
             requestAnimationFrame(animate);
         }
         requestAnimationFrame(animate);
@@ -3355,6 +3647,30 @@
             px(ctx, 14, 6, '#fff');
             px(ctx, 13, 7, '#fff');
         });
+
+        // ── Facebook — blue rounded square with white "f" ──
+        drawIcon('iconFacebook', ctx => {
+            const R = 3;
+            for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+                let inside = true;
+                if (x < R && y < R) inside = Math.sqrt((x-R)**2 + (y-R)**2) <= R;
+                else if (x > S-1-R && y < R) inside = Math.sqrt((x-(S-1-R))**2 + (y-R)**2) <= R;
+                else if (x < R && y > S-1-R) inside = Math.sqrt((x-R)**2 + (y-(S-1-R))**2) <= R;
+                else if (x > S-1-R && y > S-1-R) inside = Math.sqrt((x-(S-1-R))**2 + (y-(S-1-R))**2) <= R;
+                if (!inside) continue;
+                const t = y / (S - 1);
+                ctx.fillStyle = t < 0.3 ? '#2d7ff9' : t < 0.7 ? '#1877f2' : '#0e5ec9';
+                ctx.fillRect(x, y, 1, 1);
+            }
+            rect(ctx, 3, 0, S-6, 1, '#0a4fa8');
+            rect(ctx, 3, S-1, S-6, 1, '#083d80');
+            rect(ctx, 0, 3, 1, S-6, '#0a4fa8');
+            rect(ctx, S-1, 3, 1, S-6, '#083d80');
+            // White "f" — stem + top flag + crossbar
+            rect(ctx, 10, 5, 2, 11, '#fff');   // vertical stem
+            rect(ctx, 12, 5, 2, 2, '#fff');    // top curl
+            rect(ctx, 8, 9, 4, 2, '#fff');     // crossbar
+        });
     }
 
     // ====== INIT ======
@@ -3381,6 +3697,7 @@
         initMusicIcons();
         initSocialIcons();
         initPubBar();
+        initPubCrowd();
     }
 
 
