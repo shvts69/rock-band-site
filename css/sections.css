@@ -1174,12 +1174,12 @@
     .site-footer {
         font-size: 5px;
         padding: 0 100px;
-        gap: 4px;
-        bottom: 6px;
+        gap: 0;
+        bottom: 2px;
         letter-spacing: 1px;
         line-height: 1.6;
     }
-    .site-footer-logo { width: 24px; height: 24px; }
+    .site-footer-logo { display: none; }
 }
 
 /* ====== PIXEL TOAST ====== */
