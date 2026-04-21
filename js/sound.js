@@ -4,12 +4,9 @@
 (function () {
     'use strict';
 
-    // v2: bumped from v1 so users who were auto-opted-in under the old
-    // default-ON logic get a clean default-OFF on next load.
-    const STORAGE_KEY = 'rs5051_sound_v2';
     const HINT_KEY = 'rs5051_sound_hint_seen_v1';
-    // Default OFF — respects autoplay etiquette; user opts in via toggle.
-    let enabled = localStorage.getItem(STORAGE_KEY) === '1';
+    // Always start muted on every page load (user asked for no persistence).
+    let enabled = false;
     let ctx = null;
     let btn = null;
 
@@ -162,7 +159,6 @@
 
     function setEnabled(v) {
         enabled = !!v;
-        try { localStorage.setItem(STORAGE_KEY, enabled ? '1' : '0'); } catch (e) { /* ignore */ }
         renderBtn();
     }
 
