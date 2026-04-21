@@ -1211,7 +1211,7 @@
    ============================================================ */
 .track-player {
     position: absolute;
-    top: 47%;
+    top: 42%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: min(300px, 72%);
