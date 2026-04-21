@@ -1382,8 +1382,18 @@
     box-shadow: 0 3px 0 #000, 0 0 12px rgba(255, 204, 51, 0.7);
 }
 
+/* Narrow viewports: hide progress bar, shrink player to compact 2-row layout */
+@media (max-width: 1024px) {
+    .tp-progress { display: none; }
+    .tp-screen   { margin-bottom: 6px; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .track-player { width: min(230px, 88%); padding: 8px 10px 10px; }
+}
+
 @media (max-width: 768px) {
-    .track-player  { width: min(320px, 90%); padding: 9px 10px 10px; margin: 0; }
+    .track-player  { width: min(230px, 88%); padding: 8px 10px 10px; margin: 0; }
     .tp-screen     { padding: 6px 8px; min-height: 22px; gap: 8px; }
     .tp-title      { font-size: 8px; letter-spacing: 0; }
     .tp-time       { font-size: 7px; }
