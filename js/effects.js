@@ -3434,7 +3434,21 @@
                         const arcH = Math.min(Math.abs(pgEndX - pgStartX) * 0.15, 12);
                         pgY = pgStartY + (pgEndY - pgStartY) * eased - Math.sin(ft * Math.PI) * arcH;
                     }
-                    drawPigeonSprite(pgX, pgY, (t * 8) % 1, pgFacingRight, true);
+                    // Mid-flight somersault: one full 360° rotation at the
+                    // apex of the arc so the pigeon flips on its own.
+                    const FLIP_START = 0.40, FLIP_END = 0.62;
+                    if (pgProgress > FLIP_START && pgProgress < FLIP_END) {
+                        const fp = (pgProgress - FLIP_START) / (FLIP_END - FLIP_START);
+                        const airAngle = fp * Math.PI * 2;
+                        ctx.save();
+                        ctx.translate(pgX, pgY);
+                        ctx.rotate(pgFacingRight ? -airAngle : airAngle);
+                        ctx.translate(-pgX, -pgY);
+                        drawPigeonSprite(pgX, pgY, (t * 8) % 1, pgFacingRight, true);
+                        ctx.restore();
+                    } else {
+                        drawPigeonSprite(pgX, pgY, (t * 8) % 1, pgFacingRight, true);
+                    }
                 }
 
                 // ── Rat ──
