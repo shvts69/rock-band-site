@@ -48,6 +48,7 @@
             '<div class="egg-finale-inner">' +
             '<h2 class="egg-finale-title">\uD83C\uDF89 You now know this city \uD83C\uDF89</h2>' +
             '<p class="egg-finale-msg">All secrets revealed.</p>' +
+            '<p class="egg-finale-unlock">🍺 Secret pub party unlocked — head back to the bar!</p>' +
             '<p class="egg-finale-sub">Welcome to the real 5051.</p>' +
             '<button type="button" class="egg-finale-close">close</button>' +
             '</div>';
