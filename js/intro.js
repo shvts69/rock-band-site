@@ -81,7 +81,13 @@
         };
     }
 
+    let played = false;
+    let safetyTimer = null;
+
     function playIntro() {
+        if (played) return;
+        played = true;
+        if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
         try { sessionStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* ignore */ }
         const overlay = build();
         requestAnimationFrame(() => overlay.classList.add('intro-show'));
@@ -127,7 +133,7 @@
         });
         obs.observe(document.body, { childList: true, subtree: false, attributes: true, attributeFilter: ['class'] });
         obs.observe(loader, { attributes: true, attributeFilter: ['class'] });
-        setTimeout(() => { obs.disconnect(); if (document.querySelector('.intro-cutscene')) return; playIntro(); }, 6000);
+        safetyTimer = setTimeout(() => { obs.disconnect(); if (document.querySelector('.intro-cutscene')) return; playIntro(); }, 6000);
     }
 
     if (document.readyState === 'loading') {
