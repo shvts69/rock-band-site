@@ -2672,7 +2672,7 @@
         const barW = barRight - barLeft;
 
         // Beer glasses — offset to musicians' right so beer doesn't cover faces
-        const beerOffset = isMobilePub ? 0 : 10;
+        const beerOffset = 10;
         const glasses = [
             { targetX: centerX - 32 + beerOffset, x: centerX + 18, arrived: false, delay: 0 },
             { targetX: centerX + beerOffset, x: centerX - 22, arrived: false, delay: 500 },
