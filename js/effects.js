@@ -2672,15 +2672,16 @@
         const barW = barRight - barLeft;
 
         // Beer glasses — offset to musicians' right so beer doesn't cover faces.
-        // On mobile the rightmost musician is near the bar edge, so pushing his
-        // beer a full +offset to the right creates a visually big gap and runs
-        // off the bar. Use per-glass offsets on mobile: keep L/M at +7, but
-        // nudge the right one only +2 so it sits close to the face.
-        const [oL, oM, oR] = isMobilePub ? [7, 7, 2] : [10, 10, 10];
+        // Mobile: the band-walkers canvas is scaled to 0.65 around its center
+        // (see style.css .band-walkers canvas), so the outer musicians are
+        // visually pulled inward. Shrink the L/R musician spread by the same
+        // 0.65 factor and use a smaller offset so beers land next to faces.
+        const spread = isMobilePub ? 21 : 32;
+        const beerOffset = isMobilePub ? 6 : 10;
         const glasses = [
-            { targetX: centerX - 32 + oL, x: centerX + 18, arrived: false, delay: 0 },
-            { targetX: centerX + oM, x: centerX - 22, arrived: false, delay: 500 },
-            { targetX: centerX + 32 + oR, x: centerX + 5, arrived: false, delay: 1000 },
+            { targetX: centerX - spread + beerOffset, x: centerX + 18, arrived: false, delay: 0 },
+            { targetX: centerX + beerOffset, x: centerX - 22, arrived: false, delay: 500 },
+            { targetX: centerX + spread + beerOffset, x: centerX + 5, arrived: false, delay: 1000 },
         ];
         let started = false;
         let startTime = 0;
