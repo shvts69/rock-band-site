@@ -180,27 +180,30 @@
 
     window.EasterEggs = { find, isFound, count, all, reset, CATEGORIES: [...CATEGORIES] };
 
-    // ─── Hint button — temporary highlight of all undiscovered eggs ────
-    const HINT_DURATION_MS = 15000;
+    // ─── Hint button — toggles highlighting of all undiscovered eggs ────
+    // Toggle, not a timer. On mobile the user needs time to swipe across
+    // all 5 sections; any timer would expire mid-search. Re-clicking the
+    // button turns the glow off.
     const MODAL_AUTO_CLOSE_MS = 3500;
-    let hintTimer = null;
     let modalTimer = null;
     window._eggHintActive = false;
+
+    function toggleHint() {
+        if (window._eggHintActive) deactivateHint();
+        else activateHint();
+    }
 
     function activateHint() {
         window._eggHintActive = true;
         const btn = document.getElementById('hintBtn');
         if (btn) btn.classList.add('active');
         showHintModal();
-        clearTimeout(hintTimer);
-        hintTimer = setTimeout(deactivateHint, HINT_DURATION_MS);
     }
 
     function deactivateHint() {
         window._eggHintActive = false;
         const btn = document.getElementById('hintBtn');
         if (btn) btn.classList.remove('active');
-        clearTimeout(hintTimer);
     }
 
     function showHintModal() {
@@ -222,7 +225,7 @@
 
     function wireHintButton() {
         const btn = document.getElementById('hintBtn');
-        if (btn) btn.addEventListener('click', activateHint);
+        if (btn) btn.addEventListener('click', toggleHint);
         const modal = document.getElementById('hintModal');
         if (modal) {
             const closeBtn = modal.querySelector('.hint-modal-close');
@@ -231,6 +234,13 @@
                 if (e.target === modal) hideHintModal();
             });
         }
+        // Auto-disable once all 6 eggs are discovered
+        window.addEventListener('easterEggsChanged', function (e) {
+            if (!window._eggHintActive) return;
+            if (e.detail && e.detail.found && e.detail.found.length >= CATEGORIES.length) {
+                deactivateHint();
+            }
+        });
     }
 
     function start() {
