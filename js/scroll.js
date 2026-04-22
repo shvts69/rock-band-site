@@ -148,30 +148,29 @@
             initDesktop();
         }
 
-        // Live resize — recompute road geometry + desktop scroll mapping in
-        // place, no page reload. Mobile/desktop transitions across the 768px
-        // breakpoint still require a reload (the scroll engine is totally
-        // different between modes). Crossing breakpoints isn't a normal user
-        // flow, so that's acceptable.
+        // Reload on resize. Canvases (home-bg, stage-bg, eagle overlay,
+        // pigeon overlay, stage-instruments, etc.) are sized once at init
+        // and don't all reflow cleanly in place — live resize produced
+        // blank home-bg, stretched instruments, and mid-section translateX
+        // on the real site. Reload gives every canvas a clean init at the
+        // new viewport. Debounced so a resize drag doesn't trigger
+        // multiple reloads mid-movement. Ignore tiny <80px shifts
+        // (scrollbar auto-show, browser chrome toggle) to avoid needless
+        // reloads.
+        const RELOAD_MIN_DELTA = 80;
+        let lastW = window.innerWidth;
+        let lastH = window.innerHeight;
         let resizeTimer = null;
-        let lastWasMobile = isMobile;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                const nowMobile = window.innerWidth <= 768;
-                if (nowMobile !== lastWasMobile) {
-                    lastWasMobile = nowMobile;
-                    location.reload();
-                    return;
-                }
-                positionRoads();
-                if (!nowMobile) {
-                    const totalWidth = wrapper.scrollWidth;
-                    maxScroll = totalWidth - window.innerWidth;
-                    document.body.style.height = totalWidth + 'px';
-                    onScrollDesktop();
-                }
-            }, 200);
+                const dw = Math.abs(window.innerWidth - lastW);
+                const dh = Math.abs(window.innerHeight - lastH);
+                if (dw < RELOAD_MIN_DELTA && dh < RELOAD_MIN_DELTA) return;
+                lastW = window.innerWidth;
+                lastH = window.innerHeight;
+                location.reload();
+            }, 250);
         });
     }
 
