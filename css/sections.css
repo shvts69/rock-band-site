@@ -184,6 +184,10 @@
 
 .member-info {
     order: -1;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
 .ornate-frame {
