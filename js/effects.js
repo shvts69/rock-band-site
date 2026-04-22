@@ -1818,14 +1818,32 @@
         parent.appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
-        const W = canvas.width / PIXEL;
-        const H = canvas.height / PIXEL;
+        let W = canvas.width / PIXEL;
+        let H = canvas.height / PIXEL;
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
         ctx.imageSmoothingEnabled = false;
 
         // Helicopter position — centered above gallery, under title
-        const heliX = Math.floor(W * 0.5);
-        const heliY = Math.floor(H * 0.18);
+        let heliX = Math.floor(W * 0.5);
+        let heliY = Math.floor(H * 0.18);
+
+        // Resize — spotlight tracks live mouse/DOM rects, so the canvas pixel
+        // grid must stay in sync with the section's CSS size after a window
+        // resize or beam will point off-target.
+        let heliResizeT;
+        window.addEventListener('resize', () => {
+            clearTimeout(heliResizeT);
+            heliResizeT = setTimeout(() => {
+                canvas.width = section.offsetWidth;
+                canvas.height = section.offsetHeight;
+                ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+                ctx.imageSmoothingEnabled = false;
+                W = canvas.width / PIXEL;
+                H = canvas.height / PIXEL;
+                heliX = Math.floor(W * 0.5);
+                heliY = Math.floor(H * 0.18);
+            }, 250);
+        });
 
         // Slight hover bobbing
         let hoveredEl = null;
