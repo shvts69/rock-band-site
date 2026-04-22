@@ -15,6 +15,7 @@
     <meta property="og:description" content="A pixel-art journey through NYC with a 3-piece punk band. Horizontal scroll, hidden secrets, 8-bit sound — built for rockers and explorers.">
     <meta property="og:url" content="https://rock-band-site.vercel.app/">
     <meta property="og:image" content="https://rock-band-site.vercel.app/images/og-image.png">
+    <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="5051 — pixel-art punk rock band — equalizer bars over a NYC skyline">
@@ -24,12 +25,44 @@
     <meta name="twitter:title" content="5051 — Punk Rock Band">
     <meta name="twitter:description" content="Pixel-art punk journey through NYC. Scroll, click, find secrets, rock out.">
     <meta name="twitter:image" content="https://rock-band-site.vercel.app/images/og-image.png">
+    <meta name="twitter:image:alt" content="5051 — pixel-art punk rock band — equalizer bars over a NYC skyline">
 
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="64x64" href="/images/favicon-64x64.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+
+    <!-- Structured data — MusicGroup schema for search/jury inspection -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MusicGroup",
+        "name": "5051",
+        "alternateName": "5051 NYC",
+        "url": "https://rock-band-site.vercel.app/",
+        "image": "https://rock-band-site.vercel.app/images/og-image.png",
+        "genre": ["Punk rock", "Belarusian punk"],
+        "description": "Belarusian punk band based in New York City. Three members — Ivan, Sasha, Denis — singing in Belarusian and Russian.",
+        "foundingLocation": {
+            "@type": "Place",
+            "name": "New York City, USA"
+        },
+        "member": [
+            { "@type": "Person", "name": "Ivan", "roleName": "Vocals, Guitar" },
+            { "@type": "Person", "name": "Sasha", "roleName": "Bass" },
+            { "@type": "Person", "name": "Denis", "roleName": "Drums" }
+        ],
+        "sameAs": [
+            "https://open.spotify.com/artist/2m5oYkK4jxOBeL59QO9Ia3",
+            "https://music.youtube.com/channel/UCC6rSp87G8xQ_HMTuf2egmA",
+            "https://music.apple.com/us/artist/5051/1450855842",
+            "https://www.youtube.com/@5051",
+            "https://instagram.com/5051nyc"
+        ]
+    }
+    </script>
 
     <!-- ═══ Force bass-guitar cursor everywhere, instantly (data URI, !important) ═══ -->
     <style>
@@ -277,7 +310,9 @@
                             <div class="frame-corner frame-bl"></div>
                             <div class="frame-corner frame-br"></div>
                             <div class="member-photo">
-                                <img class="member-img" src="images/denis.png?v=2" alt="Sasha — Bass" width="120" height="144">
+                                <div class="photo-placeholder" role="img" aria-label="Sasha — photo coming soon">
+                                    <span class="no-photo-text">No photo</span>
+                                </div>
                             </div>
                         </div>
                         <div class="member-info">
@@ -295,7 +330,9 @@
                             <div class="frame-corner frame-bl"></div>
                             <div class="frame-corner frame-br"></div>
                             <div class="member-photo">
-                                <img class="member-img" src="images/ivan.png?v=2" alt="Ivan — Vocals / Guitar" width="120" height="144">
+                                <div class="photo-placeholder" role="img" aria-label="Ivan — photo coming soon">
+                                    <span class="no-photo-text">No photo</span>
+                                </div>
                             </div>
                         </div>
                         <div class="member-info">
@@ -313,7 +350,9 @@
                             <div class="frame-corner frame-bl"></div>
                             <div class="frame-corner frame-br"></div>
                             <div class="member-photo">
-                                <img class="member-img" src="images/sasha.png?v=2" alt="Denis — Drums" width="120" height="144">
+                                <div class="photo-placeholder" role="img" aria-label="Denis — photo coming soon">
+                                    <span class="no-photo-text">No photo</span>
+                                </div>
                             </div>
                         </div>
                         <div class="member-info">

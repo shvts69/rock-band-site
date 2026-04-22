@@ -1,0 +1,35 @@
+{
+    "name": "5051 — Punk Rock Band",
+    "short_name": "5051",
+    "description": "Pixel-art journey through NYC with a 3-piece Belarusian punk band.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "landscape",
+    "theme_color": "#0a0608",
+    "background_color": "#0a0608",
+    "lang": "en",
+    "icons": [
+        {
+            "src": "/images/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/favicon-64x64.png",
+            "sizes": "64x64",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
