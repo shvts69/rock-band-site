@@ -34,7 +34,7 @@
         counter.setAttribute('aria-live', 'polite');
         counter.innerHTML =
             '<span class="egg-counter-icon">\uD83D\uDD0D</span>' +
-            '<span class="egg-counter-text">Secrets <b class="egg-count">0</b>/6 &mdash; explore the city</span>';
+            '<span class="egg-counter-text">Secrets <b class="egg-count">0</b>/6 &mdash; explore the road trip</span>';
         document.body.appendChild(counter);
 
         const toastHost = document.createElement('div');
