@@ -51,6 +51,39 @@
         });
     }
 
+    // Per-canvas resize registry — each init that has position state derived
+    // from canvas dims pushes a callback here. We fire the registry right
+    // after pixel-scenes.js finishes rebuilding its backgrounds (via the
+    // 'pixelScenesRebuilt' event it dispatches) so perch-rescans etc. see the
+    // new background canvas. Lets creatures (eagle, pigeon, rat, ferry,
+    // helicopter, stage logo) stay aligned with the live DOM after a resize
+    // without re-running init (which would duplicate event listeners).
+    const __fxResizers = [];
+    function __fxRunResizers() {
+        for (const fn of __fxResizers) {
+            try { fn(); } catch (_) { /* keep other resizers alive */ }
+        }
+    }
+    window.addEventListener('pixelScenesRebuilt', __fxRunResizers);
+    // Rescale a canvas to its section's current size and return old/new scale
+    // factors so the caller can reposition its state proportionally. Returns
+    // null when nothing changed (skip work).
+    function fxRescaleCanvas(canvas, section, PIXEL) {
+        const newCanvasW = section.offsetWidth;
+        const newCanvasH = section.offsetHeight;
+        if (canvas.width === newCanvasW && canvas.height === newCanvasH) return null;
+        const oldW = canvas.width / PIXEL;
+        const oldH = canvas.height / PIXEL;
+        canvas.width = newCanvasW;
+        canvas.height = newCanvasH;
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+        const newW = newCanvasW / PIXEL;
+        const newH = newCanvasH / PIXEL;
+        return { sx: newW / oldW, sy: newH / oldH, oldW, oldH, newW, newH };
+    }
+
     // ====== STAGE EFFECTS: flashes + moving spotlights ======
     function initRandomFlashes() {
         const PIXEL = 4;
@@ -496,8 +529,8 @@
         parent.appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
-        const W = canvas.width / PIXEL;
-        const H = canvas.height / PIXEL;
+        let W = canvas.width / PIXEL;
+        let H = canvas.height / PIXEL;
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
         ctx.imageSmoothingEnabled = false;
 
@@ -659,16 +692,28 @@
         // Logo perch position
         const logo = document.querySelector('.band-logo');
         let perchX = W * 0.5, perchY = H * 0.4;
-        if (logo) {
+        function recomputePerch() {
+            if (!logo) return;
             const sr = section.getBoundingClientRect();
             const lr = logo.getBoundingClientRect();
             perchX = (lr.left + lr.width / 2 - sr.left) / PIXEL;
             const perchOffset = 6;
             perchY = (lr.top - sr.top) / PIXEL - perchOffset;
         }
+        recomputePerch();
 
         let diveStartX, diveStartY, diveProgress;
         let eagleHover = false;
+
+        __fxResizers.push(() => {
+            const r = fxRescaleCanvas(canvas, section, PIXEL);
+            if (!r) return;
+            W = r.newW; H = r.newH;
+            eagleX *= r.sx;
+            eagleBaseY *= r.sy;
+            if (diveStartX !== undefined) { diveStartX *= r.sx; diveStartY *= r.sy; }
+            recomputePerch();
+        });
 
         section.addEventListener('mousemove', function(e) {
             const rect = section.getBoundingClientRect();
@@ -1008,43 +1053,46 @@
         parent.appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
-        const W = canvas.width / PIXEL;
-        const H = canvas.height / PIXEL;
+        let W = canvas.width / PIXEL;
+        let H = canvas.height / PIXEL;
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
         ctx.imageSmoothingEnabled = false;
 
-        // Scan background canvas to find real rooftop positions
-        const perches = [];
-        try {
-            const bgCanvas = parent.querySelector('canvas');
-            if (bgCanvas) {
-                const bgCtx = bgCanvas.getContext('2d');
-                for (let sx = 30; sx < canvas.width - 30; sx += 20 * PIXEL) {
-                    const col = bgCtx.getImageData(sx, 0, 1, canvas.height);
-                    let roofPixelY = -1;
-                    for (let py = Math.floor(canvas.height * 0.15); py < canvas.height * 0.8; py++) {
-                        const idx = py * 4;
-                        const r = col.data[idx];
-                        const g = col.data[idx + 1];
-                        const b = col.data[idx + 2];
-                        if (r > 60 && r > b && g < 80) {
-                            roofPixelY = py;
-                            break;
+        function computePerches() {
+            const out = [];
+            try {
+                const bgCanvas = parent.querySelector('.ps-scene-canvas') || parent.querySelector('canvas');
+                if (bgCanvas) {
+                    const bgCtx = bgCanvas.getContext('2d');
+                    for (let sx = 30; sx < canvas.width - 30; sx += 20 * PIXEL) {
+                        const col = bgCtx.getImageData(sx, 0, 1, canvas.height);
+                        let roofPixelY = -1;
+                        for (let py = Math.floor(canvas.height * 0.15); py < canvas.height * 0.8; py++) {
+                            const idx = py * 4;
+                            const r = col.data[idx];
+                            const g = col.data[idx + 1];
+                            const b = col.data[idx + 2];
+                            if (r > 60 && r > b && g < 80) {
+                                roofPixelY = py;
+                                break;
+                            }
+                        }
+                        if (roofPixelY > 0) {
+                            out.push({ x: sx / PIXEL, y: roofPixelY / PIXEL - 1 });
                         }
                     }
-                    if (roofPixelY > 0) {
-                        perches.push({ x: sx / PIXEL, y: roofPixelY / PIXEL - 1 });
-                    }
+                }
+            } catch (e) { /* ignore */ }
+            if (out.length < 3) {
+                const groundY = Math.floor(H * 0.82);
+                for (let i = 0; i < 8; i++) {
+                    out.push({ x: Math.floor(W * (0.08 + i * 0.12)), y: groundY - 65 - (i % 3) * 12 });
                 }
             }
-        } catch(e) {}
-        // Fallback
-        if (perches.length < 3) {
-            const groundY = Math.floor(H * 0.82);
-            for (let i = 0; i < 8; i++) {
-                perches.push({ x: Math.floor(W * (0.08 + i * 0.12)), y: groundY - 65 - (i % 3) * 12 });
-            }
+            return out;
         }
+
+        let perches = computePerches();
 
         // Pigeon state — offset start for variety
         let currentPerch = Math.floor(Math.random() * perches.length)
@@ -1063,6 +1111,32 @@
         let isJumping = false;
         let flipAngle = 0;
         let pigeonHover = false;
+
+        __fxResizers.push(() => {
+            const r = fxRescaleCanvas(canvas, section, PIXEL);
+            if (!r) return;
+            W = r.newW; H = r.newH;
+            // Scale flight interpolation in-flight
+            if (startX !== undefined) { startX *= r.sx; endX *= r.sx; startY *= r.sy; endY *= r.sy; }
+            pigeonX *= r.sx;
+            pigeonY *= r.sy;
+            // Rescan perches at new section size; snap to nearest perch so the
+            // pigeon doesn't sit in empty space above the (now repositioned) roofs.
+            perches = computePerches();
+            let bestIdx = 0, bestD = Infinity;
+            for (let i = 0; i < perches.length; i++) {
+                const dx = perches[i].x - pigeonX;
+                const dy = perches[i].y - pigeonY;
+                const d = dx * dx + dy * dy;
+                if (d < bestD) { bestD = d; bestIdx = i; }
+            }
+            currentPerch = bestIdx;
+            targetPerch = bestIdx;
+            if (!isFlying) {
+                pigeonX = perches[bestIdx].x;
+                pigeonY = perches[bestIdx].y;
+            }
+        });
 
         // Register position for hover cursor
         registerAnimal('.section-about', () => ({ x: pigeonX, y: pigeonY + jumpOffY }));
@@ -1288,12 +1362,12 @@
         parent.appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
-        const W = canvas.width / PIXEL;
-        const H = canvas.height / PIXEL;
+        let W = canvas.width / PIXEL;
+        let H = canvas.height / PIXEL;
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
         ctx.imageSmoothingEnabled = false;
 
-        const roadY = Math.floor(H * 0.855);
+        let roadY = Math.floor(H * 0.855);
 
         // Rat state
         let ratX = Math.floor(W * (0.2 + Math.random() * 0.6));
@@ -1311,6 +1385,15 @@
         let isJumping = false;
         let flipAngle = 0;
         let ratHover = false;
+
+        __fxResizers.push(() => {
+            const r = fxRescaleCanvas(canvas, section, PIXEL);
+            if (!r) return;
+            W = r.newW; H = r.newH;
+            roadY = Math.floor(H * 0.855);
+            ratX *= r.sx;
+            // Re-clamp to the road vertical if the rat sits above the road
+        });
 
         // Register position for hover cursor
         registerAnimal('.section-about', () => {
@@ -1507,17 +1590,17 @@
         parent.appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
-        const W = canvas.width / PIXEL;
-        const H = canvas.height / PIXEL;
+        let W = canvas.width / PIXEL;
+        let H = canvas.height / PIXEL;
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
         ctx.imageSmoothingEnabled = false;
 
-        const waterY = Math.floor(H * 0.6);
+        let waterY = Math.floor(H * 0.6);
         // Ferry zone — right side of bridge, open water
-        const zoneLeft = Math.floor(W * 0.72);
-        const zoneRight = W - 5;
-        const zoneTop = waterY + 4;
-        const zoneBottom = Math.floor(H * 0.88);
+        let zoneLeft = Math.floor(W * 0.72);
+        let zoneRight = W - 5;
+        let zoneTop = waterY + 4;
+        let zoneBottom = Math.floor(H * 0.88);
 
         let ferryX = Math.floor(zoneLeft + 5);
         let ferryY = zoneTop + Math.floor((zoneBottom - zoneTop) * 0.3);
@@ -1527,6 +1610,24 @@
         const ripples = [];
         const smokeRings = [];
         let ferryHover = false;
+
+        __fxResizers.push(() => {
+            const r = fxRescaleCanvas(canvas, section, PIXEL);
+            if (!r) return;
+            W = r.newW; H = r.newH;
+            waterY = Math.floor(H * 0.6);
+            zoneLeft = Math.floor(W * 0.72);
+            zoneRight = W - 5;
+            zoneTop = waterY + 4;
+            zoneBottom = Math.floor(H * 0.88);
+            ferryX *= r.sx;
+            ferryY *= r.sy;
+            // Clamp to zone bounds
+            if (ferryX < zoneLeft) ferryX = zoneLeft + 5;
+            if (ferryX > zoneRight - 24) ferryX = zoneRight - 24;
+            if (ferryY < zoneTop) ferryY = zoneTop;
+            if (ferryY > zoneBottom - 10) ferryY = zoneBottom - 10;
+        });
 
         // Hover & click detection
         section.addEventListener('mousemove', function(e) {
@@ -1827,22 +1928,12 @@
         let heliX = Math.floor(W * 0.5);
         let heliY = Math.floor(H * 0.18);
 
-        // Resize — spotlight tracks live mouse/DOM rects, so the canvas pixel
-        // grid must stay in sync with the section's CSS size after a window
-        // resize or beam will point off-target.
-        let heliResizeT;
-        window.addEventListener('resize', () => {
-            clearTimeout(heliResizeT);
-            heliResizeT = setTimeout(() => {
-                canvas.width = section.offsetWidth;
-                canvas.height = section.offsetHeight;
-                ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
-                ctx.imageSmoothingEnabled = false;
-                W = canvas.width / PIXEL;
-                H = canvas.height / PIXEL;
-                heliX = Math.floor(W * 0.5);
-                heliY = Math.floor(H * 0.18);
-            }, 250);
+        __fxResizers.push(() => {
+            const r = fxRescaleCanvas(canvas, section, PIXEL);
+            if (!r) return;
+            W = r.newW; H = r.newH;
+            heliX = Math.floor(W * 0.5);
+            heliY = Math.floor(H * 0.18);
         });
 
         // Slight hover bobbing
@@ -2129,19 +2220,29 @@
         parent.appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
-        const W = canvas.width / PIXEL;
-        const H = canvas.height / PIXEL;
+        let W = canvas.width / PIXEL;
+        let H = canvas.height / PIXEL;
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
         ctx.imageSmoothingEnabled = false;
 
-        const waterY = Math.floor(H * 0.6);
-        const statueX = Math.floor(W * 0.12);
-        const torchX = statueX + 3;
-        const torchY = waterY + 4 - 38;
+        let waterY = Math.floor(H * 0.6);
+        let statueX = Math.floor(W * 0.12);
+        let torchX = statueX + 3;
+        let torchY = waterY + 4 - 38;
 
         // Firework state
         let rocket = null;       // rising phase
         let particles = [];      // explosion phase
+
+        __fxResizers.push(() => {
+            const r = fxRescaleCanvas(canvas, section, PIXEL);
+            if (!r) return;
+            W = r.newW; H = r.newH;
+            waterY = Math.floor(H * 0.6);
+            statueX = Math.floor(W * 0.12);
+            torchX = statueX + 3;
+            torchY = waterY + 4 - 38;
+        });
 
         section.addEventListener('click', function(e) {
             const rect = section.getBoundingClientRect();
@@ -2349,8 +2450,8 @@
         parent.appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
-        const W = canvas.width / PIXEL;
-        const H = canvas.height / PIXEL;
+        let W = canvas.width / PIXEL;
+        let H = canvas.height / PIXEL;
         ctx.setTransform(PIXEL, 0, 0, PIXEL, 0, 0);
         ctx.imageSmoothingEnabled = false;
 
@@ -2359,13 +2460,23 @@
         let logoHover = false;
 
         // Stage logo position (matches pixel-scenes.js)
-        const stageY = Math.floor(H * 0.855);
         const gs = 3;
         const logoTotalW = 23 * gs; // 69
-        const logoX = Math.floor(W * 0.5) - Math.floor(logoTotalW / 2);
-        const logoY = stageY - 38 - 6 * gs;
-        const logoCX = logoX + logoTotalW / 2;
         const logoH = 6 * gs;
+        let stageY = Math.floor(H * 0.855);
+        let logoX = Math.floor(W * 0.5) - Math.floor(logoTotalW / 2);
+        let logoY = stageY - 38 - 6 * gs;
+        let logoCX = logoX + logoTotalW / 2;
+
+        __fxResizers.push(() => {
+            const r = fxRescaleCanvas(canvas, section, PIXEL);
+            if (!r) return;
+            W = r.newW; H = r.newH;
+            stageY = Math.floor(H * 0.855);
+            logoX = Math.floor(W * 0.5) - Math.floor(logoTotalW / 2);
+            logoY = stageY - 38 - 6 * gs;
+            logoCX = logoX + logoTotalW / 2;
+        });
 
         // Click & hover on stage logo area
         section.addEventListener('click', function(e) {

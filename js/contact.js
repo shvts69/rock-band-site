@@ -4,7 +4,7 @@
     const form = document.getElementById('pubForm');
     if (!form) return;
 
-    const BAND_EMAIL = form.getAttribute('data-contact-email') || '5051nyc@gmail.com';
+    const BAND_EMAIL = form.getAttribute('data-contact-email') || '5051concerts@gmail.com';
     // Formsubmit AJAX endpoint — no signup. First submission triggers a one-time
     // email confirmation to BAND_EMAIL. Swap for the opaque hash from the
     // formsubmit dashboard later to avoid exposing the raw address here.
