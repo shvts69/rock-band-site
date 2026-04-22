@@ -10,10 +10,13 @@
     const curEl    = document.getElementById('tpCurrent');
     const durEl    = document.getElementById('tpDuration');
     const slider   = document.getElementById('tpProgress');
+    const volSlider= document.getElementById('tpVolume');
     const prevBtn  = document.getElementById('tpPrev');
     const playBtn  = document.getElementById('tpPlay');
     const nextBtn  = document.getElementById('tpNext');
     if (!player || !audio || !playBtn) return;
+
+    const VOL_KEY = 'rs5051_tp_volume_v1';
 
     const PLAY_GLYPH  = '▶';       // ▶
     const PAUSE_GLYPH = '❙❙'; // ❙❙
@@ -133,6 +136,29 @@
         }
         seeking = false;
     });
+
+    // Volume — restore last value, apply to audio, wire slider fill
+    function setVolFill(pct) {
+        if (volSlider) volSlider.style.setProperty('--tp-vol-fill', pct + '%');
+    }
+    (function initVolume() {
+        let vol = 0.7;
+        try {
+            const saved = parseFloat(localStorage.getItem(VOL_KEY));
+            if (isFinite(saved) && saved >= 0 && saved <= 1) vol = saved;
+        } catch (e) { /* ignore */ }
+        audio.volume = vol;
+        if (volSlider) {
+            volSlider.value = Math.round(vol * 100);
+            setVolFill(volSlider.value);
+            volSlider.addEventListener('input', function () {
+                const v = parseFloat(volSlider.value) / 100;
+                audio.volume = v;
+                setVolFill(volSlider.value);
+                try { localStorage.setItem(VOL_KEY, String(v)); } catch (e) { /* ignore */ }
+            });
+        }
+    })();
 
     // Prime the display with the first track name (no autoplay).
     titleEl.textContent = TRACKS[0].name;

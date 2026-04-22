@@ -76,7 +76,7 @@
     </style>
 
     <link rel="stylesheet" href="css/style.min.css?v=25">
-    <link rel="stylesheet" href="css/sections.min.css?v=49">
+    <link rel="stylesheet" href="css/sections.min.css?v=50">
     <link rel="stylesheet" href="css/pixel-art.min.css?v=14">
     <link rel="stylesheet" href="css/easter-eggs.min.css?v=19">
 
@@ -477,6 +477,10 @@
                         <button type="button" class="tp-btn tp-prev" id="tpPrev" aria-label="Previous track">&#9664;&#9664;</button>
                         <button type="button" class="tp-btn tp-play" id="tpPlay" aria-label="Play">&#9654;</button>
                         <button type="button" class="tp-btn tp-next" id="tpNext" aria-label="Next track">&#9654;&#9654;</button>
+                        <div class="tp-vol-wrap">
+                            <span class="tp-vol-icon" aria-hidden="true">&#9835;</span>
+                            <input type="range" class="tp-volume" id="tpVolume" min="0" max="100" value="70" step="1" aria-label="Volume">
+                        </div>
                     </div>
                     <audio id="tpAudio" preload="none" crossorigin="anonymous"></audio>
                 </div>
@@ -580,7 +584,7 @@
     <script src="js/contact.min.js?v=3"></script>
     <script src="js/credits.min.js?v=1"></script>
     <script src="js/intro.min.js?v=7"></script>
-    <script src="js/player-menu.min.js?v=7"></script>
+    <script src="js/player-menu.min.js?v=8"></script>
 
     <script>
         // Hide preloader once everything is ready; enforce a minimum show
