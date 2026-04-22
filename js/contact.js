@@ -5,40 +5,19 @@
     if (!form) return;
 
     const BAND_EMAIL = form.getAttribute('data-contact-email') || '5051nyc@gmail.com';
+    // Formsubmit AJAX endpoint — no signup. First submission triggers a one-time
+    // email confirmation to BAND_EMAIL. Swap for the opaque hash from the
+    // formsubmit dashboard later to avoid exposing the raw address here.
+    const ENDPOINT = form.getAttribute('data-form-endpoint') ||
+        ('https://formsubmit.co/ajax/' + encodeURIComponent(BAND_EMAIL));
 
-    function buildGmailUrl(subject, body) {
-        const params = new URLSearchParams({
-            view: 'cm',
-            fs: '1',
-            to: BAND_EMAIL,
-            su: subject,
-            body: body
-        });
-        return 'https://mail.google.com/mail/?' + params.toString();
-    }
+    const submitBtn = form.querySelector('.pub-submit');
+    const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
 
-    function copyToClipboard(text) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            return navigator.clipboard.writeText(text).then(() => true).catch(() => fallbackCopy(text));
-        }
-        return Promise.resolve(fallbackCopy(text));
-    }
-
-    function fallbackCopy(text) {
-        try {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.setAttribute('readonly', '');
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            const ok = document.execCommand('copy');
-            document.body.removeChild(ta);
-            return ok;
-        } catch (e) {
-            return false;
-        }
+    function setLoading(on) {
+        if (!submitBtn) return;
+        submitBtn.disabled = on;
+        submitBtn.innerHTML = on ? '♫ SENDING... ♫' : originalBtnText;
     }
 
     function showToast(message, variant) {
@@ -53,7 +32,14 @@
         }, 3800);
     }
 
-    form.addEventListener('submit', function (e) {
+    function copyToClipboard(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
+        }
+        return Promise.resolve(false);
+    }
+
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const name = (form.elements.name && form.elements.name.value || '').trim();
@@ -69,28 +55,43 @@
 
         const reasonTag = reason ? '[' + reason.toUpperCase() + '] ' : '';
         const subject = reasonTag + (userSubject || '5051 — Contact from website');
-        const body = [
-            'Hey 5051,',
-            '',
-            message,
-            '',
-            '— ' + name,
-            'Reply to: ' + email
-        ].join('\n');
 
-        const gmailUrl = buildGmailUrl(subject, body);
-        const opened = window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+        const payload = {
+            name: name,
+            email: email,
+            _subject: subject,
+            _replyto: email,
+            _template: 'table',
+            _captcha: 'false',
+            reason: reason || '(not selected)',
+            message: message
+        };
 
-        copyToClipboard(BAND_EMAIL).then((copied) => {
-            const msg = opened
-                ? (copied ? 'Gmail opened · email copied to clipboard' : 'Gmail opened in new tab')
-                : (copied ? 'Popup blocked · email copied: ' + BAND_EMAIL : 'Please email us: ' + BAND_EMAIL);
-            showToast(msg, opened ? 'ok' : 'warn');
+        setLoading(true);
+
+        try {
+            const res = await fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json().catch(() => ({}));
+            if (data && data.success === 'false') throw new Error(data.message || 'send failed');
+
+            showToast('Message sent! We’ll get back to you ♫', 'ok');
+            form.reset();
             if (window.Sound && typeof window.Sound.play === 'function') {
                 try { window.Sound.play('liberty'); } catch (_) { /* non-fatal */ }
             }
-        });
-
-        if (opened) form.reset();
+        } catch (err) {
+            const copied = await copyToClipboard(BAND_EMAIL);
+            showToast(copied
+                ? 'Send failed · email copied: ' + BAND_EMAIL
+                : 'Send failed · email us: ' + BAND_EMAIL, 'err');
+        } finally {
+            setLoading(false);
+        }
     });
 })();

@@ -2265,6 +2265,7 @@ function initScenes() {
         if (!container) return;
 
         const canvas = document.createElement('canvas');
+        canvas.className = 'ps-scene-canvas';
         canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:pixelated;z-index:0;';
 
         container.insertBefore(canvas, container.firstChild);
@@ -2289,12 +2290,15 @@ if (document.readyState === 'loading') {
     initScenes();
 }
 
-// Redraw on resize
+// Redraw on resize. Only strip our own scene canvases (.ps-scene-canvas) so
+// effects.js overlays (eagle, pigeon, helicopter, pub party, etc.) keep their
+// DOM intact — they have their own resize handler.
 let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        document.querySelectorAll('.home-bg canvas, .about-bg canvas, .live-bg canvas, .stage-bg canvas, .pub-bg canvas').forEach(c => c.remove());
+        document.querySelectorAll('.ps-scene-canvas').forEach(c => c.remove());
         initScenes();
+        window.dispatchEvent(new CustomEvent('pixelScenesRebuilt'));
     }, 300);
 });

@@ -34,6 +34,23 @@
     }
     function rsShouldRender(v) { return __tabVisible && (!v || v.visible); }
 
+    // Mobile FPS throttle — cap each rAF loop to ~30fps so 16+ concurrent canvas
+    // animations don't pin low-end Android at 100% CPU. Desktop keeps 60fps.
+    const IS_MOBILE = window.innerWidth <= 768;
+    const MOBILE_FRAME_MS = 32;
+    function rsRAF(fn) {
+        if (!IS_MOBILE) { requestAnimationFrame(fn); return; }
+        const last = fn.__rsLast || 0;
+        requestAnimationFrame((now) => {
+            if (now - last >= MOBILE_FRAME_MS) {
+                fn.__rsLast = now;
+                fn(now);
+            } else {
+                rsRAF(fn);
+            }
+        });
+    }
+
     // ====== STAGE EFFECTS: flashes + moving spotlights ======
     function initRandomFlashes() {
         const PIXEL = 4;
@@ -67,7 +84,7 @@
 
         const __vis = rsVisible(section);
         function animate() {
-            if (!rsShouldRender(__vis)) { requestAnimationFrame(animate); return; }
+            if (!rsShouldRender(__vis)) { rsRAF(animate); return; }
             ctx.clearRect(0, 0, W, H);
             const t = Date.now() * 0.001;
 
@@ -213,7 +230,7 @@
                 }
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -459,7 +476,7 @@
                     }
                 }
 
-                requestAnimationFrame(animate);
+                rsRAF(animate);
             }
             animate();
         });
@@ -763,7 +780,7 @@
                 }
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -889,7 +906,7 @@
                 ctx.fillRect(Math.floor(wx), Math.floor(w.y), w.len, 1);
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -972,7 +989,7 @@
                 ctx.fillRect(Math.floor(plane1.x) + 1, Math.floor(plane1.y), 1, 1);
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -1252,7 +1269,7 @@
                 }
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -1471,7 +1488,7 @@
                 }
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -1782,7 +1799,7 @@
                 ctx.fillRect(Math.floor(sr.x), Math.floor(sr.y - rad), 1, 1);
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -2073,7 +2090,7 @@
 
             drawHelicopter(hx, hy, t);
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -2209,7 +2226,7 @@
             }
             ctx.globalAlpha = 1;
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -2266,7 +2283,7 @@
                         }
                     }
                 }
-                requestAnimationFrame(animStatue);
+                rsRAF(animStatue);
             })();
         }
     }
@@ -2431,7 +2448,7 @@
 
         const __visStageLightning = rsVisible(section);
         function animate() {
-            if (!rsShouldRender(__visStageLightning)) { requestAnimationFrame(animate); return; }
+            if (!rsShouldRender(__visStageLightning)) { rsRAF(animate); return; }
             ctx.clearRect(0, 0, W, H);
 
             // Screen flash
@@ -2480,7 +2497,7 @@
                 }
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
         animate();
     }
@@ -2911,9 +2928,9 @@
                 glasses[2].x = centerX+5; glasses[2].arrived = false;
             }
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
-        requestAnimationFrame(animate);
+        rsRAF(animate);
     }
 
     // ====== PUB CROWD — appears only after all 6 easter eggs found ======
@@ -3177,7 +3194,7 @@
 
         const __visPubCrowd = rsVisible(section);
         function animate() {
-            if (!rsShouldRender(__visPubCrowd)) { requestAnimationFrame(animate); return; }
+            if (!rsShouldRender(__visPubCrowd)) { rsRAF(animate); return; }
             if (canvas.style.display !== 'none') {
                 ctx.clearRect(0, 0, W, H);
                 const t = Date.now() / 1000;
@@ -3201,9 +3218,9 @@
                     }
                 });
             }
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
-        requestAnimationFrame(animate);
+        rsRAF(animate);
     }
 
     // ====== PUB PARTY ANIMALS — pigeon + rat + sunglasses eagle (only in egg-party) ======
@@ -3439,7 +3456,7 @@
 
         const __visPubParty = rsVisible(section);
         function animate() {
-            if (!rsShouldRender(__visPubParty)) { requestAnimationFrame(animate); return; }
+            if (!rsShouldRender(__visPubParty)) { rsRAF(animate); return; }
             if (canvas.style.display !== 'none') {
                 ctx.clearRect(0, 0, W, H);
                 const t = Date.now() * 0.001;
@@ -3548,9 +3565,9 @@
                 const nod = Math.round(Math.sin(t * 4.2) * 1);
                 drawPubEagle(eaglePerchX, eaglePerchY, nod);
             }
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
-        requestAnimationFrame(animate);
+        rsRAF(animate);
     }
 
     // ====== PIXEL ART MUSIC ICONS (20x20 grid, 4px scale = 80px) ======
@@ -3784,7 +3801,7 @@
 
         const __visStageParty = rsVisible(section);
         function animate() {
-            if (!rsShouldRender(__visStageParty)) { requestAnimationFrame(animate); return; }
+            if (!rsShouldRender(__visStageParty)) { rsRAF(animate); return; }
             const progress = getScrollProgress();
             // Party starts fading in at 62% scroll, full at 78% (stage is now section 4 of 5)
             const target = progress > 0.62 ? Math.min(1, (progress - 0.62) / 0.16) : 0;
@@ -3794,7 +3811,7 @@
             ctx.clearRect(0, 0, W, H);
 
             if (!partyActive) {
-                requestAnimationFrame(animate);
+                rsRAF(animate);
                 return;
             }
 
@@ -3957,10 +3974,10 @@
             }
             ctx.globalAlpha = 1;
 
-            requestAnimationFrame(animate);
+            rsRAF(animate);
         }
 
-        requestAnimationFrame(animate);
+        rsRAF(animate);
     }
 
     // ====== SOCIAL ICONS (YouTube + Instagram, home section) ======

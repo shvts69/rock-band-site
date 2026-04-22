@@ -148,23 +148,30 @@
             initDesktop();
         }
 
-        // Reload on resize — canvases are sized once and don't reflow, so the
-        // page needs a fresh init when width or height changes. The loader and
-        // intro both short-circuit on subsequent loads in the same session
-        // (sessionStorage flags), so the user sees an instant re-layout
-        // without a repeated "loading" flash or intro replay. Debounced so
-        // rapid drags don't trigger multiple reloads mid-movement.
-        let lastSize = window.innerWidth + 'x' + window.innerHeight;
+        // Live resize — recompute road geometry + desktop scroll mapping in
+        // place, no page reload. Mobile/desktop transitions across the 768px
+        // breakpoint still require a reload (the scroll engine is totally
+        // different between modes). Crossing breakpoints isn't a normal user
+        // flow, so that's acceptable.
         let resizeTimer = null;
+        let lastWasMobile = isMobile;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                const newSize = window.innerWidth + 'x' + window.innerHeight;
-                if (newSize !== lastSize) {
-                    lastSize = newSize;
+                const nowMobile = window.innerWidth <= 768;
+                if (nowMobile !== lastWasMobile) {
+                    lastWasMobile = nowMobile;
                     location.reload();
+                    return;
                 }
-            }, 250);
+                positionRoads();
+                if (!nowMobile) {
+                    const totalWidth = wrapper.scrollWidth;
+                    maxScroll = totalWidth - window.innerWidth;
+                    document.body.style.height = totalWidth + 'px';
+                    onScrollDesktop();
+                }
+            }, 200);
         });
     }
 
