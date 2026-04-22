@@ -104,6 +104,9 @@
             px(ctx, ox+14, oy+2, p.hairHi);
             px(ctx, ox+3, oy+3, p.hairHi);
             px(ctx, ox+4, oy+3, p.hair);
+            // Forehead fill between the side-locks so the scene background
+            // doesn't show through this row as a transparent strip.
+            hl(ctx, ox+5, oy+3, 8, p.skin);
             px(ctx, ox+13, oy+3, p.hair);
             px(ctx, ox+14, oy+3, p.hairHi);
         }
@@ -150,6 +153,8 @@
             hl(ctx, ox+4, oy+2, 7, p.hair);
             px(ctx, ox+3, oy+3, p.hairHi);
             px(ctx, ox+4, oy+3, p.hair);
+            // Forehead fill — close the transparent row behind the hair tip
+            hl(ctx, ox+5, oy+3, 6, p.skin);
         }
     }
 
@@ -220,6 +225,20 @@
 
         // Stubble
         drawStubbleFront(ctx, ox, oy, p);
+
+        // Glasses — Денис (idx 0): black frames, clear lenses stay
+        if (idx === 0) {
+            const G = p.outline;
+            // Temple arms poking out of hair
+            px(ctx, ox+3, oy+6, G);
+            px(ctx, ox+14, oy+6, G);
+            // Bridge across the nose
+            px(ctx, ox+8, oy+6, G);
+            px(ctx, ox+9, oy+6, G);
+            // Bottom rim under each lens
+            hl(ctx, ox+4, oy+7, 4, G);
+            hl(ctx, ox+10, oy+7, 4, G);
+        }
 
         // ── NECK ──
         hl(ctx, ox+7, oy+11, 4, p.skinDk);
@@ -313,6 +332,15 @@
 
         // Stubble
         drawStubbleSide(ctx, ox, oy, p);
+
+        // Glasses — Денис (idx 0) side profile: single lens rim visible
+        if (idx === 0) {
+            const G = p.outline;
+            // Bottom rim under eye
+            hl(ctx, ox+6, oy+7, 4, G);
+            // Front corner of frame sticking past the nose line
+            px(ctx, ox+10, oy+6, G);
+        }
 
         // ── NECK ──
         hl(ctx, ox+6, oy+11, 4, p.skinDk);
