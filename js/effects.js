@@ -84,6 +84,38 @@
         return { sx: newW / oldW, sy: newH / oldH, oldW, oldH, newW, newH };
     }
 
+    // Draw a pulsing yellow halo around an easter-egg sprite — only while
+    // that category hasn't been found yet. Coordinates are in the canvas's
+    // pixel-art unit space. Skipped entirely once the egg is collected.
+    function drawEggHint(ctx, x, y, t, cat, rBase) {
+        if (!window._eggHintActive) return;
+        if (!window.EasterEggs || window.EasterEggs.isFound(cat)) return;
+        const base = rBase || 14;
+        const pulse = 0.5 + 0.5 * Math.sin(t * 2.6);
+        const r = base + pulse * (base * 0.4);
+        // Outer glow — radial gradient, bright on dark and dark backgrounds alike
+        const glowAlpha = 0.35 + pulse * 0.25;
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
+        grad.addColorStop(0, 'rgba(255, 230, 110, 0)');
+        grad.addColorStop(0.4, 'rgba(255, 220, 80, ' + (glowAlpha * 0.55).toFixed(3) + ')');
+        grad.addColorStop(0.75, 'rgba(255, 200, 60, ' + (glowAlpha * 0.3).toFixed(3) + ')');
+        grad.addColorStop(1, 'rgba(255, 180, 40, 0)');
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        // Thin crisp ring so the hint reads even on bright skies / Brooklyn lights
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = 'rgba(255, 230, 100, ' + (0.65 + pulse * 0.3).toFixed(3) + ')';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.arc(x, y, base * 0.85, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+    }
+
     // ====== STAGE EFFECTS: flashes + moving spotlights ======
     function initRandomFlashes() {
         const PIXEL = 4;
@@ -788,6 +820,9 @@
                 if (dp >= 1) { eagleState = FLY; eagleBaseY = targetY; }
             }
 
+            // Easter-egg hint halo (only while eagle is free-flying)
+            if (eagleState === FLY) drawEggHint(ctx, ex + 4, ey + 4, t, 'eagle', 16);
+
             // Draw
             if (drawPerched) {
                 const pp = getEaglePerched();
@@ -1285,6 +1320,9 @@
                 const drawX = pigeonX + bobX;
                 const drawY = pigeonY + jumpOffY;
 
+                // Easter-egg hint halo (always while perched, even mid-flip)
+                drawEggHint(ctx, drawX + 2, drawY + 2, t, 'pigeon', 14);
+
                 if (isJumping) {
                     ctx.save();
                     ctx.translate(drawX, drawY);
@@ -1316,6 +1354,8 @@
 
                 const wingPhase = (t * 3) % 1;
                 const flyDrawY = pigeonY + jumpOffY;
+                // Easter-egg hint halo also follows the pigeon mid-flight
+                drawEggHint(ctx, pigeonX + 2, flyDrawY + 2, t, 'pigeon', 14);
                 if (isJumping) {
                     ctx.save();
                     ctx.translate(pigeonX, flyDrawY);
@@ -1540,6 +1580,9 @@
             const ratY = roadY - 2 - Math.floor((1 - ratScale) * 8);
             const ratDrawY = ratY + jumpOffY;
 
+            // Easter-egg hint halo for rat (only while on the ground, full scale)
+            if (!isJumping && ratScale > 0.9) drawEggHint(ctx, ratX, ratDrawY - 1, t, 'rat', 7);
+
             if (isJumping) {
                 ctx.save();
                 ctx.translate(ratX, ratDrawY);
@@ -1689,6 +1732,9 @@
             const fx = Math.floor(ferryX);
             const bob = isMobile ? 0 : Math.sin(t * 0.8) * 0.5;
             const fy = Math.floor(ferryY + bob);
+
+            // Easter-egg hint halo centered on the hull
+            drawEggHint(ctx, fx + 11, fy + 2, t, 'ferry', 16);
 
             {
             // Draw ferry — detailed Staten Island Ferry
@@ -2268,6 +2314,12 @@
         function animate() {
             ctx.clearRect(0, 0, W, H);
 
+            // Easter-egg hint halo on the torch (only while no rocket in flight)
+            if (!rocket) {
+                const tHint = Date.now() * 0.001;
+                drawEggHint(ctx, torchX, torchY, tHint, 'liberty', 10);
+            }
+
             // Rocket rising
             if (rocket) {
                 rocket.x += rocket.vx;
@@ -2585,6 +2637,13 @@
                 ctx.fillStyle = `rgba(200,200,255,${flashAlpha * 0.15})`;
                 ctx.fillRect(0, 0, W, H);
                 flashAlpha -= 0.03;
+            }
+
+            // Easter-egg hint halo behind the 5051 logo (centered)
+            {
+                const tHint = Date.now() * 0.001;
+                drawEggHint(ctx, logoX + logoTotalW / 2, logoY + logoH / 2,
+                            tHint, 'logo', Math.max(logoTotalW, logoH) * 0.55);
             }
 
             // Hover glow on logo

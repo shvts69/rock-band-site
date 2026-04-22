@@ -33,7 +33,7 @@
         counter.className = 'egg-counter';
         counter.setAttribute('aria-live', 'polite');
         counter.innerHTML =
-            '<span class="egg-counter-icon">\uD83D\uDD0D</span>' +
+            '<span class="egg-counter-icon">◆</span>' +
             '<span class="egg-counter-text">Secrets <b class="egg-count">0</b>/6 &mdash; explore the road trip</span>';
         document.body.appendChild(counter);
 
@@ -46,9 +46,9 @@
         finale.innerHTML =
             '<canvas class="egg-fireworks"></canvas>' +
             '<div class="egg-finale-inner">' +
-            '<h2 class="egg-finale-title">\uD83C\uDF89 You now know this city \uD83C\uDF89</h2>' +
+            '<h2 class="egg-finale-title">★ You now know this city ★</h2>' +
             '<p class="egg-finale-msg">All secrets revealed.</p>' +
-            '<p class="egg-finale-unlock">🍺 Secret pub party unlocked — head back to the bar!</p>' +
+            '<p class="egg-finale-unlock">♫ Secret pub party unlocked — head back to the bar!</p>' +
             '<p class="egg-finale-sub">Welcome to the real 5051.</p>' +
             '<button type="button" class="egg-finale-close">close</button>' +
             '</div>';
@@ -180,9 +180,63 @@
 
     window.EasterEggs = { find, isFound, count, all, reset, CATEGORIES: [...CATEGORIES] };
 
+    // ─── Hint button — temporary highlight of all undiscovered eggs ────
+    const HINT_DURATION_MS = 15000;
+    const MODAL_AUTO_CLOSE_MS = 3500;
+    let hintTimer = null;
+    let modalTimer = null;
+    window._eggHintActive = false;
+
+    function activateHint() {
+        window._eggHintActive = true;
+        const btn = document.getElementById('hintBtn');
+        if (btn) btn.classList.add('active');
+        showHintModal();
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(deactivateHint, HINT_DURATION_MS);
+    }
+
+    function deactivateHint() {
+        window._eggHintActive = false;
+        const btn = document.getElementById('hintBtn');
+        if (btn) btn.classList.remove('active');
+        clearTimeout(hintTimer);
+    }
+
+    function showHintModal() {
+        const modal = document.getElementById('hintModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        clearTimeout(modalTimer);
+        modalTimer = setTimeout(hideHintModal, MODAL_AUTO_CLOSE_MS);
+    }
+
+    function hideHintModal() {
+        const modal = document.getElementById('hintModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        clearTimeout(modalTimer);
+    }
+
+    function wireHintButton() {
+        const btn = document.getElementById('hintBtn');
+        if (btn) btn.addEventListener('click', activateHint);
+        const modal = document.getElementById('hintModal');
+        if (modal) {
+            const closeBtn = modal.querySelector('.hint-modal-close');
+            if (closeBtn) closeBtn.addEventListener('click', hideHintModal);
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) hideHintModal();
+            });
+        }
+    }
+
     function start() {
         ensureDom();
         renderCounter();
+        wireHintButton();
         if (found.size === CATEGORIES.length) {
             finaleShown = true;
             document.body.classList.add('egg-party');

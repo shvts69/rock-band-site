@@ -78,7 +78,7 @@
     <link rel="stylesheet" href="css/style.min.css?v=25">
     <link rel="stylesheet" href="css/sections.min.css?v=51">
     <link rel="stylesheet" href="css/pixel-art.min.css?v=14">
-    <link rel="stylesheet" href="css/easter-eggs.min.css?v=20">
+    <link rel="stylesheet" href="css/easter-eggs.min.css?v=24">
 
     <!-- ═══ Preloader (inline so it paints instantly, no FOUC) ═══ -->
     <style>
@@ -574,11 +574,40 @@
 
     </div>
 
-    <script src="js/sound.min.js?v=16"></script>
-    <script src="js/easter-eggs.min.js?v=6"></script>
+    <!-- Hint button + modal for easter-egg highlighting -->
+    <button type="button" class="hint-btn" id="hintBtn" aria-label="Activate coder's eyes — highlight hidden objects">
+        <svg class="hint-btn-icon" viewBox="0 0 24 16" width="18" height="12" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2 C 5 2 1 8 1 8 S 5 14 12 14 S 23 8 23 8 S 19 2 12 2 Z M 12 5 C 13.7 5 15 6.3 15 8 C 15 9.7 13.7 11 12 11 C 10.3 11 9 9.7 9 8 C 9 6.3 10.3 5 12 5 Z" fill="currentColor" fill-rule="evenodd"/>
+            <circle cx="12" cy="8" r="2.4" fill="currentColor"/>
+            <circle cx="13" cy="7" r="0.8" fill="#0a0610"/>
+        </svg>
+        <span class="hint-btn-label">HINTS</span>
+    </button>
+    <div class="hint-modal" id="hintModal" role="dialog" aria-labelledby="hintModalTitle" aria-hidden="true">
+        <div class="hint-modal-inner">
+            <h3 class="hint-modal-title" id="hintModalTitle">
+                <svg class="hint-modal-eye" viewBox="0 0 24 16" width="22" height="15" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2 C 5 2 1 8 1 8 S 5 14 12 14 S 23 8 23 8 S 19 2 12 2 Z M 12 5 C 13.7 5 15 6.3 15 8 C 15 9.7 13.7 11 12 11 C 10.3 11 9 9.7 9 8 C 9 6.3 10.3 5 12 5 Z" fill="currentColor" fill-rule="evenodd"/>
+                    <circle cx="12" cy="8" r="2.4" fill="currentColor"/>
+                    <circle cx="13" cy="7" r="0.8" fill="#0a0610"/>
+                </svg>
+                CODER'S EYES ACTIVATED
+                <svg class="hint-modal-eye" viewBox="0 0 24 16" width="22" height="15" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2 C 5 2 1 8 1 8 S 5 14 12 14 S 23 8 23 8 S 19 2 12 2 Z M 12 5 C 13.7 5 15 6.3 15 8 C 15 9.7 13.7 11 12 11 C 10.3 11 9 9.7 9 8 C 9 6.3 10.3 5 12 5 Z" fill="currentColor" fill-rule="evenodd"/>
+                    <circle cx="12" cy="8" r="2.4" fill="currentColor"/>
+                    <circle cx="13" cy="7" r="0.8" fill="#0a0610"/>
+                </svg>
+            </h3>
+            <p class="hint-modal-msg">Look around — the hidden ones are glowing.</p>
+            <button type="button" class="hint-modal-close" aria-label="Close hint">close</button>
+        </div>
+    </div>
+
+    <script src="js/sound.min.js?v=17"></script>
+    <script src="js/easter-eggs.min.js?v=8"></script>
     <script src="js/pixel-scenes.min.js?v=15"></script>
     <script src="js/scroll.min.js?v=17"></script>
-    <script src="js/effects.min.js?v=41"></script>
+    <script src="js/effects.min.js?v=44"></script>
     <script src="js/band-walkers.min.js?v=15"></script>
     <script src="js/shows.min.js?v=5"></script>
     <script src="js/contact.min.js?v=3"></script>
