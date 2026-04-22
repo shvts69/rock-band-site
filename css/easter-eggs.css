@@ -529,7 +529,7 @@ body.egg-party .section-pub::after {
     .egg-finale-msg { font-size: 10px; }
     .egg-finale-sub { font-size: 8px; }
     .egg-finale-close { font-size: 9px; padding: 8px 16px; }
-    .sound-toggle { font-size: 8px; padding: 8px 10px; left: 8px; bottom: 44px; gap: 6px; }
+    .sound-toggle { font-size: 8px; padding: 8px 10px; left: 8px; top: 8px; bottom: auto; gap: 6px; }
     .sound-icon { font-size: 11px; }
     .sound-label { display: none; }
 }
