@@ -226,18 +226,24 @@
         // Stubble
         drawStubbleFront(ctx, ox, oy, p);
 
-        // Glasses — Денис (idx 0): black frames, clear lenses stay
+        // Glasses — Денис (idx 0): thick black rectangular frames,
+        // lenses stay transparent so eyes show through.
         if (idx === 0) {
-            const G = p.outline;
-            // Temple arms poking out of hair
-            px(ctx, ox+3, oy+6, G);
-            px(ctx, ox+14, oy+6, G);
-            // Bridge across the nose
-            px(ctx, ox+8, oy+6, G);
-            px(ctx, ox+9, oy+6, G);
-            // Bottom rim under each lens
-            hl(ctx, ox+4, oy+7, 4, G);
-            hl(ctx, ox+10, oy+7, 4, G);
+            const G = '#000';
+            // Top rims (one per lens)
+            hl(ctx, ox+4, oy+5, 5, G);   // left lens top   x=4-8
+            hl(ctx, ox+9, oy+5, 5, G);   // right lens top  x=9-13
+            // Frame sides at the eye row — keep eyeW + pupils intact inside
+            px(ctx, ox+4, oy+6, G);      // left lens outer
+            px(ctx, ox+8, oy+6, G);      // bridge left
+            px(ctx, ox+9, oy+6, G);      // bridge right
+            px(ctx, ox+13, oy+6, G);     // right lens outer
+            // Bottom rims
+            hl(ctx, ox+4, oy+7, 5, G);   // left lens bottom
+            hl(ctx, ox+9, oy+7, 5, G);   // right lens bottom
+            // Temple arms running back into the hair (one pixel on each side)
+            px(ctx, ox+3, oy+5, G);
+            px(ctx, ox+14, oy+5, G);
         }
 
         // ── NECK ──
@@ -333,13 +339,19 @@
         // Stubble
         drawStubbleSide(ctx, ox, oy, p);
 
-        // Glasses — Денис (idx 0) side profile: single lens rim visible
+        // Glasses — Денис (idx 0) side profile: one visible lens + temple
         if (idx === 0) {
-            const G = p.outline;
-            // Bottom rim under eye
-            hl(ctx, ox+6, oy+7, 4, G);
-            // Front corner of frame sticking past the nose line
+            const G = '#000';
+            // Top rim of the visible lens
+            hl(ctx, ox+5, oy+5, 6, G);
+            // Back + front corners of the frame
+            px(ctx, ox+5, oy+6, G);
             px(ctx, ox+10, oy+6, G);
+            // Bottom rim
+            hl(ctx, ox+5, oy+7, 6, G);
+            // Temple arm running back into the hair
+            px(ctx, ox+4, oy+6, G);
+            px(ctx, ox+3, oy+6, G);
         }
 
         // ── NECK ──
