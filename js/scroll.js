@@ -154,14 +154,21 @@
         // (sessionStorage flags), so the user sees an instant re-layout
         // without a repeated "loading" flash or intro replay. Debounced so
         // rapid drags don't trigger multiple reloads mid-movement.
-        let lastSize = window.innerWidth + 'x' + window.innerHeight;
+        // Threshold: small deltas (DevTools opening, scrollbar appearing,
+        // mobile address-bar collapse) must not trigger a reload — they
+        // would interrupt a jury/reviewer resizing the viewport.
+        let lastW = window.innerWidth;
+        let lastH = window.innerHeight;
         let resizeTimer = null;
+        const MIN_DELTA = 120;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                const newSize = window.innerWidth + 'x' + window.innerHeight;
-                if (newSize !== lastSize) {
-                    lastSize = newSize;
+                const dw = Math.abs(window.innerWidth - lastW);
+                const dh = Math.abs(window.innerHeight - lastH);
+                if (dw >= MIN_DELTA || dh >= MIN_DELTA) {
+                    lastW = window.innerWidth;
+                    lastH = window.innerHeight;
                     location.reload();
                 }
             }, 250);
