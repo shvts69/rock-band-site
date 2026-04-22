@@ -810,7 +810,7 @@
         btn.classList.toggle('muted', !enabled);
         btn.innerHTML = enabled
             ? '<span class="sound-icon" aria-hidden="true">♪</span><span class="sound-label">SOUND ON</span>'
-            : '<span class="sound-icon" aria-hidden="true">✕</span><span class="sound-label">SOUND OFF</span>';
+            : '<span class="sound-icon" aria-hidden="true">♪</span><span class="sound-label">SOUND OFF</span>';
     }
 
     window.Sound = { play, isEnabled: () => enabled, setEnabled };

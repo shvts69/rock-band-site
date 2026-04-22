@@ -204,8 +204,27 @@ body.egg-party .section-pub::after {
     box-shadow: 0 0 0 2px #000, 0 2px 0 rgba(0, 0, 0, 0.6);
 }
 .sound-toggle.muted { border-color: #666; color: #999; }
-.sound-icon { font-size: 14px; filter: drop-shadow(0 0 4px #ff4444); }
+.sound-icon {
+    font-size: 14px;
+    line-height: 1;
+    filter: drop-shadow(0 0 4px #ff4444);
+    position: relative;
+    display: inline-block;
+}
 .sound-toggle.muted .sound-icon { filter: none; }
+.sound-toggle.muted .sound-icon::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    right: -2px;
+    top: 50%;
+    height: 2px;
+    background: #c33;
+    transform: rotate(-28deg);
+    transform-origin: center;
+    box-shadow: 0 0 3px rgba(255, 80, 80, 0.6);
+    pointer-events: none;
+}
 
 /* ─── Hint button (beside sound toggle on desktop, top-right on mobile) ─── */
 .hint-btn {
