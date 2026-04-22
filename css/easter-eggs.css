@@ -370,7 +370,15 @@ body.egg-party .section-pub::after {
         gap: 6px;
     }
     .hint-btn-icon { font-size: 11px; }
-    .hint-btn-label { display: none; }
+    .hint-btn-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
     .hint-modal-inner { padding: 18px 18px 20px; }
     .hint-modal-title { font-size: 11px; }
     .hint-modal-msg { font-size: 8px; }
@@ -726,5 +734,13 @@ body.egg-party .section-pub::after {
     .egg-finale-close { font-size: 9px; padding: 8px 16px; }
     .sound-toggle { font-size: 8px; padding: 8px 10px; left: 8px; top: 8px; bottom: auto; gap: 6px; }
     .sound-icon { font-size: 11px; }
-    .sound-label { display: none; }
+    .sound-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
 }
