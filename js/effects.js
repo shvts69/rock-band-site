@@ -2671,8 +2671,11 @@
         const barRight = Math.floor(W * 0.88);
         const barW = barRight - barLeft;
 
-        // Beer glasses — offset to musicians' right so beer doesn't cover faces
-        const beerOffset = 10;
+        // Beer glasses — offset to musicians' right so beer doesn't cover faces.
+        // Mobile bar is narrower (barRight ≈ 85, right musician at +32 from
+        // centerX ≈ 48) so a 10-unit offset pushes the right beer past the
+        // bar edge. Use 5 on mobile to keep all three within the bar.
+        const beerOffset = isMobilePub ? 5 : 10;
         const glasses = [
             { targetX: centerX - 32 + beerOffset, x: centerX + 18, arrived: false, delay: 0 },
             { targetX: centerX + beerOffset, x: centerX - 22, arrived: false, delay: 500 },
