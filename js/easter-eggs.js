@@ -33,7 +33,7 @@
         counter.className = 'egg-counter';
         counter.setAttribute('aria-live', 'polite');
         counter.innerHTML =
-            '<span class="egg-counter-icon">◆</span>' +
+            '<span class="egg-counter-icon">?</span>' +
             '<span class="egg-counter-text">' +
                 '<span class="egg-counter-label">Secrets </span>' +
                 '<span class="egg-counter-fraction"><b class="egg-count">0</b>/6</span>' +

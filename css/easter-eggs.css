@@ -30,7 +30,14 @@
     border-color: #ee2222;
     opacity: 1;
 }
-.egg-counter-icon { font-size: 14px; filter: drop-shadow(0 0 4px #ff4444); }
+.egg-counter-icon {
+    font-size: 16px;
+    color: #ffcc33;
+    -webkit-text-stroke: 1px #ffcc33;
+    paint-order: stroke fill;
+    text-shadow: 2px 2px 0 #000, 0 0 6px #ff4444;
+    line-height: 1;
+}
 .egg-counter-text { line-height: 1.4; }
 .egg-counter .egg-count { color: #ffcc33; padding: 0 2px; }
 .egg-counter.complete {
