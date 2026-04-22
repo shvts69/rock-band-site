@@ -698,7 +698,15 @@ body.egg-party .section-pub::after {
 
 /* ─── Mobile tuning ─── */
 @media (max-width: 768px) {
-    .egg-counter { font-size: 8px; padding: 8px 10px; right: 8px; bottom: 44px; gap: 6px; }
+    .egg-counter {
+        font-size: 8px;
+        padding: 6px 10px;
+        right: 8px;
+        left: 8px;
+        bottom: max(4px, env(safe-area-inset-bottom));
+        gap: 6px;
+        justify-content: center;
+    }
     .egg-counter-icon { font-size: 11px; }
     .egg-toast { font-size: 9px; padding: 8px 12px; }
     .egg-finale-title { font-size: 13px; }
