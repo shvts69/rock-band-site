@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,13 +33,13 @@
 
     <!-- ═══ Force bass-guitar cursor everywhere, instantly (data URI, !important) ═══ -->
     <style>
-        html, html *, body, body *, #site-loader, #site-loader * {
-            cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAKO0lEQVR4nO2ZeXBV5RmHn3PuuVvuktwkZIEgsiQYVgEFi7aOiljUEYXi2JZStFVcilBEYRi1dBGrzmhBtMVS68ZMJUVlXAIWSCKMwAhCxCAkCGS94W65yd238/WPAA00gSTcJLWT5697vu/95vze977n/TaJNqybhNaXkXmvEDwDIhPEY4//y/Pijh07rpdluRRoai7955iZK9c28H+C3Pah2ZbxtBBiXavzANJTq2bkDLjxxhvLwg3H1tdvWOVuKi97ri+E9hRS24dVM3IGaOOxSiDtTJssa17MMGcXIpgBoE3LEuaRk342c9nzG3pZa49wTgasKG50SpL43enHgIz0e8mqexLIAjBePoqBc1dIxuFXrtu4cY6mt8X2BLIQQi4rK5tXWlq6dePGjRqL3rBOluQtIEIqqndJUV1ISGIpQLjuGIlAM3G/t9pYM9rW1+KTgVRSUmKQJOkb4HL3/q0vV299/ZcJETee7vfGFG3BiuJG5xuzxhYJGKBNz1s+d33xnr4UnUwkgO3FH9zl3fvpEy3lZde4Aw6EUNuYiHXKkILVZk3KH/RBZd68tz8N9JHWHkEGuGnGne/7vtrpk7UGsq+YerZTkjWB1KFXTrQabAdlRTcrZIyt6jOlPYRy9kd63tM5M++/WWNKpcVZQ7zpVLU1f8J+xZw2KxENY0lPZ2Dh6IUfFwzbdNvSv33Wl6KTydlZYO764j1Rd+PhmOdUIKfw+/cv2tJwedjb9JDRYg6MmHoDQ6+6Br3JIhmtWa/2peBkc840mHA5rr/560rr7KfXrAd46O3PHamZtpKU1DQSCYT72xMNnqrawncfnX1r38hNPtLFDD5Zs1CvN2cf9je48mI+j05CYBmYbT9RUTJkwWv7Y70hsieRL2Zw66MvR3xHjy4WakxrGTiYvO9NIfOKwtyCCdPf6g2BPc1FAwBw53Nvf2jLy60eMLoQbYqZWCAY8zS5r3r1oeu+84uhTgUAINrsuleNRFR3XYOzomSL7K2vGaHF+EJPiusNLloD2vLWktnrJb3hFyIeJTUri9yRo4T7xOHbZyx65ZOeEtjTdDoDAEL+5sdMaWm+/Otu4rLxk1D0BklrtD5/oTH74ZZ9sPVzMF7Irq/oUgAWvLat2WxN+UhvMhONxBOnKivrm6pqRv9j0V1zzrc9APn7YKOALcB0PTzRtv8vcPOf4dpL1H/JdOkTABArV8rbczkUcHgKYgGvIhIJUNXjmZaRI29YuTJeAeYgLJVgOaBvMzQkQ+HX4ArB370wxwCNiyA3ee50nS7v6X9bWiruHDP4iKRo50uKVlKjYZBlW9Bvjy/be7ggDpsluI02y2wAARoXpCZgrQ4mtwAxMM+C2MewM1kOdZUuZ8AZNq24b4tGb7xFjYRRjh0/lr15V1QTiY1qzzYMFadAJGDMmTYv4AF0EDFB+gIIdlfLpaBc3KR9oqr6oMnj3Z317pZ6XaN7Iu0EMwF2OxyPwtTz+1MBP8SjoM+AN4H/qiO9QbcyYB+kAAuBJwHz+f0Cgk74wgdXSWCKyTJ7s7MZ73ZjiUZJSFJwl83W6FCUIZMcDo0WxFC4YhZUXqI/XaZLGSBAehOePwAPT2gNApIsI9T/HKD44AsX5Aq4HqB83DjK09KwBwJ4DAYKnM6qj9LTh7oUZRjACJ+P1FBI8kARMD55rnWOLhXBkZDpgk0+0KdqtWTn5KA1GokGAoTgcD00BGAiYD2VksLWyZNJTJyI3mpFqqsL326312yzWEZU63Rnp98mg4F8n48wZM2B8o/gSNK9vABdWgf8BFwZ8FeAY6qKRqdDazLhN5kO2WGkCuNbrFa2TZvGW4WFfBuJ4PN6Sa+sdKysqNCObWkZNs/tPuelAVlWYzqdQ4AUgteT6l0n6PI0+B4UfwVL/ELo02X5lMVgMOt1umynzycD7Jg1C01ODiKRYNTJk7X37t2rmVhTY5OEkAFsiQRORaFWp+Nqv79+XmOjnBWPp5+eFo2zQP8xbE+ynx3SrSK4AeYIeEkvSYNG5+Wh12qpcblwtrRQUVBA9dix0ek7d7oKHI6B7Y2vU5SKBlm2ZUajZ/tbABeghVg2ZM5tbepxur0OKII3BPw8zWRieHY2cVWlqra2ekAi4dDA1e2NicEJO7jiHfTXQjQGuhwong+9curUpRrQlhgsA1q8gQAtoVBckWWGp6Xlted8Arx2KKuFQXG4OqwobBs8mCZ960o5IsvNxZmZtTtycrQALvjhBriyu9q6QrevtzZB4G4Q6aCkRKM2vcVi1Oj1ciwYRCQSAAhQW+BzO2TEoTCh0Wj2TJ5MWX4+VYpCs04nvEKceCcrK6fKaEx1abXSsGgUfSwmKXDTh/By0jztgG5nAMAoeCkNBiWiUVvE5wNJwpiRAUAADlTDMXfrji+j2mKhaOpUguPHkz1kCINDocAcu722xmgcFtBozn6KpenpCEkiDukbe2EL3e2lMMBoiO6HZQLeC3s86EwmtEYjPrP5iNPvnwBgz8ykfMoUDjkcqMEgeqdTjDx5suGRw4cHAaZ58ThfDRqEKp2NQVxjMKx+OBRaeom+dYpuF8G27IOtAq5VbTZ7ps02IhKLUVFXhxCCT+65B53Vyqn6elFQXn5idn39QEUIQ9vxr2dkUGK1Mtnnq7TF41P+5PV6k6GrMyTlivvHcLAe7m6ORIbYTCYMOh2qquKPRCAQUJtMpvDcXbt8UxyOgfL5WSfLImf69OPjjx5ljMeTd1k4vKcIjiZDV2dISgYAvAuvSPCwxWikIDcXVVU5VldXmR6PRzVttsFtCY4bdyK6cGG2kp+fEnr/fXyrVwMcN8OoWyGSLG0X4pKKYFskeApw+0IhfKFQRJZlLrPZCtpzPpad7Wp69lmXunr1UCU/P0V1OokeOnSme5gfHkyWrk7oTh7vwSPp8COLVjslLS/PiCTRUl9PItL6Zwq9PuS977565Y47hktGoyQiEYKbNhF85x1EMIhoPTZbo4NnZoIvmdo6IqkBKAHFAgeAMcaMDAypqcTDYXwNDfimTasSDzwwVM7KUgCiu3fjW7OGhN0OnLON/tVy2JxMXRciqQEA+BJuUmGbJMtYBw9G1mhoHDfOG1u8OA0gXlWFf+1aouXlAIThyCmIJP5zFnA8BUY9+l2rAWeYCNsFfJhQVY/L660EyDh4ME3U1eFfuxbPggVEy8tJgKcBPmuA/MS5ByHDArA42bo64pIWQh3hhyVO2C01NxeYzGb84TDu+fNR43EERN2wuwUmAD9oZ3iUXrxESfoncIYieEG03g8gTrcF4EsnpKowvINh21RYtAIO95Su8+mxAGwGS6R1QZMbgxMN0JRoPS5rj2+AXy+HrT2lpyN6LAAARfBTYEAdfBCBrwHTeSZeAX+MwEsrW1O/1+nRALTlWVgpwW9OP6oCNiiw9HFw9JaG9ui1ALwIxgh8I8FxWtO9vLfe/T/Dc9DuGWE//fTTTz/99NNPP/30008//fTTT2/ybzZb6Nkg1NxTAAAAAElFTkSuQmCC") 3 1, auto !important;
+        html, body {
+            cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAKO0lEQVR4nO2ZeXBV5RmHn3PuuVvuktwkZIEgsiQYVgEFi7aOiljUEYXi2JZStFVcilBEYRi1dBGrzmhBtMVS68ZMJUVlXAIWSCKMwAhCxCAkCGS94W65yd238/WPAA00gSTcJLWT5697vu/95vze977n/TaJNqybhNaXkXmvEDwDIhPEY4//y/Pijh07rpdluRRoai7955iZK9c28H+C3Pah2ZbxtBBiXavzANJTq2bkDLjxxhvLwg3H1tdvWOVuKi97ri+E9hRS24dVM3IGaOOxSiDtTJssa17MMGcXIpgBoE3LEuaRk342c9nzG3pZa49wTgasKG50SpL43enHgIz0e8mqexLIAjBePoqBc1dIxuFXrtu4cY6mt8X2BLIQQi4rK5tXWlq6dePGjRqL3rBOluQtIEIqqndJUV1ISGIpQLjuGIlAM3G/t9pYM9rW1+KTgVRSUmKQJOkb4HL3/q0vV299/ZcJETee7vfGFG3BiuJG5xuzxhYJGKBNz1s+d33xnr4UnUwkgO3FH9zl3fvpEy3lZde4Aw6EUNuYiHXKkILVZk3KH/RBZd68tz8N9JHWHkEGuGnGne/7vtrpk7UGsq+YerZTkjWB1KFXTrQabAdlRTcrZIyt6jOlPYRy9kd63tM5M++/WWNKpcVZQ7zpVLU1f8J+xZw2KxENY0lPZ2Dh6IUfFwzbdNvSv33Wl6KTydlZYO764j1Rd+PhmOdUIKfw+/cv2tJwedjb9JDRYg6MmHoDQ6+6Br3JIhmtWa/2peBkc840mHA5rr/560rr7KfXrAd46O3PHamZtpKU1DQSCYT72xMNnqrawncfnX1r38hNPtLFDD5Zs1CvN2cf9je48mI+j05CYBmYbT9RUTJkwWv7Y70hsieRL2Zw66MvR3xHjy4WakxrGTiYvO9NIfOKwtyCCdPf6g2BPc1FAwBw53Nvf2jLy60eMLoQbYqZWCAY8zS5r3r1oeu+84uhTgUAINrsuleNRFR3XYOzomSL7K2vGaHF+EJPiusNLloD2vLWktnrJb3hFyIeJTUri9yRo4T7xOHbZyx65ZOeEtjTdDoDAEL+5sdMaWm+/Otu4rLxk1D0BklrtD5/oTH74ZZ9sPVzMF7Irq/oUgAWvLat2WxN+UhvMhONxBOnKivrm6pqRv9j0V1zzrc9APn7YKOALcB0PTzRtv8vcPOf4dpL1H/JdOkTABArV8rbczkUcHgKYgGvIhIJUNXjmZaRI29YuTJeAeYgLJVgOaBvMzQkQ+HX4ArB370wxwCNiyA3ee50nS7v6X9bWiruHDP4iKRo50uKVlKjYZBlW9Bvjy/be7ggDpsluI02y2wAARoXpCZgrQ4mtwAxMM+C2MewM1kOdZUuZ8AZNq24b4tGb7xFjYRRjh0/lr15V1QTiY1qzzYMFadAJGDMmTYv4AF0EDFB+gIIdlfLpaBc3KR9oqr6oMnj3Z317pZ6XaN7Iu0EMwF2OxyPwtTz+1MBP8SjoM+AN4H/qiO9QbcyYB+kAAuBJwHz+f0Cgk74wgdXSWCKyTJ7s7MZ73ZjiUZJSFJwl83W6FCUIZMcDo0WxFC4YhZUXqI/XaZLGSBAehOePwAPT2gNApIsI9T/HKD44AsX5Aq4HqB83DjK09KwBwJ4DAYKnM6qj9LTh7oUZRjACJ+P1FBI8kARMD55rnWOLhXBkZDpgk0+0KdqtWTn5KA1GokGAoTgcD00BGAiYD2VksLWyZNJTJyI3mpFqqsL326312yzWEZU63Rnp98mg4F8n48wZM2B8o/gSNK9vABdWgf8BFwZ8FeAY6qKRqdDazLhN5kO2WGkCuNbrFa2TZvGW4WFfBuJ4PN6Sa+sdKysqNCObWkZNs/tPuelAVlWYzqdQ4AUgteT6l0n6PI0+B4UfwVL/ELo02X5lMVgMOt1umynzycD7Jg1C01ODiKRYNTJk7X37t2rmVhTY5OEkAFsiQRORaFWp+Nqv79+XmOjnBWPp5+eFo2zQP8xbE+ynx3SrSK4AeYIeEkvSYNG5+Wh12qpcblwtrRQUVBA9dix0ek7d7oKHI6B7Y2vU5SKBlm2ZUajZ/tbABeghVg2ZM5tbepxur0OKII3BPw8zWRieHY2cVWlqra2ekAi4dDA1e2NicEJO7jiHfTXQjQGuhwong+9curUpRrQlhgsA1q8gQAtoVBckWWGp6Xlted8Arx2KKuFQXG4OqwobBs8mCZ960o5IsvNxZmZtTtycrQALvjhBriyu9q6QrevtzZB4G4Q6aCkRKM2vcVi1Oj1ciwYRCQSAAhQW+BzO2TEoTCh0Wj2TJ5MWX4+VYpCs04nvEKceCcrK6fKaEx1abXSsGgUfSwmKXDTh/By0jztgG5nAMAoeCkNBiWiUVvE5wNJwpiRAUAADlTDMXfrji+j2mKhaOpUguPHkz1kCINDocAcu722xmgcFtBozn6KpenpCEkiDukbe2EL3e2lMMBoiO6HZQLeC3s86EwmtEYjPrP5iNPvnwBgz8ykfMoUDjkcqMEgeqdTjDx5suGRw4cHAaZ58ThfDRqEKp2NQVxjMKx+OBRaeom+dYpuF8G27IOtAq5VbTZ7ps02IhKLUVFXhxCCT+65B53Vyqn6elFQXn5idn39QEUIQ9vxr2dkUGK1Mtnnq7TF41P+5PV6k6GrMyTlivvHcLAe7m6ORIbYTCYMOh2qquKPRCAQUJtMpvDcXbt8UxyOgfL5WSfLImf69OPjjx5ljMeTd1k4vKcIjiZDV2dISgYAvAuvSPCwxWikIDcXVVU5VldXmR6PRzVttsFtCY4bdyK6cGG2kp+fEnr/fXyrVwMcN8OoWyGSLG0X4pKKYFskeApw+0IhfKFQRJZlLrPZCtpzPpad7Wp69lmXunr1UCU/P0V1OokeOnSme5gfHkyWrk7oTh7vwSPp8COLVjslLS/PiCTRUl9PItL6Zwq9PuS977565Y47hktGoyQiEYKbNhF85x1EMIhoPTZbo4NnZoIvmdo6IqkBKAHFAgeAMcaMDAypqcTDYXwNDfimTasSDzwwVM7KUgCiu3fjW7OGhN0OnLON/tVy2JxMXRciqQEA+BJuUmGbJMtYBw9G1mhoHDfOG1u8OA0gXlWFf+1aouXlAIThyCmIJP5zFnA8BUY9+l2rAWeYCNsFfJhQVY/L660EyDh4ME3U1eFfuxbPggVEy8tJgKcBPmuA/MS5ByHDArA42bo64pIWQh3hhyVO2C01NxeYzGb84TDu+fNR43EERN2wuwUmAD9oZ3iUXrxESfoncIYieEG03g8gTrcF4EsnpKowvINh21RYtAIO95Su8+mxAGwGS6R1QZMbgxMN0JRoPS5rj2+AXy+HrT2lpyN6LAAARfBTYEAdfBCBrwHTeSZeAX+MwEsrW1O/1+nRALTlWVgpwW9OP6oCNiiw9HFw9JaG9ui1ALwIxgh8I8FxWtO9vLfe/T/Dc9DuGWE//fTTTz/99NNPP/30008//fTTT2/ybzZb6Nkg1NxTAAAAAElFTkSuQmCC") 3 1, auto;
         }
     </style>
 
-    <link rel="stylesheet" href="css/style.css?v=24">
-    <link rel="stylesheet" href="css/sections.css?v=45">
+    <link rel="stylesheet" href="css/style.css?v=25">
+    <link rel="stylesheet" href="css/sections.css?v=46">
     <link rel="stylesheet" href="css/pixel-art.css?v=14">
     <link rel="stylesheet" href="css/easter-eggs.css?v=18">
 
@@ -204,8 +204,9 @@
     <div class="horizontal-wrapper" id="horizontalWrapper">
 
         <!-- ====== СЕКЦІЯ 1: ГОЛОВНА ====== -->
-        <section class="section section-home" id="home">
+        <section class="section section-home" id="home" aria-labelledby="section-home-sr">
             <div class="home-bg">
+                <h2 id="section-home-sr" class="sr-only">5051 — home. A desert highway at dusk with Route 66 sign, American flag, saguaro cacti, and the band logo. Social links for YouTube, Instagram, Facebook.</h2>
                 <!-- Небо з градієнтом -->
                 <div class="sky"></div>
                 <!-- Гори -->
@@ -257,8 +258,9 @@
         </div>
 
         <!-- ====== СЕКЦІЯ 2: ПРО ГРУПУ ====== -->
-        <section class="section section-about" id="about">
+        <section class="section section-about" id="about" aria-labelledby="section-about-sr">
             <div class="about-bg">
+                <p class="sr-only" id="section-about-sr">The band — three members: Sasha on bass, Ivan on vocals and guitar, Denis on drums. Set against a pixel-art Brooklyn skyline with fire escapes and lit windows.</p>
                 <!-- Бруклінські будинки -->
                 <div class="brooklyn-buildings"></div>
                 <div class="brooklyn-windows"></div>
@@ -330,8 +332,9 @@
         </div>
 
         <!-- ====== СЕКЦІЯ 3: ЖИВІ ВИСТУПИ ====== -->
-        <section class="section section-live" id="live">
+        <section class="section section-live" id="live" aria-labelledby="section-live-sr">
             <div class="live-bg">
+                <p class="sr-only" id="section-live-sr">Live shows. The Brooklyn Bridge crosses a starlit night sky over the East River. Upcoming concert dates are loaded from Bandsintown.</p>
                 <!-- Нічне небо -->
                 <div class="night-sky">
                     <div class="pixel-star star-1"></div>
@@ -369,8 +372,9 @@
         </div>
 
         <!-- ====== СЕКЦІЯ 4: СЦЕНА / ФІНАЛ ====== -->
-        <section class="section section-stage" id="stage">
+        <section class="section section-stage" id="stage" aria-labelledby="section-stage-sr">
             <div class="stage-bg">
+                <p class="sr-only" id="section-stage-sr">Live performance. A pixel-art stage with spotlights, speakers, and a cheering crowd. Links to Spotify, YouTube Music, and Apple Music, plus an inline player with 30-second previews of 5051 tracks.</p>
                 <!-- Прожектори -->
                 <div class="spotlight spotlight-1"></div>
                 <div class="spotlight spotlight-2"></div>
@@ -454,8 +458,9 @@
         </div>
 
         <!-- ====== СЕКЦІЯ 5: ПАБ / КОНТАКТ ====== -->
-        <section class="section section-pub" id="pub">
+        <section class="section section-pub" id="pub" aria-labelledby="section-pub-sr">
             <div class="pub-bg">
+                <p class="sr-only" id="section-pub-sr">Booking and contact. A late-night pub interior with bar crowd. Form to reach out for booking, collaboration, press, or other inquiries.</p>
                 <!-- Contact / Booking form -->
                 <div class="pub-form-container">
                     <h2 class="section-title pub-title">BOOK US / CONTACT</h2>
