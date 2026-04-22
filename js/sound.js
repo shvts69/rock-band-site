@@ -167,7 +167,6 @@
         btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'sound-toggle';
-        btn.setAttribute('aria-label', 'Toggle sound');
         btn.addEventListener('click', () => {
             // This click counts as a user gesture — resume ctx if needed
             const c = ensureCtx();
@@ -199,8 +198,8 @@
         if (!btn) return;
         btn.classList.toggle('muted', !enabled);
         btn.innerHTML = enabled
-            ? '<span class="sound-icon">🔊</span><span class="sound-label">SOUND ON</span>'
-            : '<span class="sound-icon">🔇</span><span class="sound-label">SOUND OFF</span>';
+            ? '<span class="sound-icon" aria-hidden="true">🔊</span><span class="sound-label">SOUND ON</span>'
+            : '<span class="sound-icon" aria-hidden="true">🔇</span><span class="sound-label">SOUND OFF</span>';
     }
 
     window.Sound = { play, isEnabled: () => enabled, setEnabled };

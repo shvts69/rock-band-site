@@ -34,6 +34,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.webmanifest">
 
+    <!-- Preload latin font subsets so first paint has correct type, not FOUC -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/press-start-2p-latin.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/vt323-latin.woff2" crossorigin>
+
     <!-- Structured data — MusicGroup schema for search/jury inspection -->
     <script type="application/ld+json">
     {
@@ -318,7 +322,7 @@
                         <div class="member-info">
                             <h3 class="member-name">SASHA</h3>
                             <p class="member-role">Bass</p>
-                            <p class="member-desc">Keeps the chaos tight. All in for punk.</p>
+                            <p class="member-desc">Low-end backbone. Holds the riot together when the vocals go wild.</p>
                         </div>
                     </div>
 
@@ -338,7 +342,7 @@
                         <div class="member-info">
                             <h3 class="member-name">IVAN</h3>
                             <p class="member-role">Vocals / Guitar</p>
-                            <p class="member-desc">Covers to Belarusian punk. Started 5051.</p>
+                            <p class="member-desc">Voice of the band. Turned covers into Belarusian punk. Started 5051.</p>
                         </div>
                     </div>
 
@@ -358,7 +362,7 @@
                         <div class="member-info">
                             <h3 class="member-name">DENIS</h3>
                             <p class="member-role">Drums</p>
-                            <p class="member-desc">US 8 years. Screams in Belarusian punk.</p>
+                            <p class="member-desc">Drums. Eight years stateside, still hits like he's back home.</p>
                         </div>
                     </div>
                 </div>
@@ -509,7 +513,7 @@
                             <input type="email" class="pub-input" name="email" placeholder="EMAIL" required>
                         </div>
                         <div class="pub-form-row">
-                            <select class="pub-input pub-select" name="reason">
+                            <select class="pub-input pub-select" name="reason" aria-label="Reason for contact">
                                 <option value="" disabled selected>REASON</option>
                                 <option value="booking">BOOKING / SHOW</option>
                                 <option value="collab">COLLABORATION</option>
