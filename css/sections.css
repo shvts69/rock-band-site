@@ -996,19 +996,29 @@
     }
 
     .members-gallery {
-        padding: 0 10px;
-        padding-top: 35%;
-        gap: 22px;
+        padding: 14% 10px 0;
+        gap: 14px;
         justify-content: center;
+        align-items: flex-start;
     }
 
     .member-block {
         max-width: 110px;
-        gap: 10px;
+        gap: 8px;
     }
 
+    /* Mobile reorder: portrait at top, then name / role / description.
+       All three portraits stay on one horizontal line (align-items: flex-start
+       on the gallery) because they're the first child in each block. */
     .member-info {
-        min-height: 120px;
+        order: 1;
+        min-height: 0;
+        justify-content: flex-start;
+        text-align: center;
+    }
+
+    .ornate-frame {
+        order: -1;
     }
 
     .ornate-frame {

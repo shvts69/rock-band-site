@@ -10,10 +10,10 @@
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
-    background: rgba(10, 6, 14, 0.85);
-    border: 2px solid #ee2222;
+    background: rgba(10, 6, 14, 0.40);
+    border: 2px solid rgba(238, 34, 34, 0.65);
     border-radius: 2px;
-    box-shadow: 0 0 0 2px #000, 0 6px 0 rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), 0 6px 0 rgba(0, 0, 0, 0.35);
     font-family: 'Press Start 2P', monospace;
     font-size: 10px;
     color: #fff;
@@ -21,7 +21,14 @@
     user-select: none;
     pointer-events: auto;
     cursor: url('../images/cursor-bass.png') 3 1, auto;
-    transition: border-color 0.3s ease, transform 0.3s ease;
+    opacity: 0.75;
+    transition: border-color 0.3s ease, transform 0.3s ease,
+                background 0.25s ease, opacity 0.25s ease;
+}
+.egg-counter:hover {
+    background: rgba(10, 6, 14, 0.85);
+    border-color: #ee2222;
+    opacity: 1;
 }
 .egg-counter-icon { font-size: 14px; filter: drop-shadow(0 0 4px #ff4444); }
 .egg-counter-text { line-height: 1.4; }
@@ -173,19 +180,25 @@ body.egg-party .section-pub::after {
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
-    background: rgba(10, 6, 14, 0.85);
-    border: 2px solid #ee2222;
+    background: rgba(10, 6, 14, 0.40);
+    border: 2px solid rgba(238, 34, 34, 0.65);
     border-radius: 2px;
-    box-shadow: 0 0 0 2px #000, 0 4px 0 rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), 0 4px 0 rgba(0, 0, 0, 0.35);
     font-family: 'Press Start 2P', monospace;
     font-size: 10px;
     color: #fff;
     letter-spacing: 1px;
     cursor: url('../images/cursor-bass.png') 3 1, pointer;
     user-select: none;
-    transition: border-color 0.2s ease, transform 0.1s ease;
+    opacity: 0.75;
+    transition: border-color 0.2s ease, transform 0.1s ease,
+                background 0.25s ease, opacity 0.25s ease;
 }
-.sound-toggle:hover { border-color: #ff4444; }
+.sound-toggle:hover {
+    background: rgba(10, 6, 14, 0.85);
+    border-color: #ff4444;
+    opacity: 1;
+}
 .sound-toggle:active {
     transform: translateY(2px);
     box-shadow: 0 0 0 2px #000, 0 2px 0 rgba(0, 0, 0, 0.6);
