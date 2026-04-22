@@ -226,24 +226,25 @@
         // Stubble
         drawStubbleFront(ctx, ox, oy, p);
 
-        // Glasses — Денис (idx 0): thick black rectangular frames,
-        // lenses stay transparent so eyes show through.
+        // Glasses — Денис (idx 0): two separate lens frames with a narrow
+        // nose bridge between them. Key bit is that the top rims leave a
+        // gap over the nose so the shape reads as two lenses, not a band.
         if (idx === 0) {
             const G = '#000';
-            // Top rims (one per lens)
-            hl(ctx, ox+4, oy+5, 5, G);   // left lens top   x=4-8
-            hl(ctx, ox+9, oy+5, 5, G);   // right lens top  x=9-13
-            // Frame sides at the eye row — keep eyeW + pupils intact inside
-            px(ctx, ox+4, oy+6, G);      // left lens outer
-            px(ctx, ox+8, oy+6, G);      // bridge left
-            px(ctx, ox+9, oy+6, G);      // bridge right
-            px(ctx, ox+13, oy+6, G);     // right lens outer
-            // Bottom rims
-            hl(ctx, ox+4, oy+7, 5, G);   // left lens bottom
-            hl(ctx, ox+9, oy+7, 5, G);   // right lens bottom
-            // Temple arms running back into the hair (one pixel on each side)
-            px(ctx, ox+3, oy+5, G);
-            px(ctx, ox+14, oy+5, G);
+            // Top rims — only over each lens, gap at x=8,9 above the nose
+            hl(ctx, ox+5, oy+5, 3, G);   // left lens top  x=5,6,7
+            hl(ctx, ox+10, oy+5, 3, G);  // right lens top x=10,11,12
+            // Eye row — outer frame sides + thin bridge between lenses
+            px(ctx, ox+4, oy+6, G);      // left lens outer side
+            px(ctx, ox+8, oy+6, G);      // bridge
+            px(ctx, ox+9, oy+6, G);      // bridge
+            px(ctx, ox+13, oy+6, G);     // right lens outer side
+            // Bottom rims — match top rims so each lens is fully boxed
+            hl(ctx, ox+5, oy+7, 3, G);
+            hl(ctx, ox+10, oy+7, 3, G);
+            // Temple arms running back into the hair
+            px(ctx, ox+3, oy+6, G);
+            px(ctx, ox+14, oy+6, G);
         }
 
         // ── NECK ──
