@@ -706,6 +706,8 @@ body.egg-party .section-pub::after {
         bottom: max(4px, env(safe-area-inset-bottom));
         gap: 6px;
         justify-content: center;
+        /* Non-interactive HUD — let taps pass through to rats/walkers behind */
+        pointer-events: none;
     }
     .egg-counter-icon { font-size: 11px; }
     .egg-toast { font-size: 9px; padding: 8px 12px; }
