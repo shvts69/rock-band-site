@@ -8,8 +8,8 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const token = process.env.TG_BOT_TOKEN;
-    const chatId = process.env.TG_CHAT_ID;
+    const token = (process.env.TG_BOT_TOKEN || '').trim();
+    const chatId = (process.env.TG_CHAT_ID || '').trim();
     if (!token || !chatId) {
         console.error('Missing TG_BOT_TOKEN or TG_CHAT_ID env var');
         return res.status(500).json({ error: 'Server not configured' });
@@ -66,7 +66,13 @@ export default async function handler(req, res) {
             console.error('Telegram API error', r.status, errBody);
             return res.status(502).json({
                 error: 'Delivery failed',
-                _debug: { status: r.status, body: errBody.slice(0, 500) }
+                _debug: {
+                    status: r.status,
+                    body: errBody.slice(0, 500),
+                    chatIdLength: chatId.length,
+                    chatIdSample: chatId.slice(0, 4) + '...' + chatId.slice(-4),
+                    tokenLength: token.length
+                }
             });
         }
         return res.status(200).json({ success: true });
