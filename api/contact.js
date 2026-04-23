@@ -1,11 +1,46 @@
 // Vercel serverless function — forwards contact-form submissions
 // from js/contact.js to a Telegram chat via the Bot API. Keeps the
 // bot token server-side; the client only ever sees /api/contact.
+//
+// Rate-limiting is per-IP best-effort: rejects a client sending more
+// than MAX_PER_WINDOW requests inside RATE_WINDOW_MS. Uses an in-
+// memory Map, so it resets on cold start, which is fine for a
+// contact form — the goal is only to stop trivial spam loops.
+
+const RATE_WINDOW_MS = 60 * 1000;   // 1 minute
+const MAX_PER_WINDOW = 3;
+const ipHits = new Map();
+
+function clientIp(req) {
+    const xf = req.headers['x-forwarded-for'];
+    if (typeof xf === 'string' && xf.length) return xf.split(',')[0].trim();
+    return req.headers['x-real-ip'] || 'unknown';
+}
+
+function overLimit(ip) {
+    const now = Date.now();
+    const hits = (ipHits.get(ip) || []).filter(t => now - t < RATE_WINDOW_MS);
+    hits.push(now);
+    ipHits.set(ip, hits);
+    // Prune stale keys occasionally so the map doesn't grow forever.
+    if (ipHits.size > 200) {
+        for (const [k, arr] of ipHits) {
+            if (arr.length === 0 || now - arr[arr.length - 1] > RATE_WINDOW_MS) {
+                ipHits.delete(k);
+            }
+        }
+    }
+    return hits.length > MAX_PER_WINDOW;
+}
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         res.setHeader('Allow', 'POST');
         return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    if (overLimit(clientIp(req))) {
+        return res.status(429).json({ error: 'Too many requests — slow down' });
     }
 
     const token = (process.env.TG_BOT_TOKEN || '').trim();
@@ -64,16 +99,7 @@ export default async function handler(req, res) {
         if (!r.ok) {
             const errBody = await r.text().catch(() => '');
             console.error('Telegram API error', r.status, errBody);
-            return res.status(502).json({
-                error: 'Delivery failed',
-                _debug: {
-                    status: r.status,
-                    body: errBody.slice(0, 500),
-                    chatIdLength: chatId.length,
-                    chatIdSample: chatId.slice(0, 4) + '...' + chatId.slice(-4),
-                    tokenLength: token.length
-                }
-            });
+            return res.status(502).json({ error: 'Delivery failed' });
         }
         return res.status(200).json({ success: true });
     } catch (err) {
