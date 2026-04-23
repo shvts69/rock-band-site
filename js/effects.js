@@ -84,12 +84,13 @@
         return { sx: newW / oldW, sy: newH / oldH, oldW, oldH, newW, newH };
     }
 
-    // Draw a pulsing yellow halo around an easter-egg sprite — only while
-    // that category hasn't been found yet. Coordinates are in the canvas's
-    // pixel-art unit space. Skipped entirely once the egg is collected.
+    // Draw a pulsing yellow halo around an easter-egg sprite — shown for
+    // every object while the hint pulse is active, unless the user has
+    // already clicked the egg during this hint session. Coordinates are
+    // in the canvas's pixel-art unit space.
     function drawEggHint(ctx, x, y, t, cat, rBase) {
         if (!window._eggHintActive) return;
-        if (!window.EasterEggs || window.EasterEggs.isFound(cat)) return;
+        if (window._eggHintDismissed && window._eggHintDismissed.has(cat)) return;
         const base = rBase || 14;
         const pulse = 0.5 + 0.5 * Math.sin(t * 2.6);
         const r = base + pulse * (base * 0.4);

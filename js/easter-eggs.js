@@ -90,6 +90,13 @@
 
     function find(cat) {
         if (!CATEGORIES.includes(cat)) return false;
+        // If a hint pulse is running, a click always dismisses the glow for
+        // this egg and resets the idle timer — even on a replay where the
+        // egg is already in `found`.
+        if (window._eggHintActive) {
+            hintDismissed.add(cat);
+            resetHintIdleTimer();
+        }
         if (found.has(cat)) return false;
         found.add(cat);
         save();
@@ -184,30 +191,43 @@
 
     window.EasterEggs = { find, isFound, count, all, reset, CATEGORIES: [...CATEGORIES] };
 
-    // ─── Hint button — toggles highlighting of all undiscovered eggs ────
-    // Toggle, not a timer. On mobile the user needs time to swipe across
-    // all 5 sections; any timer would expire mid-search. Re-clicking the
-    // button turns the glow off.
+    // ─── Hint button — halo pulse on every egg, always available ────
+    // Each activation clears the dismissed-set so all 6 eggs glow again on
+    // replay. Clicking an egg dismisses its glow for the current session
+    // and resets the 15s idle timer; if no click happens for 15s the hint
+    // turns itself off.
     const MODAL_AUTO_CLOSE_MS = 3500;
+    const HINT_IDLE_MS = 15000;
     let modalTimer = null;
+    let hintTimer = null;
+    const hintDismissed = new Set();
     window._eggHintActive = false;
+    window._eggHintDismissed = hintDismissed;
 
     function toggleHint() {
         if (window._eggHintActive) deactivateHint();
         else activateHint();
     }
 
+    function resetHintIdleTimer() {
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(deactivateHint, HINT_IDLE_MS);
+    }
+
     function activateHint() {
         window._eggHintActive = true;
+        hintDismissed.clear();
         const btn = document.getElementById('hintBtn');
         if (btn) btn.classList.add('active');
         showHintModal();
+        resetHintIdleTimer();
     }
 
     function deactivateHint() {
         window._eggHintActive = false;
         const btn = document.getElementById('hintBtn');
         if (btn) btn.classList.remove('active');
+        clearTimeout(hintTimer);
     }
 
     function showHintModal() {
@@ -238,13 +258,6 @@
                 if (e.target === modal) hideHintModal();
             });
         }
-        // Auto-disable once all 6 eggs are discovered
-        window.addEventListener('easterEggsChanged', function (e) {
-            if (!window._eggHintActive) return;
-            if (e.detail && e.detail.found && e.detail.found.length >= CATEGORIES.length) {
-                deactivateHint();
-            }
-        });
     }
 
     function start() {
