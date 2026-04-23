@@ -64,7 +64,10 @@ export default async function handler(req, res) {
         if (!r.ok) {
             const errBody = await r.text().catch(() => '');
             console.error('Telegram API error', r.status, errBody);
-            return res.status(502).json({ error: 'Delivery failed' });
+            return res.status(502).json({
+                error: 'Delivery failed',
+                _debug: { status: r.status, body: errBody.slice(0, 500) }
+            });
         }
         return res.status(200).json({ success: true });
     } catch (err) {
