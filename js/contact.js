@@ -5,11 +5,9 @@
     if (!form) return;
 
     const BAND_EMAIL = form.getAttribute('data-contact-email') || '5051concerts@gmail.com';
-    // Formsubmit AJAX endpoint — no signup. First submission triggers a one-time
-    // email confirmation to BAND_EMAIL. Swap for the opaque hash from the
-    // formsubmit dashboard later to avoid exposing the raw address here.
-    const ENDPOINT = form.getAttribute('data-form-endpoint') ||
-        ('https://formsubmit.co/ajax/' + encodeURIComponent(BAND_EMAIL));
+    // POST to our own Vercel serverless function, which forwards the
+    // request to a Telegram chat via the Bot API. Token stays server-side.
+    const ENDPOINT = form.getAttribute('data-form-endpoint') || '/api/contact';
 
     const submitBtn = form.querySelector('.pub-submit');
     const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
@@ -53,17 +51,11 @@
             return;
         }
 
-        const reasonTag = reason ? '[' + reason.toUpperCase() + '] ' : '';
-        const subject = reasonTag + (userSubject || '5051 — Contact from website');
-
         const payload = {
             name: name,
             email: email,
-            _subject: subject,
-            _replyto: email,
-            _template: 'table',
-            _captcha: 'false',
-            reason: reason || '(not selected)',
+            reason: reason || '',
+            subject: userSubject || '',
             message: message
         };
 
@@ -76,9 +68,10 @@
                 body: JSON.stringify(payload)
             });
 
-            if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json().catch(() => ({}));
-            if (data && data.success === 'false') throw new Error(data.message || 'send failed');
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || ('HTTP ' + res.status));
+            }
 
             showToast('Message sent! We’ll get back to you ♫', 'ok');
             form.reset();
