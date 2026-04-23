@@ -494,8 +494,10 @@
 
                 // Flickering street lamps (section 2) — lamp 1 and 3
                 if (sec.moon) {
-                    const lampSpacing = Math.floor(W / 4);
-                    const flickerLamps = [0, 1, 2, 3]; // all 4
+                    const lampCount = IS_MOBILE ? 3 : 4;
+                    const lampSpacing = Math.floor(W / lampCount);
+                    const flickerLamps = [];
+                    for (let i = 0; i < lampCount; i++) flickerLamps.push(i);
                     flickerLamps.forEach(li => {
                         const lx = Math.floor(lampSpacing * 0.5 + li * lampSpacing) - 2;
                         const lampTopY = Math.floor(H * 0.855) - 23;
