@@ -30,6 +30,22 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
+    const MIN_FRAMES = 3;
+
+    function buildPlaceholderItem() {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        item.innerHTML =
+            '<div class="gallery-frame gallery-frame--placeholder">' +
+                '<div class="gallery-placeholder">' +
+                    '<div class="show-date">SOON</div>' +
+                    '<div class="show-venue">NEW SHOW<br>DROPPING</div>' +
+                    '<div class="show-city">STAY TUNED</div>' +
+                '</div>' +
+            '</div>';
+        return item;
+    }
+
     function renderShows(events) {
         const frag = document.createDocumentFragment();
         events.forEach(ev => {
@@ -55,6 +71,8 @@
                 '</div>';
             frag.appendChild(item);
         });
+        const fillCount = Math.max(0, MIN_FRAMES - events.length);
+        for (let i = 0; i < fillCount; i++) frag.appendChild(buildPlaceholderItem());
         gallery.innerHTML = '';
         gallery.appendChild(frag);
         updateArrows();
@@ -91,11 +109,7 @@
             return r.json();
         })
         .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
-                renderMessage('shows-empty', 'NO UPCOMING SHOWS — STAY TUNED');
-                return;
-            }
-            renderShows(data);
+            renderShows(Array.isArray(data) ? data : []);
         })
         .catch(() => {
             renderMessage('shows-error', 'COULD NOT LOAD SHOWS');
